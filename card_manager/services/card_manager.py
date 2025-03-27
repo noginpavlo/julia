@@ -5,7 +5,7 @@ import sqlite3
 def get_definition(input_word):
     url = f'https://api.dictionaryapi.dev/api/v2/entries/en/{input_word}'
     response = requests.get(url)
-    with sqlite3.connect("db.sqlite") as connect:
+    with sqlite3.connect("sqlite3.db") as connect:
         cursor = connect.cursor()
         cursor.execute(
             '''
@@ -15,7 +15,7 @@ def get_definition(input_word):
         result = cursor.fetchone()
 
 def create_database():
-    with sqlite3.connect("db.sqlite3") as connect:
+    with sqlite3.connect("sqlite3.db") as connect:
         cursor = connect.cursor()
         cursor.execute('''
                         CREATE TABLE IF NOT EXISTS vocabulary
@@ -32,4 +32,4 @@ def create_database():
 
 
 create_database()
-# get_definition("cat")
+get_definition("cat")
