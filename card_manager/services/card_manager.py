@@ -39,6 +39,17 @@ def get_definition(input_word):
             return "Unable to find"
 
 
+def save_word(array):
+    if len(array) == 6:
+        with sqlite3.connect("sqlite3.db") as connection:
+            cursor = connection.cursor()
+            cursor.execute('''
+                               INSERT INTO vocabulary (date, word, phonetics, definition, example, increment)
+                               VALUES (?, ?, ?, ?, ?, ?);
+                           ''', (array[0], array[1], array[2], array[3], array[4], array[5]))
+    else:
+        print(array)
+
 def create_database():
     with sqlite3.connect("sqlite3.db") as connect:
         cursor = connect.cursor()
@@ -56,5 +67,5 @@ def create_database():
                     ''')
 
 
-create_database()
-get_definition("cat")
+information = get_definition("cat")
+save_word(information)
