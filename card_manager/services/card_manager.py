@@ -1,6 +1,7 @@
 import requests
 from datetime import date
 import sqlite3
+import random
 
 today_date = str(date.today())
 
@@ -66,6 +67,42 @@ def create_database():
                         )
                     ''')
 
+def pull_random_card():
+    with sqlite3.connect("sqlite3.db") as connect:
+        cursor = connect.cursor()
+        cursor.execute('''
+                        SELECT id FROM vocabulary WHERE date <= ?
+                    ''', (date.today(), ))
+        result = cursor.fetchall()
 
-information = get_definition("cat")
+        if not result:
+            raise ValueError("No cards available for the given date condition.")
+
+        random_word_id = random.choice(result)[0]
+    return random_word_id
+
+
+def make_card(card_id):
+    with sqlite3.connect("sqlite3.db") as connect:
+        cursor = connect.cursor()
+        cursor.execute('''
+                    SELECT * FROM vocabulary WHERE id = ? AND date <= ?
+                        ''', (card_id, date.today()))
+        row = cursor.fetchall()
+
+        word_title = row[0][2]
+        word_phonetics = row[0][3]
+        word_definition = row[0][4]
+        word_example = row[0][5]
+    print(
+        f"Here is a card that will appear on the frontend:\nWord title: {word_title},\n"
+        f"Word phonetics :{word_phonetics},\nWord definition: {word_definition},\nWord example: {word_example}"
+    )
+    return word_title, word_phonetics, word_definition, word_example
+
+
+
+information = get_definition("dog")
 save_word(information)
+word_id = pull_random_card()
+make_card(word_id)
