@@ -1,9 +1,0 @@
-Plans for 04-01-2025
-
-1.1 Choose HTML5 UP template. DONE
-1.2 Make the folder strucrure in Django work. DONE
-1.3 Make homepage hlml template render. DONE
-
-
-
-
