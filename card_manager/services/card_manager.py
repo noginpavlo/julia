@@ -5,7 +5,7 @@ import random
 
 today_date = str(date.today())
 
-def get_data(input_word):
+def get_word(input_word):
     global today_date
     url = f'https://api.dictionaryapi.dev/api/v2/entries/en/{input_word}'
     response = requests.get(url)
@@ -24,18 +24,11 @@ def get_data(input_word):
             response = response.json()
             word = input_word.upper()
             record_date = today_date
-            # !!! Find better way to check if phonetics and example information are there then using try/except !!!
-            try:
-                phonetics = response[0]['phonetic']
-            except KeyError:
-                phonetics = "not found"
-            definition = response[0]['meanings'][0]['definitions'][0]['definition']
-            try:
-                example = response[0]['meanings'][0]['definitions'][0]['example']
-            except KeyError:
-                example = "No example found."
-            increment = 1
-            array = record_date, word, phonetics, definition, example, increment
+            phonetics = response[0].get('phonetic', "not found")
+            definition = response[0]['meanings'][0]['definitions'][0].get('definition', "No definition found")
+            example = response[0]['meanings'][0]['definitions'][0].get('example', "No example found")
+
+            array = (record_date, word, phonetics, definition, example, 1)
             if len(array) == 6:
                 with sqlite3.connect("sqlite3.db") as connection:
                     cursor = connection.cursor()
@@ -49,8 +42,6 @@ def get_data(input_word):
                 return "Some error occurred that I need to clasify later"
         else:
             return "Unable to find"
-
-
 
 
 def create_database():
@@ -104,7 +95,7 @@ def make_card(card_id):
 
 
 
-information = get_data("test")
+information = get_word("order")
 print(f"This is what get_data() returns: {information}")
 word_id = pull_random_card()
 make_card(word_id)
