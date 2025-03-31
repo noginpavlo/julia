@@ -35,22 +35,23 @@ def get_data(input_word):
             except KeyError:
                 example = "No example found."
             increment = 1
-            return record_date, word, phonetics, definition, example, increment
+            array = record_date, word, phonetics, definition, example, increment
+            if len(array) == 6:
+                with sqlite3.connect("sqlite3.db") as connection:
+                    cursor = connection.cursor()
+                    cursor.execute('''
+                                       INSERT INTO vocabulary (date, word, phonetics, definition, example, increment)
+                                       VALUES (?, ?, ?, ?, ?, ?);
+                                   ''', (array[0], array[1], array[2], array[3], array[4], array[5]))
+                return "Success"
+            else:
+                # add some meaningful error here
+                return "Some error occurred that I need to clasify later"
         else:
             return "Unable to find"
 
 
-def save_word(array):
-    if len(array) == 6:
-        with sqlite3.connect("sqlite3.db") as connection:
-            cursor = connection.cursor()
-            cursor.execute('''
-                               INSERT INTO vocabulary (date, word, phonetics, definition, example, increment)
-                               VALUES (?, ?, ?, ?, ?, ?);
-                           ''', (array[0], array[1], array[2], array[3], array[4], array[5]))
-    else:
-        # here I want to return some meaningful error
-        print(array)
+
 
 def create_database():
     with sqlite3.connect("sqlite3.db") as connect:
@@ -103,8 +104,7 @@ def make_card(card_id):
 
 
 
-information = get_data("snake")
+information = get_data("test")
 print(f"This is what get_data() returns: {information}")
-save_word(information)
 word_id = pull_random_card()
 make_card(word_id)
