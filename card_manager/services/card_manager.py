@@ -17,13 +17,14 @@ def get_definition(input_word):
                 ''', (input_word.upper(),)
         )
         result = cursor.fetchone()
-        print(result[0])
+        print(f"This is result 0: {result[0]}")
         if result[0] > 0:
             return "Word already in dictionary"
         elif response.status_code == 200:
             response = response.json()
             word = input_word.upper()
             record_date = today_date
+            # !!! Find better way to check if phonetics and example information are there then using try/except !!!
             try:
                 phonetics = response[0]['phonetic']
             except KeyError:
@@ -34,7 +35,6 @@ def get_definition(input_word):
             except KeyError:
                 example = "No example found."
             increment = 1
-            print(record_date, word, phonetics, definition, example, increment)
             return record_date, word, phonetics, definition, example, increment
         else:
             return "Unable to find"
@@ -49,6 +49,7 @@ def save_word(array):
                                VALUES (?, ?, ?, ?, ?, ?);
                            ''', (array[0], array[1], array[2], array[3], array[4], array[5]))
     else:
+        # here I want to return some meaningful error
         print(array)
 
 def create_database():
@@ -76,7 +77,7 @@ def pull_random_card():
         result = cursor.fetchall()
 
         if not result:
-            raise ValueError("No cards available for the given date condition.")
+            raise ValueError("No cards available for the given date.")
 
         random_word_id = random.choice(result)[0]
     return random_word_id
@@ -95,14 +96,14 @@ def make_card(card_id):
         word_definition = row[0][4]
         word_example = row[0][5]
     print(
-        f"Here is a card that will appear on the frontend:\nWord title: {word_title},\n"
+        f"Here is a RANDOM card that will appear on the frontend:\nWord title: {word_title},\n"
         f"Word phonetics :{word_phonetics},\nWord definition: {word_definition},\nWord example: {word_example}"
     )
     return word_title, word_phonetics, word_definition, word_example
 
 
 
-information = get_definition("dog")
+information = get_definition("word")
 save_word(information)
 word_id = pull_random_card()
 make_card(word_id)
