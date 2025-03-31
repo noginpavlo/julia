@@ -5,7 +5,7 @@ import random
 
 today_date = str(date.today())
 
-def get_definition(input_word):
+def get_data(input_word):
     global today_date
     url = f'https://api.dictionaryapi.dev/api/v2/entries/en/{input_word}'
     response = requests.get(url)
@@ -17,7 +17,7 @@ def get_definition(input_word):
                 ''', (input_word.upper(),)
         )
         result = cursor.fetchone()
-        print(f"This is result 0: {result[0]}")
+        print(f"This is 'result 0': {result[0]}")
         if result[0] > 0:
             return "Word already in dictionary"
         elif response.status_code == 200:
@@ -103,7 +103,8 @@ def make_card(card_id):
 
 
 
-information = get_definition("word")
+information = get_data("snake")
+print(f"This is what get_data() returns: {information}")
 save_word(information)
 word_id = pull_random_card()
 make_card(word_id)
