@@ -9,6 +9,7 @@ def get_word(input_word):
     global today_date
     url = f'https://api.dictionaryapi.dev/api/v2/entries/en/{input_word}'
     response = requests.get(url)
+    print(f"This is RESPONSE: {response}")
     with sqlite3.connect("sqlite3.db") as connect:
         cursor = connect.cursor()
         cursor.execute(
