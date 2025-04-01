@@ -5,6 +5,7 @@ import random
 
 today_date = str(date.today())
 
+# let's create 3 functions and one decorator that checks for any error.
 def get_word(input_word):
     global today_date
     url = f'https://api.dictionaryapi.dev/api/v2/entries/en/{input_word}'
