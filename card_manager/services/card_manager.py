@@ -11,6 +11,9 @@ def get_word(input_word):
     url = f'https://api.dictionaryapi.dev/api/v2/entries/en/{input_word}'
     response = requests.get(url)
     print(f"This is RESPONSE: {response}")
+    return response, input_word
+
+def process_word(response, input_word):
     with sqlite3.connect("sqlite3.db") as connect:
         cursor = connect.cursor()
         cursor.execute(
@@ -24,26 +27,24 @@ def get_word(input_word):
             return "Word already in dictionary"
         elif response.status_code == 200:
             response = response.json()
-            word = input_word.upper()
             record_date = today_date
             phonetics = response[0].get('phonetic', "not found")
             definition = response[0]['meanings'][0]['definitions'][0].get('definition', "No definition found")
             example = response[0]['meanings'][0]['definitions'][0].get('example', "No example found")
 
-            array = (record_date, word, phonetics, definition, example, 1)
-            if len(array) == 6:
-                with sqlite3.connect("sqlite3.db") as connection:
-                    cursor = connection.cursor()
-                    cursor.execute('''
-                                       INSERT INTO vocabulary (date, word, phonetics, definition, example, increment)
-                                       VALUES (?, ?, ?, ?, ?, ?);
-                                   ''', (array[0], array[1], array[2], array[3], array[4], array[5]))
-                return "Success"
-            else:
-                # add some meaningful error here
-                return "Some error occurred that I need to clasify later"
-        else:
-            return "Unable to find"
+            return record_date, input_word.upper(), phonetics, definition, example, 1
+
+def save_word(array):
+    if len(array) == 6:
+        with sqlite3.connect("sqlite3.db") as connection:
+            cursor = connection.cursor()
+            cursor.execute('''
+                               INSERT INTO vocabulary (date, word, phonetics, definition, example, increment)
+                               VALUES (?, ?, ?, ?, ?, ?);
+                           ''', (array[0], array[1], array[2], array[3], array[4], array[5]))
+        return "Success"
+    else:
+        return "Unable to find"
 
 
 def create_database():
@@ -97,7 +98,8 @@ def make_card(card_id):
 
 
 
-information = get_word("order")
-print(f"This is what get_data() returns: {information}")
+information, word = get_word("car")
+processed_data = process_word(information, word)
+save_word(processed_data)
 word_id = pull_random_card()
 make_card(word_id)
