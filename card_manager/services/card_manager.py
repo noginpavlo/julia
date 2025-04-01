@@ -5,14 +5,36 @@ import random
 
 today_date = str(date.today())
 
-# let's create 3 functions and one decorator that checks for any error.
+
+def catch_errors(func):
+    def wrapper(*args):
+        try:
+            return func(*args)
+        except NameError:
+            users_note("!!!There is name error!!!")
+        except IndexError:
+            users_note("!!!There is an IndexError!!!")
+        except TypeError:
+            users_note("!!!There is a TypeError!!!")
+    return wrapper
+
+
+def users_note(status):
+    print(status)
+    return status
+
+
+@catch_errors
 def get_word(input_word):
     global today_date
     url = f'https://api.dictionaryapi.dev/api/v2/entries/en/{input_word}'
     response = requests.get(url)
     print(f"This is RESPONSE: {response}")
+    # no response error
     return response, input_word
 
+
+@catch_errors
 def process_word(response, input_word):
     with sqlite3.connect("sqlite3.db") as connect:
         cursor = connect.cursor()
@@ -23,8 +45,10 @@ def process_word(response, input_word):
         )
         result = cursor.fetchone()
         print(f"This is 'result 0': {result[0]}")
+        # word already in the dictionary error
         if result[0] > 0:
-            return "Word already in dictionary"
+            raise IndexError
+        # status code != 200 error
         elif response.status_code == 200:
             response = response.json()
             record_date = today_date
@@ -34,7 +58,13 @@ def process_word(response, input_word):
 
             return record_date, input_word.upper(), phonetics, definition, example, 1
 
+        elif response.status_code != 200:
+            raise NameError
+
+
+@catch_errors
 def save_word(array):
+    # array != 6 error (unable to find word)
     if len(array) == 6:
         with sqlite3.connect("sqlite3.db") as connection:
             cursor = connection.cursor()
@@ -42,9 +72,8 @@ def save_word(array):
                                INSERT INTO vocabulary (date, word, phonetics, definition, example, increment)
                                VALUES (?, ?, ?, ?, ?, ?);
                            ''', (array[0], array[1], array[2], array[3], array[4], array[5]))
+        # you can also check if the word is really in the dictionary after recording and raise and error if not
         return "Success"
-    else:
-        return "Unable to find"
 
 
 def create_database():
