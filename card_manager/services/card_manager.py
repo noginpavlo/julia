@@ -25,7 +25,7 @@ def users_note(status):
 
 
 @catch_errors
-def get_word(input_word):
+def get_data(input_word):
     global today_date
     url = f'https://api.dictionaryapi.dev/api/v2/entries/en/{input_word}'
     response = requests.get(url)
@@ -35,7 +35,7 @@ def get_word(input_word):
 
 
 @catch_errors
-def process_word(response, input_word):
+def process_data(response, input_word):
     with sqlite3.connect("sqlite3.db") as connect:
         cursor = connect.cursor()
         cursor.execute(
@@ -63,7 +63,7 @@ def process_word(response, input_word):
 
 
 @catch_errors
-def save_word(array):
+def save_data(array):
     # array != 6 error (unable to find word)
     if len(array) == 6:
         with sqlite3.connect("sqlite3.db") as connection:
@@ -127,8 +127,8 @@ def make_card(card_id):
 
 
 
-information, word = get_word("car")
-processed_data = process_word(information, word)
-save_word(processed_data)
+information, word = get_data("car")
+processed_data = process_data(information, word)
+save_data(processed_data)
 word_id = pull_random_card()
 make_card(word_id)
