@@ -27,13 +27,22 @@ def get_data(input_word):
     global today_date
     url = f'https://api.dictionaryapi.dev/api/v2/entries/en/{input_word}'
     response = requests.get(url)
-    print(f"This is RESPONSE: {response}")
-    # no response error
+
+    # This word does not exist error
+    if response.status_code == 404:
+        raise ValueError(f"Data not available for the word: {input_word} (404 Error)")  # Raise custom error
+
+    # Catching any kind of oter errors related to api data retrieving
+    if response.status_code != 200:
+        raise ValueError(f"Unexpected error occurred with status code: {response.status_code}")
+
     return response, input_word
 
 
 @catch_errors
 def process_data(response, input_word):
+
+    # Checking if the word is already in db
     with sqlite3.connect("sqlite3.db") as connect:
         cursor = connect.cursor()
         cursor.execute(
@@ -42,27 +51,22 @@ def process_data(response, input_word):
                 ''', (input_word.upper(),)
         )
         result = cursor.fetchone()
-        print(f"This is 'result 0': {result[0]}")
-        # word already in the dictionary error
+
+        # Word already in the dictionary error
         if result[0] > 0:
-            raise IndexError
-        # status code != 200 error
-        elif response.status_code == 200:
-            response = response.json()
-            record_date = today_date
-            phonetics = response[0].get('phonetic', "not found")
-            definition = response[0]['meanings'][0]['definitions'][0].get('definition', "No definition found")
-            example = response[0]['meanings'][0]['definitions'][0].get('example', "No example found")
+            raise IndexError("Word already in the dictionary")
 
-            return record_date, input_word.upper(), phonetics, definition, example, 1
+        response = response.json()
+        record_date = today_date
+        phonetics = response[0].get('phonetic', "not found")
+        definition = response[0]['meanings'][0]['definitions'][0].get('definition', "No definition found")
+        example = response[0]['meanings'][0]['definitions'][0].get('example', "No example found")
 
-        elif response.status_code != 200:
-            raise NameError
+        return record_date, input_word.upper(), phonetics, definition, example, 1
 
 
 @catch_errors
 def save_data(array):
-    # array != 6 error (unable to find word)
     if len(array) == 6:
         with sqlite3.connect("sqlite3.db") as connection:
             cursor = connection.cursor()
@@ -70,7 +74,7 @@ def save_data(array):
                                INSERT INTO vocabulary (date, word, phonetics, definition, example, increment)
                                VALUES (?, ?, ?, ?, ?, ?);
                            ''', (array[0], array[1], array[2], array[3], array[4], array[5]))
-        # you can also check if the word is really in the dictionary after recording and raise and error if not
+        print(f"Successfully recorder data on '{array[1]}' word")
         return "Success"
 
 
@@ -90,7 +94,7 @@ def create_database():
                         )
                     ''')
 
-
+@catch_errors
 def pull_random_card():
     with sqlite3.connect("sqlite3.db") as connect:
         cursor = connect.cursor()
@@ -99,6 +103,7 @@ def pull_random_card():
                     ''', (date.today(), ))
         result = cursor.fetchall()
 
+        # No words to choose from error
         if not result:
             raise ValueError("No cards available for the given date.")
 
@@ -140,6 +145,6 @@ make_card(word_id)
 
 # Run the main function
 if __name__ == "__main__":
-    main("asadfsdfaf")
+    main("kind")
 
 
