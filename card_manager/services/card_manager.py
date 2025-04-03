@@ -12,14 +12,8 @@ def catch_errors(func):
         try:
             return func(*args)
         except Exception as e:
-            users_note(f"Error occurred: {str(e)}")
             raise e
     return wrapper
-
-
-def users_note(status):
-    print(status)
-    return status
 
 
 @catch_errors
