@@ -1,22 +1,22 @@
 <mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/26.0.16 Chrome/132.0.6834.196 Electron/34.2.0 Safari/537.36" version="26.0.16">
   <diagram name="Page-1" id="5d7acffa-a066-3a61-03fe-96351882024d">
-    <mxGraphModel dx="1323" dy="855" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" background="#ffffff" math="0" shadow="0">
+    <mxGraphModel dx="1222" dy="789" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" background="#ffffff" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
         <mxCell id="21ea969265ad0168-6" value="get_data(input_word)" style="swimlane;html=1;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=#e0e0e0;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;swimlaneFillColor=#ffffff;align=center;rounded=1;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=12" parent="1" vertex="1">
-          <mxGeometry x="160" y="74" width="160" height="130" as="geometry" />
+          <mxGeometry x="410" y="74" width="160" height="130" as="geometry" />
         </mxCell>
         <mxCell id="21ea969265ad0168-7" value="&lt;div&gt;Tekes str with word from a user as an arg.&lt;/div&gt;Retrieves definition from dictionary api.&lt;br&gt;Returns responce from an api and word itself.&lt;br&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;whiteSpace=wrap;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" parent="21ea969265ad0168-6" vertex="1">
           <mxGeometry y="26" width="160" height="104" as="geometry" />
         </mxCell>
         <mxCell id="peTf6YKkXectEXM6obJf-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="21ea969265ad0168-14" target="21ea969265ad0168-18">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="240" y="420" as="targetPoint" />
+            <mxPoint x="490" y="420" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         <mxCell id="21ea969265ad0168-14" value="process_data(response, word)" style="swimlane;html=1;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=#e0e0e0;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;swimlaneFillColor=#ffffff;align=center;rounded=1;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=12" parent="1" vertex="1">
-          <mxGeometry x="160" y="290" width="160" height="250" as="geometry" />
+          <mxGeometry x="410" y="290" width="160" height="250" as="geometry" />
         </mxCell>
         <mxCell id="21ea969265ad0168-15" value="Takes respinse and word as an argument" style="text;html=1;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;whiteSpace=wrap;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" parent="21ea969265ad0168-14" vertex="1">
           <mxGeometry y="26" width="160" height="44" as="geometry" />
@@ -31,13 +31,60 @@
           <mxGeometry y="160" width="160" height="90" as="geometry" />
         </mxCell>
         <mxCell id="21ea969265ad0168-18" value="save_data(array)" style="swimlane;html=1;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=#e0e0e0;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;swimlaneFillColor=#ffffff;align=center;rounded=1;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=12" parent="1" vertex="1">
-          <mxGeometry x="160" y="650" width="160" height="90" as="geometry" />
+          <mxGeometry x="410" y="650" width="160" height="90" as="geometry" />
         </mxCell>
         <mxCell id="21ea969265ad0168-21" value="Takes an array of 6 as an argument and saves the word in db." style="text;html=1;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;whiteSpace=wrap;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" parent="21ea969265ad0168-18" vertex="1">
           <mxGeometry y="26" width="160" height="64" as="geometry" />
         </mxCell>
         <mxCell id="21ea969265ad0168-36" style="edgeStyle=orthogonalEdgeStyle;html=1;labelBackgroundColor=none;startFill=0;startSize=8;endFill=1;endSize=8;fontFamily=Verdana;fontSize=12;" parent="1" source="21ea969265ad0168-6" target="21ea969265ad0168-14" edge="1">
           <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="peTf6YKkXectEXM6obJf-5" value="main(word)" style="swimlane;html=1;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=#fad9d5;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;swimlaneFillColor=#ffffff;align=center;rounded=1;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=12;arcSize=19;strokeColor=light-dark(#f32c12, #ec8f82);" vertex="1" parent="1">
+          <mxGeometry x="780" y="320" width="160" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="peTf6YKkXectEXM6obJf-6" value="&lt;div&gt;Takes user string with word as an argument and executes functions one by one.&lt;/div&gt;" style="text;html=1;spacingLeft=4;spacingRight=4;whiteSpace=wrap;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="peTf6YKkXectEXM6obJf-5">
+          <mxGeometry y="26" width="160" height="84" as="geometry" />
+        </mxCell>
+        <mxCell id="peTf6YKkXectEXM6obJf-8" value="" style="endArrow=classic;html=1;rounded=0;exitX=-0.011;exitY=0.357;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="peTf6YKkXectEXM6obJf-6" target="21ea969265ad0168-7">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="640" y="390" as="sourcePoint" />
+            <mxPoint x="690" y="340" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="720" y="376" />
+              <mxPoint x="720" y="152" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="peTf6YKkXectEXM6obJf-9" value="" style="endArrow=classic;html=1;rounded=0;entryX=1.019;entryY=0.34;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.011;exitY=0.364;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="778.7200000000001" y="376.576" as="sourcePoint" />
+            <mxPoint x="570" y="377" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="peTf6YKkXectEXM6obJf-10" value="" style="endArrow=classic;html=1;rounded=0;exitX=-0.007;exitY=0.357;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="peTf6YKkXectEXM6obJf-6" target="21ea969265ad0168-21">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="530" y="510" as="sourcePoint" />
+            <mxPoint x="580" y="460" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="720" y="376" />
+              <mxPoint x="720" y="708" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="peTf6YKkXectEXM6obJf-12" value="catch_errors()" style="swimlane;html=1;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;swimlaneFillColor=#ffffff;align=center;rounded=1;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=12;arcSize=50;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="30" y="50" width="160" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="peTf6YKkXectEXM6obJf-13" value="Decorator.&lt;br&gt;Catches errors and stops subsequent functions from executing in main()." style="text;html=1;spacingLeft=4;spacingRight=4;whiteSpace=wrap;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="peTf6YKkXectEXM6obJf-12">
+          <mxGeometry y="30" width="160" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="peTf6YKkXectEXM6obJf-16" value="&lt;font style=&quot;font-size: 18px; color: rgb(153, 153, 0);&quot;&gt;&lt;b&gt;@catch_errors&lt;/b&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="430" y="40" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="peTf6YKkXectEXM6obJf-18" value="&lt;font style=&quot;font-size: 18px; color: rgb(153, 153, 0);&quot;&gt;&lt;b&gt;@catch_errors&lt;/b&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="435" y="250" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="peTf6YKkXectEXM6obJf-19" value="&lt;font style=&quot;font-size: 18px; color: rgb(153, 153, 0);&quot;&gt;&lt;b&gt;@catch_errors&lt;/b&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="430" y="610" width="110" height="30" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

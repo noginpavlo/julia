@@ -26,7 +26,7 @@ def get_data(input_word):
     if response.status_code == 404:
         raise ValueError(f"Data not available for the word: {input_word} (404 Error)")  # Raise custom error
 
-    # Catching any kind of oter errors related to api data retrieving
+    # Catching any kind of other errors related to api data retrieving
     if response.status_code != 200:
         raise ValueError(f"Unexpected error occurred with status code: {response.status_code}")
 
@@ -88,6 +88,7 @@ def create_database():
                         )
                     ''')
 
+
 @catch_errors
 def pull_random_card():
     with sqlite3.connect("sqlite3.db") as connect:
@@ -137,8 +138,6 @@ def main(user_input):
 word_id = pull_random_card()
 make_card(word_id)
 
-# Run the main function
+
 if __name__ == "__main__":
     main("kind")
-
-

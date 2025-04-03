@@ -72,9 +72,9 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="peTf6YKkXectEXM6obJf-12" value="catch_errors()" style="swimlane;html=1;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;swimlaneFillColor=#ffffff;align=center;rounded=1;shadow=0;comic=0;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=12;arcSize=50;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
-          <mxGeometry x="30" y="50" width="160" height="130" as="geometry" />
+          <mxGeometry x="30" y="50" width="160" height="110" as="geometry" />
         </mxCell>
-        <mxCell id="peTf6YKkXectEXM6obJf-13" value="Decorator.&lt;br&gt;Catches errors and stops subsequent functions from executing." style="text;html=1;spacingLeft=4;spacingRight=4;whiteSpace=wrap;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="peTf6YKkXectEXM6obJf-12">
+        <mxCell id="peTf6YKkXectEXM6obJf-13" value="Decorator.&lt;br&gt;Catches errors and stops subsequent functions from executing in main()." style="text;html=1;spacingLeft=4;spacingRight=4;whiteSpace=wrap;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="peTf6YKkXectEXM6obJf-12">
           <mxGeometry y="30" width="160" height="70" as="geometry" />
         </mxCell>
         <mxCell id="peTf6YKkXectEXM6obJf-16" value="&lt;font style=&quot;font-size: 18px; color: rgb(153, 153, 0);&quot;&gt;&lt;b&gt;@catch_errors&lt;/b&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fillColor=none;" vertex="1" parent="1">
