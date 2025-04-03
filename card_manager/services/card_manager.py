@@ -3,6 +3,7 @@ from datetime import date
 import sqlite3
 import random
 
+
 today_date = str(date.today())
 
 
@@ -10,12 +11,9 @@ def catch_errors(func):
     def wrapper(*args):
         try:
             return func(*args)
-        except NameError:
-            users_note("!!!There is name error!!!")
-        except IndexError:
-            users_note("!!!There is an IndexError!!!")
-        except TypeError:
-            users_note("!!!There is a TypeError!!!")
+        except Exception as e:
+            users_note(f"Error occurred: {str(e)}")
+            raise e
     return wrapper
 
 
@@ -92,6 +90,7 @@ def create_database():
                         )
                     ''')
 
+
 def pull_random_card():
     with sqlite3.connect("sqlite3.db") as connect:
         cursor = connect.cursor()
@@ -126,9 +125,21 @@ def make_card(card_id):
     return word_title, word_phonetics, word_definition, word_example
 
 
+def main(user_input):
+    try:
+        information, word = get_data(user_input)
+        processed_data = process_data(information, word)
+        save_data(processed_data)
 
-information, word = get_data("car")
-processed_data = process_data(information, word)
-save_data(processed_data)
+    except Exception as e:
+        print(f"Execution stopped due to error: {str(e)}")
+
+
 word_id = pull_random_card()
 make_card(word_id)
+
+# Run the main function
+if __name__ == "__main__":
+    main("asadfsdfaf")
+
+
