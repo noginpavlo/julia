@@ -1,4 +1,3 @@
-# Python-related
 *.pyc
 *.pyo
 *.pyd
@@ -7,43 +6,29 @@ __pycache__/
 *.swo
 *.bak
 
-# Virtual environment
 venv/
 env/
 *.egg-info/
 pip-log.txt
 pip-delete-this-directory.txt
 
-# Django-specific
 db.sqlite3
 db.sqlite3-journal
 media/
 staticfiles/
 *.log
 
-# Migrations (optional: only ignore auto-generated ones)
 **/migrations/*.py
 !**/migrations/__init__.py
 
-# IDEs and Editors
-.vscode/
 .idea/
 *.sublime-workspace
 
-# OS files
 .DS_Store
 Thumbs.db
 
-# Environment variables / secrets
 .env
 *.env
 
-# Compiled files
 *.out
 *.o
-
-# Node.js (if using frontend with Django)
-node_modules/
-npm-debug.log
-yarn.lock
-package-lock.json
