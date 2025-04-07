@@ -3,7 +3,6 @@ from datetime import date
 import sqlite3
 import random
 
-
 today_date = str(date.today())
 
 
@@ -60,16 +59,16 @@ def process_data(response, input_word):
 
 
 @catch_errors
-def save_data(array):
-    if len(array) == 6:
-        with sqlite3.connect("sqlite3.db") as connection:
-            cursor = connection.cursor()
-            cursor.execute('''
-                               INSERT INTO vocabulary (date, word, phonetics, definition, example, increment)
-                               VALUES (?, ?, ?, ?, ?, ?);
-                           ''', (array[0], array[1], array[2], array[3], array[4], array[5]))
-        print(f"Successfully recorder data on '{array[1]}' word")
-        return "Success"
+# def save_data(array):
+#     if len(array) == 6:
+#         with sqlite3.connect("sqlite3.db") as connection:
+#             cursor = connection.cursor()
+#             cursor.execute('''
+#                                INSERT INTO vocabulary (date, word, phonetics, definition, example, increment)
+#                                VALUES (?, ?, ?, ?, ?, ?);
+#                            ''', (array[0], array[1], array[2], array[3], array[4], array[5]))
+#         print(f"Successfully recorder data on '{array[1]}' word")
+#         return "Success"
 
 
 def create_database():
