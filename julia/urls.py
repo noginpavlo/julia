@@ -16,8 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from card_manager import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include("home.urls"))
+    path('', include("home.urls")),
+    path('save-card/', views.save_card_view, name='save_card'),
 ]
