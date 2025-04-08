@@ -8,5 +8,8 @@ class JuliaTest(models.Model):
     example = models.TextField()
     increment = models.IntegerField()
 
+    class Meta:
+        db_table = 'julia_test'  # Explicitly define the table name
+
     def __str__(self):
         return self.word

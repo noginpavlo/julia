@@ -19,6 +19,7 @@ if not settings.configured:
 from card_manager.models import JuliaTest
 
 def save_data(array):
+    print("save_data called!")
     if len(array) == 6:
         # Create a new record in the JuliaTest table using Django ORM
         JuliaTest.objects.create(
@@ -35,5 +36,5 @@ def save_data(array):
         return "Invalid input array length"
 
 # Example usage
-save_data(["2025-04-07", "test_word", "test", "A sample word", "An example sentence", 1])
+# save_data(["2025-04-07", "tt", "test", "A sample word", "An example sentence", 1])
 
