@@ -34,7 +34,3 @@ def save_data(array):
         return "Success"
     else:
         return "Invalid input array length"
-
-# Example usage
-# save_data(["2025-04-07", "tt", "test", "A sample word", "An example sentence", 1])
-
