@@ -40,5 +40,5 @@ The goal is to create a lightweight and intuitive system for spaced repetition, 
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/julia.git
+git clone https://github.com/noginpavlo/julia.git
 cd julia
