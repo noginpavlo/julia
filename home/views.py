@@ -6,5 +6,6 @@ from django.shortcuts import render
 def index(request):
     return render(request ,"home.html")
 
+@login_required
 def dashboard(request):
     return render(request, "dashboard.html")
