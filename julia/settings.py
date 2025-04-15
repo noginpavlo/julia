@@ -22,10 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure--i9u1fv=)ant-g9s)w9&_h%b#kr4=i@$(fby%mmd^1(inxu@q-'
-<<<<<<< HEAD
-=======
 
->>>>>>> ed120b5 (Initial commit to implement google Oauth)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
