@@ -1,2 +1,5 @@
 <h2>Welcome to the dashboard, {{ user.username }}!</h2>
-<p><a href="{% url 'logout' %}">Logout</a></p>
+<form action="{% url 'logout' %}" method="post" style="display: inline;">
+  {% csrf_token %}
+  <button type="submit">Logout</button>
+</form>
