@@ -66,7 +66,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
-    # 'social_django',
+    "allauth.socialaccount.providers.github",
 ]
 
 MIDDLEWARE = [
@@ -85,7 +85,7 @@ ROOT_URLCONF = 'julia.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'home/templates'],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
