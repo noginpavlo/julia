@@ -4,6 +4,13 @@ from django.http import HttpResponse
 
 
 def save_card_view(request):
-    array = ["2025-04-07", "newdatat", "something here", "test", "Let's be so programatic about it", 1]
+    array = [
+            "2077-04-07",
+             "blade",
+             "blaid",
+             "Something that bladerunner runns on",
+             "Oh, you thought it is you, Bladerunner...",
+             1
+            ]
     result = save_data(array)
     return HttpResponse(result)

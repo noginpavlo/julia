@@ -3,20 +3,15 @@ import django
 import sys
 from django.conf import settings
 
-# Set the default settings module for Django
+# Set the default settings module for Django and initialize Django
+# (needed for standalone scripts that interact with django)
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "julia.settings")
-
-# Initialize Django
 django.setup()
 
-# Your logic here
-if not settings.configured:
-    print("Django settings are not configured")
-
-# Now import your models
 from card_manager.models import JuliaTest
+
 
 def save_data(array):
     print("save_data called!")
