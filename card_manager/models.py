@@ -38,7 +38,7 @@ class Card(models.Model):
         related_name='cards'
     )
     front = models.TextField()
-    back = models.JSONField()  # Enables flexible structure for word, transcription, meaning, example
+    back = models.JSONField()
     e_param = models.FloatField(default=0.0)
     m_param = models.FloatField(default=0.0)
     h_param = models.FloatField(default=0.0)

@@ -1,7 +1,11 @@
 import os
 import django
 import sys
+import requests
 from django.conf import settings
+from card_manager.models import Card
+from card_manager.models import Deck
+
 
 # Set the default settings module for Django and initialize Django
 # (needed for standalone scripts that interact with django)
@@ -10,22 +14,54 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "julia.settings")
 django.setup()
 
-from card_manager.models import JuliaTest
+
+def catch_errors(func):
+    def wrapper(*args):
+        try:
+            return func(*args)
+        except Exception as e:
+            print(f"Error in {func.__name__}: {e}")
+            raise
+    return wrapper
 
 
-def save_data(array):
+@catch_errors
+def get_data(input_word):
+    url = f'https://api.dictionaryapi.dev/api/v2/entries/en/{input_word}'
+    response = requests.get(url)
+    print(response)
+    print(type(response))
+
+    # This word does not exist error
+    if response.status_code == 404:
+        raise ValueError(f"Data not available for the word: {input_word} (404 Error)")  # Raise custom error
+
+    # Catching any kind of other errors related to api data retrieving
+    if response.status_code != 200:
+        raise ValueError(f"Unexpected error occurred with status code: {response.status_code}")
+
+    return response, input_word
+
+
+@catch_errors
+def save_data(response, word, user):
     print("save_data called!")
-    if len(array) == 6:
-        # Create a new record in the JuliaTest table using Django ORM
-        JuliaTest.objects.create(
-            date=array[0],
-            word=array[1],
-            phonetics=array[2],
-            definition=array[3],
-            example=array[4],
-            increment=array[5]
-        )
-        print(f"Successfully recorded data for word '{array[1]}'")
-        return "Success"
-    else:
-        return "Invalid input array length"
+    # Create test deck
+    deck, created = Deck.objects.get_or_create(user=user, deck_name="test_deck")
+
+    # Create a new record in the JuliaTest table using Django ORM
+    Card.objects.create(
+        deck=deck,
+        front=word,
+        back=response,
+        e_param=123,
+        m_param=22,
+        h_param=324,
+    )
+    print(f"Successfully recorded data for word '{word}'")
+    return "Success"
+
+def get_and_save(input_word, user):
+    response, word = get_data(input_word)
+    save_result = save_data(response.json(), word, user)
+    return save_result
