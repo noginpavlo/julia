@@ -2,7 +2,6 @@ import os
 import django
 import sys
 import requests
-from django.conf import settings
 from card_manager.models import Card
 from card_manager.models import Deck
 
@@ -61,7 +60,17 @@ def save_data(response, word, user):
     print(f"Successfully recorded data for word '{word}'")
     return "Success"
 
+@catch_errors
 def get_and_save(input_word, user):
     response, word = get_data(input_word)
     save_result = save_data(response.json(), word, user)
     return save_result
+
+@catch_errors
+def delete_card(card_id, user):
+    print("delete_card triggered")
+
+    #Initialize card object with spesified id and .delete() it
+    card_to_delete = Card.objects.get(id=card_id, deck__user=user)
+    card_to_delete.delete()
+    return f"Card id {card_id} deleted successfully"

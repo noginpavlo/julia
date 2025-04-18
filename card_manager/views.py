@@ -1,23 +1,18 @@
 from django.contrib.auth.decorators import login_required
-from card_manager.services.card_dealer import save_data
 from card_manager.services.card_dealer import get_and_save
+from card_manager.services.card_dealer import delete_card
 from django.http import HttpResponse
 
-
-def save_card_view(request):
-    array = [
-            "2077-04-07",
-             "blade",
-             "blaid",
-             "Something that bladerunner runns on",
-             "Oh, you thought it is you, Bladerunner...",
-             1
-            ]
-    result = save_data(array)
-    return HttpResponse(result)
 
 @login_required
 def get_and_save_view(request):
     test_word = "novel"
     result = get_and_save(test_word, request.user)
     return HttpResponse(result)
+
+@login_required
+def delete_card_view(request):
+    card_id = 1
+    result = delete_card(card_id, request.user)
+    return HttpResponse(result)
+
