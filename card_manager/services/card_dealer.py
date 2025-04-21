@@ -58,13 +58,18 @@ def save_data(response, word, user):
         h_param=324,
     )
     print(f"Successfully recorded data for word '{word}'")
-    return word
+    return word if word else "success"
 
 @catch_errors
 def get_and_save(input_word, user):
     response, word = get_data(input_word)
     save_result = save_data(response.json(), word, user)
     return save_result
+
+@catch_errors
+def create_deck(deck_name, user):
+    deck, created = Deck.objects.get_or_create(user=user, deck_name=deck_name)
+    return f"Deck {deck_name} created"
 
 @catch_errors
 def delete_card(card_id, user):

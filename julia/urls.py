@@ -24,6 +24,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include("users.urls")),
     path('get-and-save/', card_views.get_and_save_view, name='get_save'),
+    path('create-deck', card_views.create_deck_view, name='create-deck'),
     path('delete-card', card_views.delete_card_view, name='delete-card'),
     path('delete-deck', card_views.delete_deck_view, name='delete-deck'),
     path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
