@@ -28,12 +28,10 @@ def catch_errors(func):
 def get_data(input_word):
     url = f'https://api.dictionaryapi.dev/api/v2/entries/en/{input_word}'
     response = requests.get(url)
-    print(response)
-    print(type(response))
 
     # This word does not exist error
     if response.status_code == 404:
-        raise ValueError(f"Data not available for the word: {input_word} (404 Error)")  # Raise custom error
+        raise ValueError(f"Data not available for the word: {input_word} (404 Error)")
 
     # Catching any kind of other errors related to api data retrieving
     if response.status_code != 200:
@@ -48,11 +46,43 @@ def save_data(response, word, user):
     # Create test deck
     deck, created = Deck.objects.get_or_create(user=user, deck_name="test_deck")
 
+    print(f"HERE IS THE UNPROCESSED DATA TO SAVE\n{response}")
+
+    entry = response[0]
+
+    word = entry.get("word", "")
+    phonetic = entry.get("phonetic", "")
+    definitions = []
+    examples = []
+
+    for meaning in entry.get("meanings", []):
+        for definition_obj in meaning.get("definitions", []):
+            if len(definitions) < 2:
+                definitions.append(definition_obj.get("definition", ""))
+
+            example = definition_obj.get("example")
+            if example and len(examples) < 2:
+                examples.append(example)
+
+            if len(definitions) >= 2 and len(examples) >= 2:
+                break
+        if len(definitions) >= 2 and len(examples) >= 2:
+            break
+
+    cleaned_data = {
+        "word": word,
+        "phonetic": phonetic,
+        "definitions": definitions,
+        "examples": examples
+    }
+
+    print(f"HERE IS THE CLEAN DATA TO SAVE\n{cleaned_data}")
+
     # Create a new record in the JuliaTest table using Django ORM
     Card.objects.create(
         deck=deck,
         front=word,
-        back=response,
+        back=cleaned_data,
         e_param=123,
         m_param=22,
         h_param=324,

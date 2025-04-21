@@ -8,7 +8,7 @@ from django.http import HttpResponse
 
 @login_required
 def get_and_save_view(request):
-    test_word = ""
+    test_word = "telephone"
     result = get_and_save(test_word, request.user)
     return HttpResponse(f"Word {result} saved successfully")
 
