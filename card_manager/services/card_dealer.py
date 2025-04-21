@@ -58,7 +58,7 @@ def save_data(response, word, user):
         h_param=324,
     )
     print(f"Successfully recorded data for word '{word}'")
-    return "Success"
+    return word
 
 @catch_errors
 def get_and_save(input_word, user):

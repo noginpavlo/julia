@@ -7,9 +7,9 @@ from django.http import HttpResponse
 
 @login_required
 def get_and_save_view(request):
-    test_word = "novel"
+    test_word = ""
     result = get_and_save(test_word, request.user)
-    return HttpResponse(result)
+    return HttpResponse(f"Word {result} saved successfully")
 
 @login_required
 def delete_card_view(request):
