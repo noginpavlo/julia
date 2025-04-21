@@ -37,14 +37,14 @@ def get_data(input_word):
     if response.status_code != 200:
         raise ValueError(f"Unexpected error occurred with status code: {response.status_code}")
 
-    return response, input_word
+    return response
 
 
 @catch_errors
-def save_data(response, word, user):
+def save_data(response, deck_name, user):
     print("save_data called!")
     # Create test deck
-    deck, created = Deck.objects.get_or_create(user=user, deck_name="test_deck")
+    deck, created = Deck.objects.get_or_create(user=user, deck_name=deck_name)
 
     print(f"HERE IS THE UNPROCESSED DATA TO SAVE\n{response}")
 
@@ -91,9 +91,9 @@ def save_data(response, word, user):
     return word if word else "success"
 
 @catch_errors
-def get_and_save(input_word, user):
-    response, word = get_data(input_word)
-    save_result = save_data(response.json(), word, user)
+def get_and_save(input_word, deck_name, user):
+    response = get_data(input_word)
+    save_result = save_data(response.json(), deck_name, user)
     return save_result
 
 @catch_errors

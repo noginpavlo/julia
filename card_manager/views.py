@@ -8,13 +8,14 @@ from django.http import HttpResponse
 
 @login_required
 def get_and_save_view(request):
-    test_word = "telephone"
-    result = get_and_save(test_word, request.user)
+    test_word = "cat"
+    deck_name = "animals"
+    result = get_and_save(test_word, deck_name, request.user)
     return HttpResponse(f"Word {result} saved successfully")
 
 @login_required
 def create_deck_view(request):
-    deck_name = "test_create-deck_name"
+    deck_name = "animals"
     result = create_deck(deck_name, request.user)
     return HttpResponse(result)
 
@@ -27,6 +28,6 @@ def delete_card_view(request):
 
 @login_required
 def delete_deck_view(request):
-    deck_id = 2
+    deck_id = 1
     result = delete_deck(deck_id, request.user)
     return HttpResponse(result)
