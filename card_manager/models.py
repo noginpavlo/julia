@@ -1,5 +1,7 @@
 from django.db import models
 from django.conf import settings
+from django.contrib.auth.models import User
+
 
 class JuliaTest(models.Model):
     date = models.TextField()
@@ -48,3 +50,15 @@ class Card(models.Model):
 
     def __str__(self):
         return f"{self.front}\n{self.back}"
+
+class ShowCardDailyStat(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    date = models.DateField(auto_now_add=True)
+    count = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        db_table = "daily_card_learning"
+        unique_together = ('user', 'date')
+
+    def __str__(self):
+        return f"{self.user.username} - {self.date}: {self.count} times"

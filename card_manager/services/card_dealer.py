@@ -3,8 +3,9 @@ import random
 import django
 import sys
 import requests
-from card_manager.models import Card
-from card_manager.models import Deck
+from datetime import date
+from django.db.models import F
+from card_manager.models import Card, Deck, ShowCardDailyStat
 
 
 # Set the default settings module for Django and initialize Django
@@ -120,22 +121,43 @@ def delete_deck(deck_id, user):
     return f"Deck id {deck_id} deleted successfully"
 
 
+# This function shows the whole card including front and back. Handle showing a part of it on frontend
+# !!! Frontend will receive the whole card but will show only front then after click will show back
 @catch_errors
 def show_card(deck_name, user):
-    #retrieve all ids that user have in a specified deck
-    all_deck_ids = list(
+
+    #this function counts words learned by user every dat and saves the data to db
+    increment_daily_learning(user)
+
+    all_cards_ids = list(
         Card.objects.filter(deck__deck_name=deck_name, deck__user=user).values_list('id', flat=True)
     )
 
-    if not all_deck_ids:
+    if not all_cards_ids:
         raise ValueError(f"No cards found in deck '{deck_name}' for user '{user.username}'.")
 
-    card_id = random.choice(all_deck_ids)
+    card_id = random.choice(all_cards_ids)
 
     card_to_show = Card.objects.get(id=card_id, deck__user=user)
 
     print(f"HERE IS CARD TO SHOW \n{card_to_show}")
-
     return card_to_show
 
+
+def increment_daily_learning(user):
+    today = date.today()
+
+    stat, created = ShowCardDailyStat.objects.get_or_create(user=user, date=today)
+
+    if not created:
+        stat.count = F('count') + 1
+    else:
+        stat.count = 1  # First time today, set count to 1
+
+    stat.save(update_fields=["count"])
+    stat.refresh_from_db()
+
+    print(stat)
+
+    return stat
 
