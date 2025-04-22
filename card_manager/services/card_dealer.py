@@ -1,4 +1,5 @@
 import os
+import random
 import django
 import sys
 import requests
@@ -46,8 +47,7 @@ def save_data(response, deck_name, user):
     # Create test deck
     deck, created = Deck.objects.get_or_create(user=user, deck_name=deck_name)
 
-    print(f"HERE IS THE UNPROCESSED DATA TO SAVE\n{response}")
-
+    # Process data to remove redundant meanings and examples
     entry = response[0]
 
     word = entry.get("word", "")
@@ -76,9 +76,8 @@ def save_data(response, deck_name, user):
         "examples": examples
     }
 
-    print(f"HERE IS THE CLEAN DATA TO SAVE\n{cleaned_data}")
 
-    # Create a new record in the JuliaTest table using Django ORM
+    #Record cleaned data to cards_card table
     Card.objects.create(
         deck=deck,
         front=word,
@@ -105,7 +104,7 @@ def create_deck(deck_name, user):
 def delete_card(card_id, user):
     print("delete_card triggered")
 
-    #Initialize card object with spesified id and .delete() it
+    #Initialize card object with specified id and .delete() it
     # deck__user=user specifies that card is related to a deck that has user info. Cards don't have user inf.
     card_to_delete = Card.objects.get(id=card_id, deck__user=user)
     card_to_delete.delete()
@@ -119,4 +118,24 @@ def delete_deck(deck_id, user):
     deck_to_delete = Deck.objects.get(id=deck_id, user=user)
     deck_to_delete.delete()
     return f"Deck id {deck_id} deleted successfully"
+
+
+@catch_errors
+def show_card(deck_name, user):
+    #retrieve all ids that user have in a specified deck
+    all_deck_ids = list(
+        Card.objects.filter(deck__deck_name=deck_name, deck__user=user).values_list('id', flat=True)
+    )
+
+    if not all_deck_ids:
+        raise ValueError(f"No cards found in deck '{deck_name}' for user '{user.username}'.")
+
+    card_id = random.choice(all_deck_ids)
+
+    card_to_show = Card.objects.get(id=card_id, deck__user=user)
+
+    print(f"HERE IS CARD TO SHOW \n{card_to_show}")
+
+    return card_to_show
+
 

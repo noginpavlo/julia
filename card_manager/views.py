@@ -1,14 +1,11 @@
 from django.contrib.auth.decorators import login_required
-from card_manager.services.card_dealer import get_and_save
-from card_manager.services.card_dealer import delete_card
-from card_manager.services.card_dealer import delete_deck
-from card_manager.services.card_dealer import create_deck
+from card_manager.services.card_dealer import get_and_save, show_card, delete_card, delete_deck, create_deck
 from django.http import HttpResponse
 
 
 @login_required
 def get_and_save_view(request):
-    test_word = "cat"
+    test_word = "rat"
     deck_name = "animals"
     result = get_and_save(test_word, deck_name, request.user)
     return HttpResponse(f"Word {result} saved successfully")
@@ -30,4 +27,10 @@ def delete_card_view(request):
 def delete_deck_view(request):
     deck_id = 1
     result = delete_deck(deck_id, request.user)
+    return HttpResponse(result)
+
+@login_required
+def show_card_view(request):
+    deck_name = "animals"
+    result = show_card(deck_name, request.user)
     return HttpResponse(result)

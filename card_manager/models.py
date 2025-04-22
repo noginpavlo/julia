@@ -47,4 +47,4 @@ class Card(models.Model):
         db_table = 'cards_card'  # Overwrites Django’s default table naming
 
     def __str__(self):
-        return self.front
+        return f"{self.front}\n{self.back}"

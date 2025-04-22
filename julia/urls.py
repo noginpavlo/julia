@@ -27,6 +27,7 @@ urlpatterns = [
     path('create-deck', card_views.create_deck_view, name='create-deck'),
     path('delete-card', card_views.delete_card_view, name='delete-card'),
     path('delete-deck', card_views.delete_deck_view, name='delete-deck'),
+    path('show-card', card_views.show_card_view, name='show-card'),
     path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='/'), name='logout'),
     path('dashboard/', users_views.dashboard, name='dashboard'),
