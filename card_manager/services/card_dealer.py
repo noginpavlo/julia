@@ -4,6 +4,8 @@ import django
 import sys
 import requests
 from datetime import date
+from django.utils import timezone
+from datetime import timedelta
 from django.db.models import F
 from card_manager.models import Card, Deck, ShowCardDailyStat
 
@@ -155,3 +157,51 @@ def increment_daily_learning(user):
 
     return stat
 
+
+@catch_errors
+def sm2(card_id, user_feedback, user):
+    print(f"HERE IS CARD_ID in sm2: {card_id}")
+    print(f"HERE IS USER FEEDBACK in sm2: {user_feedback}")
+
+    card = Card.objects.get(id=card_id, deck__user=user)
+
+    if not 0 <= user_feedback <= 5:
+        raise ValueError("Feedback must be between 0 and 5.")
+
+    # Save user feedback as quality
+    card.quality = user_feedback
+    card.save(update_fields=["quality"])
+
+    # Logic block
+    if user_feedback < 3:
+        Card.objects.filter(id=card.id).update(
+            repetitions=0,
+            interval=1
+        )
+    else:
+        if card.repetitions == 0:
+            Card.objects.filter(id=card.id).update(
+                interval=1,
+                repetitions=F('repetitions') + 1
+               )
+        elif card.repetitions == 1:
+            Card.objects.filter(id=card.id).update(
+                interval=3,
+                repetitions=F('repetitions') + 1
+                )
+        else:
+            Card.objects.filter(id=card.id).update(
+                interval=F('interval') * F('ef'),
+                repetitions=F('repetitions') + 1
+            )
+
+    card.refresh_from_db(fields=["interval", "repetitions", "ef"])
+
+    new_ef = card.ef + (0.1 - (5 - user_feedback) * (0.08 + (5 - user_feedback) * 0.02))
+    card.ef = max(new_ef, 1.3)
+
+    card.refresh_from_db()
+    interval_days = round(float(card.interval))
+    card.due_date = timezone.now() + timedelta(days=interval_days)
+
+    card.save(update_fields=["ef", "due_date"])

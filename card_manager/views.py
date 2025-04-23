@@ -1,10 +1,9 @@
 from django.contrib.auth.decorators import login_required
-from card_manager.services.card_dealer import get_and_save, show_card, delete_card, delete_deck, create_deck
+from card_manager.services.card_dealer import get_and_save, show_card, delete_card, delete_deck, create_deck, sm2
 from django.http import HttpResponse
-from django.shortcuts import render
-from django.db.models import F
-from django.utils import timezone
-from datetime import timedelta
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Card
+
 
 @login_required
 def get_and_save_view(request):
@@ -35,35 +34,17 @@ def delete_deck_view(request):
 @login_required
 def show_card_view(request):
     deck_name = "animals"
+
+    if request.method == "POST":
+        card_id = request.POST.get("card_id")
+        print(f"HERE IS CARD_ID views: {card_id}")
+        user_feedback = int(request.POST.get("user_feedback"))
+        print(f"HERE IS USER FEEDBACK views: {user_feedback}")
+
+        sm2(card_id, user_feedback, request.user)
+
+        return redirect('show-card')
+
     result = show_card(deck_name, request.user)
     return render(request, "cards/show_card.html", {"card": result})
 
-@login_required
-def sm2(card, user_feedback):
-
-    if not 0 <= user_feedback <= 5:
-        raise ValueError("Feedback must be between 0 and 5.")
-
-    card.quality = user_feedback
-    repetitions = card.repetitions
-    ef = card.ef
-
-    if user_feedback < 3:
-        card.repetitions = 0
-        card.interval = 1
-    else:
-        if repetitions == 0:
-            card.interval = 1
-        elif repetitions == 1:
-            card.interval = 3
-        else:
-            card.interval = F('interval') * F('ef')
-
-        card.interval = F('interval') + 1
-
-    new_ef = ef + (0.1 - (5 - user_feedback) * (0.08 + (5 - user_feedback) * 0.02))
-    card.ef = max(new_ef, 1.3)
-
-    card.due_date = timezone.now() + timedelta(days=card.interval)
-
-    card.save(update_fields=['quality', 'repetitions', 'interval', 'ef', 'due_date'])

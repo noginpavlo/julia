@@ -85,10 +85,11 @@
         <div class="buttons">
             <form method="post">
                 {% csrf_token %}
-                <button name="difficulty" value="again">Again</button>
-                <button name="difficulty" value="easy">Easy</button>
-                <button name="difficulty" value="medium">Medium</button>
-                <button name="difficulty" value="hard">Hard</button>
+                <input type="hidden" name="card_id" value="{{ card.id }}">
+                <button name="user_feedback" value="1">Again</button>
+                <button name="user_feedback" value="3">Hard</button>
+                <button name="user_feedback" value="4">Medium</button>
+                <button name="user_feedback" value="5">Easy</button>
             </form>
         </div>
     </div>
