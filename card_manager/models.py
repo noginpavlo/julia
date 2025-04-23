@@ -37,7 +37,7 @@ class Card(models.Model):
         db_table = 'cards_card'  # Overwrites Django’s default table naming
 
     def __str__(self):
-        return self.json_data
+        return f"{self.json_data}"
 
 class ShowCardDailyStat(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

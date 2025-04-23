@@ -81,11 +81,7 @@ def save_data(response, deck_name, user):
     #Record cleaned data to cards_card table
     Card.objects.create(
         deck=deck,
-        front=word,
-        back=cleaned_data,
-        e_param=123,
-        m_param=22,
-        h_param=324,
+        json_data=cleaned_data,
     )
     print(f"Successfully recorded data for word '{word}'")
     return word if word else "success"
@@ -137,10 +133,8 @@ def show_card(deck_name, user):
         raise ValueError(f"No cards found in deck '{deck_name}' for user '{user.username}'.")
 
     card_id = random.choice(all_cards_ids)
-
     card_to_show = Card.objects.get(id=card_id, deck__user=user)
 
-    print(f"HERE IS CARD TO SHOW \n{card_to_show}")
     return card_to_show
 
 

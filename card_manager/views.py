@@ -1,6 +1,8 @@
 from django.contrib.auth.decorators import login_required
 from card_manager.services.card_dealer import get_and_save, show_card, delete_card, delete_deck, create_deck
 from django.http import HttpResponse
+from django.shortcuts import render
+import json
 
 
 @login_required
@@ -33,4 +35,4 @@ def delete_deck_view(request):
 def show_card_view(request):
     deck_name = "animals"
     result = show_card(deck_name, request.user)
-    return HttpResponse(result)
+    return render(request, "cards/show_card.html", {"card": result})

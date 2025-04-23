@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Flashcard Viewer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 2rem;
+            background-color: #f9f9f9;
+        }
+
+        .card-container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .field {
+            margin-bottom: 1rem;
+        }
+
+        .field label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+
+        .buttons button {
+            margin-right: 10px;
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="card-container">
+        <h2>Card Info</h2>
+
+        <div class="field">
+            <label>JSON Data:</label>
+            <div style="
+                background-color: #f0f0f0;
+                padding: 1rem;
+                border-radius: 5px;
+                max-height: 300px;
+                overflow-y: auto;
+                white-space: pre-wrap;
+                font-family: monospace;
+                font-size: 0.9rem;
+                border: 1px solid #ccc;
+            ">
+                {{ card.json_data|pprint }}
+            </div>
+        </div>
+
+        <div class="field">
+            <label>EF (Ease Factor):</label>
+            <p>{{ card.ef }}</p>
+        </div>
+
+        <div class="field">
+            <label>Interval (days):</label>
+            <p>{{ card.interval }}</p>
+        </div>
+
+        <div class="field">
+            <label>Repetitions:</label>
+            <p>{{ card.repetitions }}</p>
+        </div>
+
+        <div class="field">
+            <label>Quality:</label>
+            <p>{{ card.quality }}</p>
+        </div>
+
+        <div class="field">
+            <label>Due Date:</label>
+            <p>{{ card.due_date }}</p>
+        </div>
+
+        <div class="buttons">
+            <form method="post">
+                {% csrf_token %}
+                <button name="difficulty" value="again">Again</button>
+                <button name="difficulty" value="easy">Easy</button>
+                <button name="difficulty" value="medium">Medium</button>
+                <button name="difficulty" value="hard">Hard</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
