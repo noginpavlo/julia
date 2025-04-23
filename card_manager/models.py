@@ -1,21 +1,8 @@
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.utils import timezone
 
-
-class JuliaTest(models.Model):
-    date = models.TextField()
-    word = models.TextField()
-    phonetics = models.TextField()
-    definition = models.TextField()
-    example = models.TextField()
-    increment = models.IntegerField()
-
-    class Meta:
-        db_table = 'julia_test'  # Explicitly define the table name
-
-    def __str__(self):
-        return self.word
 
 class Deck(models.Model):
     user = models.ForeignKey(
@@ -39,17 +26,18 @@ class Card(models.Model):
         on_delete=models.CASCADE,
         related_name='cards'
     )
-    front = models.TextField()
-    back = models.JSONField()
-    e_param = models.FloatField(default=0.0)
-    m_param = models.FloatField(default=0.0)
-    h_param = models.FloatField(default=0.0)
+    json_data = models.JSONField()
+    quality = models.FloatField(default=1)
+    ef = models.FloatField(default=1.3)
+    repetitions = models.FloatField(default=0.0)
+    interval = models.FloatField(default=1)
+    due_date = models.DateTimeField(default=timezone.now)
 
     class Meta:
         db_table = 'cards_card'  # Overwrites Django’s default table naming
 
     def __str__(self):
-        return f"{self.front}\n{self.back}"
+        return self.json_data
 
 class ShowCardDailyStat(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
