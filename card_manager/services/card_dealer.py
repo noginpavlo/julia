@@ -47,7 +47,7 @@ def get_data(input_word):
 @catch_errors
 def save_data(response, deck_name, user):
     print("save_data called!")
-    # Create test deck
+
     deck, created = Deck.objects.get_or_create(user=user, deck_name=deck_name)
 
     # Process data to remove redundant meanings and examples

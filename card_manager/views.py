@@ -11,11 +11,13 @@ def get_and_save_view(request):
     result = get_and_save(test_word, deck_name, request.user)
     return HttpResponse(f"Word {result} saved successfully")
 
+
 @login_required
 def create_deck_view(request):
     deck_name = "animals"
     result = create_deck(deck_name, request.user)
     return HttpResponse(result)
+
 
 @login_required
 def delete_card_view(request):
@@ -29,6 +31,7 @@ def delete_deck_view(request):
     deck_id = 1
     result = delete_deck(deck_id, request.user)
     return HttpResponse(result)
+
 
 @login_required
 def show_card_view(request):
