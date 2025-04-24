@@ -1,5 +1,7 @@
 import os
 import random
+from http.client import HTTPResponse
+
 import django
 import sys
 import requests
@@ -138,7 +140,7 @@ def show_card(deck_name, user):
     )
 
     if not all_cards_ids:
-        raise ValueError(f"No cards found in deck '{deck_name}' for user '{user.username}'.")
+        return "No cards left for today" # this will be handled in show_card_view() in views.py
 
     card_id = random.choice(all_cards_ids)
     card_to_show = Card.objects.get(id=card_id, deck__user=user)

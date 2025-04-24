@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect
 
 @login_required
 def get_and_save_view(request):
-    test_word = "fish"
+    test_word = "lion"
     deck_name = "animals"
     result = get_and_save(test_word, deck_name, request.user)
     return HttpResponse(f"Word {result} saved successfully")
@@ -39,14 +39,15 @@ def show_card_view(request):
 
     if request.method == "POST":
         card_id = request.POST.get("card_id")
-        print(f"HERE IS CARD_ID views: {card_id}")
         user_feedback = int(request.POST.get("user_feedback"))
-        print(f"HERE IS USER FEEDBACK views: {user_feedback}")
-
         sm2(card_id, user_feedback, request.user)
 
         return redirect('show-card')
 
     result = show_card(deck_name, request.user)
+
+    if result == "No cards left for today":
+        return HttpResponse(f"Congratulations☺️ You've learned all cards in '{deck_name}' deck for today.")
+
     return render(request, "cards/show_card.html", {"card": result})
 
