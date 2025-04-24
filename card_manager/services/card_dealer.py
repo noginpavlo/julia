@@ -124,11 +124,17 @@ def delete_deck(deck_id, user):
 @catch_errors
 def show_card(deck_name, user):
 
-    #this function counts words learned by user every dat and saves the data to db
+    #this function counts cards learned by user every day and saves the data to db
     increment_daily_learning(user)
 
+    now = timezone.now()
+
     all_cards_ids = list(
-        Card.objects.filter(deck__deck_name=deck_name, deck__user=user).values_list('id', flat=True)
+        Card.objects.filter(
+            deck__deck_name=deck_name,
+            deck__user=user,
+            due_date__lte=now  # __lte stands for 'less than or equal to'
+        ).values_list('id', flat=True)
     )
 
     if not all_cards_ids:
@@ -160,19 +166,12 @@ def increment_daily_learning(user):
 
 @catch_errors
 def sm2(card_id, user_feedback, user):
-    print(f"HERE IS CARD_ID in sm2: {card_id}")
-    print(f"HERE IS USER FEEDBACK in sm2: {user_feedback}")
 
     card = Card.objects.get(id=card_id, deck__user=user)
 
-    if not 0 <= user_feedback <= 5:
-        raise ValueError("Feedback must be between 0 and 5.")
-
-    # Save user feedback as quality
     card.quality = user_feedback
     card.save(update_fields=["quality"])
 
-    # Logic block
     if user_feedback < 3:
         Card.objects.filter(id=card.id).update(
             repetitions=0,

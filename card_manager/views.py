@@ -1,13 +1,12 @@
 from django.contrib.auth.decorators import login_required
 from card_manager.services.card_dealer import get_and_save, show_card, delete_card, delete_deck, create_deck, sm2
 from django.http import HttpResponse
-from django.shortcuts import render, get_object_or_404, redirect
-from .models import Card
+from django.shortcuts import render, redirect
 
 
 @login_required
 def get_and_save_view(request):
-    test_word = "snail"
+    test_word = "fish"
     deck_name = "animals"
     result = get_and_save(test_word, deck_name, request.user)
     return HttpResponse(f"Word {result} saved successfully")
