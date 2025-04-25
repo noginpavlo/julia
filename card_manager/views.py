@@ -2,12 +2,24 @@ from django.contrib.auth.decorators import login_required
 from card_manager.services.card_dealer import get_and_save, show_card, delete_card, delete_deck, create_deck, sm2
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
+from .models import Deck, Card
 
 
 @login_required
 def get_and_save_view(request):
     test_word = "lion"
     deck_name = "animals"
+
+    deck, created = Deck.objects.get_or_create(user=request.user, deck_name=deck_name)
+
+    card_exists = Card.objects.filter(
+        deck=deck,
+        json_data__word__iexact=test_word
+    ).exists()
+
+    if card_exists:
+        return HttpResponse(f"Word '{test_word}' already exists in your '{deck_name}' deck.")
+
     result = get_and_save(test_word, deck_name, request.user)
     return HttpResponse(f"Word {result} saved successfully")
 
