@@ -1,9 +1,8 @@
 import os
 import random
-from http.client import HTTPResponse
-
 import django
 import sys
+from django.http import HttpResponse
 import requests
 from datetime import date
 from django.utils import timezone
@@ -37,7 +36,8 @@ def get_data(input_word):
 
     # This word does not exist error
     if response.status_code == 404:
-        raise ValueError(f"Data not available for the word: {input_word} (404 Error)")
+        return f"Data not available for the word: {input_word} (404 Error)"
+
 
     # Catching any kind of other errors related to api data retrieving
     if response.status_code != 200:
@@ -93,7 +93,11 @@ def save_data(response, deck_name, user):
 @catch_errors
 def get_and_save(input_word, deck_name, user):
     response = get_data(input_word)
-    save_result = save_data(response.json(), deck_name, user)
+    if type(response) is str:
+        return response
+    else:
+        save_result = save_data(response.json(), deck_name, user)
+
     return save_result
 
 @catch_errors
@@ -160,8 +164,6 @@ def increment_daily_learning(user):
 
     stat.save(update_fields=["count"])
     stat.refresh_from_db()
-
-    print(stat)
 
     return stat
 

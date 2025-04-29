@@ -7,7 +7,7 @@ from .models import Deck, Card
 
 @login_required
 def get_and_save_view(request):
-    test_word = "lion"
+    test_word = "asdgashgbwagweyugvwe"
     deck_name = "animals"
 
     deck, created = Deck.objects.get_or_create(user=request.user, deck_name=deck_name)
@@ -21,7 +21,12 @@ def get_and_save_view(request):
         return HttpResponse(f"Word '{test_word}' already exists in your '{deck_name}' deck.")
 
     result = get_and_save(test_word, deck_name, request.user)
-    return HttpResponse(f"Word {result} saved successfully")
+
+    #word do not exist error
+    if "404 Error" in result:
+        return HttpResponse(result)
+    else:
+        return HttpResponse(f"Word {result} saved successfully")
 
 
 @login_required
