@@ -76,5 +76,5 @@ def update_card_view(request):
         update_card(request, user)
 
     print("Successfully updated card")
-    return HttpResponse("Successfully updated card")
+    return redirect('show-card')
 

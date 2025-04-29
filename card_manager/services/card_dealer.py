@@ -2,7 +2,6 @@ import os
 import random
 import django
 import sys
-from django.http import HttpResponse
 import requests
 from datetime import date
 from django.utils import timezone
