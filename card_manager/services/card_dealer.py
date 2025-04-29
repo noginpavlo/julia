@@ -208,3 +208,34 @@ def sm2(card_id, user_feedback, user):
     card.due_date = timezone.now() + timedelta(days=interval_days)
 
     card.save(update_fields=["ef", "due_date"])
+
+
+def update_card(request, user):
+
+    card_id = request.POST.get("card_id")
+    card = Card.objects.get(id=card_id, deck__user=user)
+
+    if request.POST.get("changed") == "true":
+        card_data = card.json_data
+
+        print(card_data)
+
+        card_data["word"] = request.POST.get("word", card_data.get("word", ""))
+        card_data["phonetic"] = request.POST.get("phonetic", card_data.get("phonetic", ""))
+        card_data["definitions"] = [
+            request.POST.get("meaning1", ""),
+            request.POST.get("meaning2", "")
+        ]
+        card_data["examples"] = [
+            request.POST.get("example1", ""),
+            request.POST.get("example2", "")
+        ]
+
+        card.json_data = card_data
+
+        print(card.json_data)
+
+        card.save()
+
+    return card
+

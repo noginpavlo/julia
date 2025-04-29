@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from card_manager.services.card_dealer import get_and_save, show_card, delete_card, delete_deck, create_deck, sm2
+from card_manager.services.card_dealer import get_and_save, show_card, delete_card, delete_deck, create_deck, sm2, update_card
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from .models import Deck, Card
@@ -7,7 +7,7 @@ from .models import Deck, Card
 
 @login_required
 def get_and_save_view(request):
-    test_word = "asdgashgbwagweyugvwe"
+    test_word = "snail"
     deck_name = "animals"
 
     deck, created = Deck.objects.get_or_create(user=request.user, deck_name=deck_name)
@@ -67,4 +67,14 @@ def show_card_view(request):
         return HttpResponse(f"Congratulations☺️ You've learned all cards in '{deck_name}' deck for today.")
 
     return render(request, "cards/show_card.html", {"card": result})
+
+
+def update_card_view(request):
+    user = request.user
+
+    if request.method == "POST":
+        update_card(request, user)
+
+    print("Successfully updated card")
+    return HttpResponse("Successfully updated card")
 
