@@ -1,5 +1,7 @@
 from django.contrib.auth.decorators import login_required
-from card_manager.services.card_dealer import get_and_save, show_card, delete_card, delete_deck, create_deck, sm2, update_card
+from card_manager.services.card_dealer import (
+    get_and_save, show_card, delete_card, delete_deck, create_deck, sm2, update_card
+    )
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from .models import Deck, Card
@@ -77,4 +79,3 @@ def update_card_view(request):
 
     print("Successfully updated card")
     return redirect('show-card')
-
