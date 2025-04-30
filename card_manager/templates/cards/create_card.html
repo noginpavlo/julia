@@ -40,15 +40,18 @@
             border: 1px solid #ccc;
         }
 
-        .submit-placeholder {
-            margin-top: 2rem;
-            padding: 1rem;
-            background-color: #f0f0f0;
-            text-align: center;
-            color: #888;
-            border: 1px dashed #bbb;
-            border-radius: 5px;
-            font-style: italic;
+        .submit-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            font-size: 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .submit-button:hover {
+            background-color: #45a049;
         }
     </style>
 </head>
@@ -56,20 +59,20 @@
     <div class="card-container">
         <h2>Create a New Flashcard</h2>
 
-        <div class="field">
-            <label for="deck-name">Deck Name</label>
-            <input type="text" id="deck-name" name="deck_name" placeholder="Enter deck name">
-        </div>
+        <form method="POST" action="/get-and-save/">
+            {% csrf_token %}
+            <div class="field">
+                <label for="deck-name">Deck Name</label>
+                <input type="text" id="deck-name" name="deck_name" placeholder="Enter deck name" required>
+            </div>
 
-        <div class="field">
-            <label for="word-input">Word</label>
-            <input type="text" id="word-input" name="word" placeholder="Enter word to create card">
-        </div>
+            <div class="field">
+                <label for="word-input">Word</label>
+                <input type="text" id="word-input" name="word" placeholder="Enter word to create card" required>
+            </div>
 
-        <div class="submit-placeholder">
-            <!-- Placeholder for POST form / submission logic -->
-            Form submission will be added here
-        </div>
+            <button type="submit" class="submit-button">Create Card</button>
+        </form>
     </div>
 </body>
 </html>

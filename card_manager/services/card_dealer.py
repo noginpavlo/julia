@@ -209,6 +209,7 @@ def sm2(card_id, user_feedback, user):
     card.save(update_fields=["ef", "due_date"])
 
 
+@catch_errors
 def update_card(request, user):
 
     card_id = request.POST.get("card_id")
@@ -216,8 +217,6 @@ def update_card(request, user):
 
     if request.POST.get("changed") == "true":
         card_data = card.json_data
-
-        print(card_data)
 
         card_data["word"] = request.POST.get("word", card_data.get("word", ""))
         card_data["phonetic"] = request.POST.get("phonetic", card_data.get("phonetic", ""))

@@ -14,8 +14,13 @@ def create_card_view(request):
 
 @login_required
 def get_and_save_view(request):
-    test_word = "snail"
-    deck_name = "animals"
+
+    if request.method == 'POST':
+        test_word = request.POST.get("word")
+        deck_name = request.POST.get("deck_name")
+
+    else:
+        return HttpResponse("Request method is not POST")
 
     deck, created = Deck.objects.get_or_create(user=request.user, deck_name=deck_name)
 
