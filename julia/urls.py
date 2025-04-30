@@ -23,6 +23,7 @@ from django.contrib.auth import views as auth_views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include("users.urls")),
+    path('create-card', card_views.create_card_view, name='create-card'),
     path('get-and-save/', card_views.get_and_save_view, name='get_save'),
     path('create-deck', card_views.create_deck_view, name='create-deck'),
     path('delete-card', card_views.delete_card_view, name='delete-card'),

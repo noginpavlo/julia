@@ -8,6 +8,11 @@ from .models import Deck, Card
 
 
 @login_required
+def create_card_view(request):
+    return render(request, "cards/create_card.html")
+
+
+@login_required
 def get_and_save_view(request):
     test_word = "snail"
     deck_name = "animals"
@@ -31,6 +36,7 @@ def get_and_save_view(request):
         return HttpResponse(f"Word {result} saved successfully")
 
 
+# DELETE this after you connect create_card.html to get_and_save(). Will be redundant
 @login_required
 def create_deck_view(request):
     deck_name = "animals"
