@@ -5,6 +5,7 @@ from card_manager.services.card_dealer import (
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from .models import Deck, Card
+import re
 
 
 @login_required
@@ -20,6 +21,7 @@ def get_and_save_view(request):
         deck_name = request.POST.get("deck_name")
 
     else:
+        # Here must be OOPS something went wrong on our side page rendering
         return HttpResponse("Request method is not POST")
 
     deck, created = Deck.objects.get_or_create(user=request.user, deck_name=deck_name)
@@ -35,10 +37,13 @@ def get_and_save_view(request):
     result = get_and_save(test_word, deck_name, request.user)
 
     #word do not exist error
-    if "404 Error" in result:
-        return HttpResponse(result)
-    else:
-        return HttpResponse(f"Word {result} saved successfully")
+    pattern = re.match(r"Data not available for the word: (.+)\. Are you sure you spelled it right?", result)
+
+    match pattern:
+        case re.Match():
+            return HttpResponse(result)
+        case _:
+            return HttpResponse(f"Word {result} saved successfully")
 
 
 # DELETE this after you connect create_card.html to get_and_save(). Will be redundant

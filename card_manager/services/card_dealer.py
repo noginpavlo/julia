@@ -1,4 +1,5 @@
 import os
+import re
 import random
 import django
 import sys
@@ -35,10 +36,10 @@ def get_data(input_word):
 
     # This word does not exist error
     if response.status_code == 404:
-        return f"Data not available for the word: {input_word} (404 Error)"
-
+        return f"Data not available for the word: {input_word}. Are you sure you spelled it right?"
 
     # Catching any kind of other errors related to api data retrieving
+    # Here has to be OOPS SOMETHING WENT WRONG redirect
     if response.status_code != 200:
         raise ValueError(f"Unexpected error occurred with status code: {response.status_code}")
 
@@ -47,7 +48,6 @@ def get_data(input_word):
 
 @catch_errors
 def save_data(response, deck_name, user):
-    print("save_data called!")
 
     deck, created = Deck.objects.get_or_create(user=user, deck_name=deck_name)
 
@@ -80,7 +80,6 @@ def save_data(response, deck_name, user):
         "examples": examples
     }
 
-
     #Record cleaned data to cards_card table
     Card.objects.create(
         deck=deck,
@@ -89,15 +88,21 @@ def save_data(response, deck_name, user):
     print(f"Successfully recorded data for word '{word}'")
     return word if word else "success"
 
+
 @catch_errors
 def get_and_save(input_word, deck_name, user):
     response = get_data(input_word)
-    if type(response) is str:
-        return response
-    else:
-        save_result = save_data(response.json(), deck_name, user)
+
+    pattern = re.match(r"Data not available for the word: (.+)\. Are you sure you spelled it right?", response)
+
+    match pattern:
+        case re.Match():
+            return response
+        case _:
+            save_result = save_data(response.json(), deck_name, user)
 
     return save_result
+
 
 @catch_errors
 def create_deck(deck_name, user):
