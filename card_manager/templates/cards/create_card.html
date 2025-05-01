@@ -53,6 +53,23 @@
         .submit-button:hover {
             background-color: #45a049;
         }
+
+        .notification {
+            display: none;
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background-color: #4CAF50;
+            color: white;
+            padding: 1rem;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+
+        .notification.error {
+            background-color: #f44336;
+        }
     </style>
 </head>
 <body>
@@ -74,5 +91,73 @@
             <button type="submit" class="submit-button">Create Card</button>
         </form>
     </div>
+    <div id="notification" class="notification"></div>
+
+<script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (const cookie of cookies) {
+                const trimmed = cookie.trim();
+                if (trimmed.startsWith(name + '=')) {
+                    cookieValue = decodeURIComponent(trimmed.slice(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    const csrftoken = getCookie('csrftoken');
+
+    const form = document.querySelector('form');
+    const notification = document.getElementById('notification');
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(form);
+
+        try {
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': csrftoken
+                }
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                showNotification(data.message, 'success');
+            } else {
+                showNotification(data.error || data.message || 'An error occurred.', 'error');
+            }
+
+        } catch (error) {
+            showNotification('An error occurred. Please try again.', 'error');
+        }
+    });
+
+    let notificationTimeout;
+
+    function showNotification(message, type) {
+        notification.textContent = message;
+        notification.className = 'notification ' + (type === 'error' ? 'error' : '');
+        notification.style.display = 'block';
+
+        if (notificationTimeout) {
+            clearTimeout(notificationTimeout);
+        }
+
+        notificationTimeout = setTimeout(() => {
+            notification.style.display = 'none';
+        }, 5000);
+    }
+</script>
+
 </body>
 </html>

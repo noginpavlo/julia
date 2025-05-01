@@ -5,7 +5,7 @@ from card_manager.services.card_dealer import (
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from .models import Deck, Card
-import re
+from django.http import JsonResponse
 
 
 @login_required
@@ -24,25 +24,17 @@ def get_and_save_view(request):
     deck, _ = Deck.objects.get_or_create(user=request.user, deck_name=deck_name)
 
     if Card.objects.filter(deck=deck, json_data__word__iexact=test_word).exists():
-        return HttpResponse(f"Word '{test_word}' already exists in your '{deck_name}' deck.")
+        return JsonResponse({"message": f"Word '{test_word}' already exists in your '{deck_name}' deck."}, status=400)
 
     try:
         result = get_and_save(test_word, deck_name, request.user)
     except Exception:
-        return HttpResponse("Oops, something went wrong on our end.", status=500)
+        return JsonResponse({"error": "Oops, something went wrong on our end."}, status=500)
 
     if isinstance(result, str) and result.startswith("Data not available for word"):
-        return HttpResponse(result)
+        return JsonResponse({"message": result}, status=400)
 
-    return HttpResponse(f"Word {result} saved successfully")
-
-
-# DELETE this after you connect create_card.html to get_and_save(). Will be redundant
-@login_required
-def create_deck_view(request):
-    deck_name = "animals"
-    result = create_deck(deck_name, request.user)
-    return HttpResponse(result)
+    return JsonResponse({"message": f"Word '{result}' saved successfully!"})
 
 
 @login_required
