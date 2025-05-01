@@ -8,9 +8,23 @@ from .models import Deck, Card
 from django.http import JsonResponse
 
 
+def catch_views_errors(func):
+    def wrapper(request, *args, **kwargs):
+        try:
+            return func(request, *args, **kwargs)
+        except Exception as e:
+            print(f"Error in {func.__name__}: {e}")
+            return redirect("oops")
+    return wrapper
+
+
 @login_required
 def create_card_view(request):
     return render(request, "cards/create_card.html")
+
+@login_required
+def oops_view(request):
+    return render(request, "errors/oops.html")
 
 
 @login_required
@@ -38,6 +52,7 @@ def get_and_save_view(request):
 
 
 @login_required
+@catch_views_errors
 def delete_card_view(request):
     card_id = 1
     result = delete_card(card_id, request.user)
@@ -45,6 +60,7 @@ def delete_card_view(request):
 
 
 @login_required
+@catch_views_errors
 def delete_deck_view(request):
     deck_id = 1
     result = delete_deck(deck_id, request.user)
@@ -52,6 +68,7 @@ def delete_deck_view(request):
 
 
 @login_required
+@catch_views_errors
 def show_card_view(request):
     deck_name = "animals"
 
@@ -70,11 +87,12 @@ def show_card_view(request):
     return render(request, "cards/show_card.html", {"card": result})
 
 
+# In this function later AJAX will be applied with JsonResponse so here is no @catch_views_errors
+@login_required
 def update_card_view(request):
     user = request.user
 
     if request.method == "POST":
         update_card(request, user)
 
-    print("Successfully updated card")
     return redirect('show-card')

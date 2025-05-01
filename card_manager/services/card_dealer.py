@@ -1,5 +1,4 @@
 import os
-import re
 import random
 import django
 import sys
@@ -9,6 +8,8 @@ from django.utils import timezone
 from datetime import timedelta
 from django.db.models import F
 from card_manager.models import Card, Deck, ShowCardDailyStat
+from django.shortcuts import redirect
+from django.urls import reverse
 
 
 # Set the default settings module for Django and initialize Django
@@ -25,22 +26,17 @@ class WordNotFoundError(Exception):
         super().__init__(f"Data not available for word {word}. Are you sure you spelled '{word}' correctly?")
 
 
-# This is where OOPS SOMETHING WENT WRONG is going to live in the future
-def catch_errors(func):
-    def wrapper(*args):
+def log_errors(func):
+    def wrapper(*args, **kwargs):
         try:
-            return func(*args)
-
-        except WordNotFoundError:
-            raise
-
+            return func(*args, **kwargs)
         except Exception as e:
-            print(f"Error in {func.__name__}: {e}")
+            print(f"Unexpected error in {func.__name__}: {e}")
             raise
     return wrapper
 
 
-@catch_errors
+@log_errors
 def get_data(input_word):
     url = f'https://api.dictionaryapi.dev/api/v2/entries/en/{input_word}'
     response = requests.get(url)
@@ -48,15 +44,10 @@ def get_data(input_word):
     if response.status_code == 404:
         raise WordNotFoundError(input_word)
 
-    # Catching any kind of other errors related to api data retrieving
-    # Remove when decorator will handle something went wrong with any unexpected errors
-    if response.status_code != 200:
-        raise ValueError(f"Unexpected error occurred with status code: {response.status_code}")
-
     return response
 
 
-@catch_errors
+@log_errors
 def save_data(response, deck_name, user):
 
     deck, created = Deck.objects.get_or_create(user=user, deck_name=deck_name)
@@ -99,7 +90,7 @@ def save_data(response, deck_name, user):
     return word if word else "success"
 
 
-@catch_errors
+@log_errors
 def get_and_save(input_word, deck_name, user):
     try:
         response = get_data(input_word)
@@ -108,12 +99,12 @@ def get_and_save(input_word, deck_name, user):
         return str(e)
 
 
-@catch_errors
+@log_errors
 def create_deck(deck_name, user):
     deck, created = Deck.objects.get_or_create(user=user, deck_name=deck_name)
     return f"Deck {deck_name} created"
 
-@catch_errors
+@log_errors
 def delete_card(card_id, user):
     print("delete_card triggered")
 
@@ -123,7 +114,7 @@ def delete_card(card_id, user):
     card_to_delete.delete()
     return f"Card id {card_id} deleted successfully"
 
-@catch_errors
+@log_errors
 def delete_deck(deck_id, user):
     print("delete_deck() triggered")
 
@@ -135,7 +126,7 @@ def delete_deck(deck_id, user):
 
 # This function shows the whole card including front and back. Handle showing a part of it on frontend
 # !!! Frontend will receive the whole card but will show only front then after click will show back
-@catch_errors
+@log_errors
 def show_card(deck_name, user):
 
     #this function counts cards learned by user every day and saves the data to db
@@ -159,7 +150,7 @@ def show_card(deck_name, user):
 
     return card_to_show
 
-
+@log_errors
 def increment_daily_learning(user):
     today = date.today()
 
@@ -176,7 +167,7 @@ def increment_daily_learning(user):
     return stat
 
 
-@catch_errors
+@log_errors
 def sm2(card_id, user_feedback, user):
 
     card = Card.objects.get(id=card_id, deck__user=user)
@@ -218,7 +209,7 @@ def sm2(card_id, user_feedback, user):
     card.save(update_fields=["ef", "due_date"])
 
 
-@catch_errors
+@log_errors
 def update_card(request, user):
 
     card_id = request.POST.get("card_id")
