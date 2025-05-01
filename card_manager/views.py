@@ -15,35 +15,26 @@ def create_card_view(request):
 
 @login_required
 def get_and_save_view(request):
+    if request.method != 'POST':
+        return HttpResponse("Invalid request method.", status=400)
 
-    if request.method == 'POST':
-        test_word = request.POST.get("word")
-        deck_name = request.POST.get("deck_name")
+    test_word = request.POST.get("word")
+    deck_name = request.POST.get("deck_name")
 
-    else:
-        # Here must be OOPS something went wrong on our side page rendering
-        return HttpResponse("Request method is not POST")
+    deck, _ = Deck.objects.get_or_create(user=request.user, deck_name=deck_name)
 
-    deck, created = Deck.objects.get_or_create(user=request.user, deck_name=deck_name)
-
-    card_exists = Card.objects.filter(
-        deck=deck,
-        json_data__word__iexact=test_word
-    ).exists()
-
-    if card_exists:
+    if Card.objects.filter(deck=deck, json_data__word__iexact=test_word).exists():
         return HttpResponse(f"Word '{test_word}' already exists in your '{deck_name}' deck.")
 
-    result = get_and_save(test_word, deck_name, request.user)
+    try:
+        result = get_and_save(test_word, deck_name, request.user)
+    except Exception:
+        return HttpResponse("Oops, something went wrong on our end.", status=500)
 
-    #word do not exist error
-    pattern = re.match(r"Data not available for the word: (.+)\. Are you sure you spelled it right?", result)
+    if isinstance(result, str) and result.startswith("Data not available for word"):
+        return HttpResponse(result)
 
-    match pattern:
-        case re.Match():
-            return HttpResponse(result)
-        case _:
-            return HttpResponse(f"Word {result} saved successfully")
+    return HttpResponse(f"Word {result} saved successfully")
 
 
 # DELETE this after you connect create_card.html to get_and_save(). Will be redundant

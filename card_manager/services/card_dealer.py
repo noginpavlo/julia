@@ -19,10 +19,21 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "julia.settings")
 django.setup()
 
 
+class WordNotFoundError(Exception):
+    def __init__(self, word):
+        self.word = word
+        super().__init__(f"Data not available for word {word}. Are you sure you spelled '{word}' correctly?")
+
+
+# This is where OOPS SOMETHING WENT WRONG is going to live in the future
 def catch_errors(func):
     def wrapper(*args):
         try:
             return func(*args)
+
+        except WordNotFoundError:
+            raise
+
         except Exception as e:
             print(f"Error in {func.__name__}: {e}")
             raise
@@ -34,12 +45,11 @@ def get_data(input_word):
     url = f'https://api.dictionaryapi.dev/api/v2/entries/en/{input_word}'
     response = requests.get(url)
 
-    # This word does not exist error
     if response.status_code == 404:
-        return f"Data not available for the word: {input_word}. Are you sure you spelled it right?"
+        raise WordNotFoundError(input_word)
 
     # Catching any kind of other errors related to api data retrieving
-    # Here has to be OOPS SOMETHING WENT WRONG redirect
+    # Remove when decorator will handle something went wrong with any unexpected errors
     if response.status_code != 200:
         raise ValueError(f"Unexpected error occurred with status code: {response.status_code}")
 
@@ -91,17 +101,11 @@ def save_data(response, deck_name, user):
 
 @catch_errors
 def get_and_save(input_word, deck_name, user):
-    response = get_data(input_word)
-
-    pattern = re.match(r"Data not available for the word: (.+)\. Are you sure you spelled it right?", response)
-
-    match pattern:
-        case re.Match():
-            return response
-        case _:
-            save_result = save_data(response.json(), deck_name, user)
-
-    return save_result
+    try:
+        response = get_data(input_word)
+        return save_data(response.json(), deck_name, user)
+    except WordNotFoundError as e:
+        return str(e)
 
 
 @catch_errors
