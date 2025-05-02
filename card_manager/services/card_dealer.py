@@ -85,6 +85,7 @@ def save_data(response, deck_name, user):
     Card.objects.create(
         deck=deck,
         json_data=cleaned_data,
+        word=word,
     )
     print(f"Successfully recorded data for word '{word}'")
     return word if word else "success"
@@ -218,6 +219,7 @@ def update_card(request, user):
     if request.POST.get("changed") == "true":
         card_data = card.json_data
 
+        word = request.POST.get("word", card_data.get("word", ""))
         card_data["word"] = request.POST.get("word", card_data.get("word", ""))
         card_data["phonetic"] = request.POST.get("phonetic", card_data.get("phonetic", ""))
         card_data["definitions"] = [
@@ -230,8 +232,7 @@ def update_card(request, user):
         ]
 
         card.json_data = card_data
-
-        print(card.json_data)
+        card.word = word
 
         card.save()
 
