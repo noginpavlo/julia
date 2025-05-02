@@ -178,8 +178,8 @@ def sm2(card_id, user_feedback, user):
 
     if user_feedback < 3:
         Card.objects.filter(id=card.id).update(
+            interval=1,
             repetitions=0,
-            interval=1
         )
     else:
         if card.repetitions == 0:
@@ -203,7 +203,6 @@ def sm2(card_id, user_feedback, user):
     new_ef = card.ef + (0.1 - (5 - user_feedback) * (0.08 + (5 - user_feedback) * 0.02))
     card.ef = max(new_ef, 1.3)
 
-    card.refresh_from_db()
     interval_days = round(float(card.interval))
     card.due_date = timezone.now() + timedelta(days=interval_days)
 

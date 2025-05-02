@@ -141,7 +141,7 @@
         <button class="cancel-button" id="cancel-btn" onclick="cancelEdits()">Cancel</button>
 
         <div class="buttons">
-            <form method="post" action="{% url 'update-card' %}">
+            <form method="post" action="{% url 'show-card' %}">
                 {% csrf_token %}
                 <input type="hidden" name="card_id" value="{{ card.id }}">
                 <input type="hidden" name="changed" id="changed-flag" value="false">
