@@ -120,7 +120,6 @@
   </style>
 </head>
 <body>
-  <h1>Cards in Deck</h1>
   <ul id="card-list">
     <!-- Cards will be injected here -->
   </ul>
@@ -130,77 +129,141 @@
     <button id="next-page" class="pagination-btn" disabled>Next ➡️</button>
   </div>
 
-  <script>
-    const deckId = window.location.pathname.split('/')[2];
-    let currentPageUrl = `/api/decks/${deckId}/cards/`;
+ <script>
+  const deckId = window.location.pathname.split('/')[2];
+  let currentPageUrl = `/api/decks/${deckId}/cards/`;
 
-    function getCSRFToken() {
-      const name = 'csrftoken';
-      const cookies = document.cookie.split(';');
-      for (let cookie of cookies) {
-        const [key, value] = cookie.trim().split('=');
-        if (key === name) return decodeURIComponent(value);
-      }
-      return '';
+  function getCSRFToken() {
+    const name = 'csrftoken';
+    const cookies = document.cookie.split(';');
+    for (let cookie of cookies) {
+      const [key, value] = cookie.trim().split('=');
+      if (key === name) return decodeURIComponent(value);
     }
+    return '';
+  }
 
-    function deleteCard(cardId, button) {
-      if (!confirm("Delete this card?")) return;
+  function deleteCard(cardId, button) {
+    if (!confirm("Delete this card?")) return;
 
-      fetch(`/api/cards/${cardId}/`, {
-        method: 'DELETE',
-        headers: {
-          'X-CSRFToken': getCSRFToken()
+    fetch(`/api/cards/${cardId}/`, {
+      method: 'DELETE',
+      headers: {
+        'X-CSRFToken': getCSRFToken()
+      }
+    }).then(res => {
+      if (res.ok) {
+        button.closest('li').remove();
+      } else {
+        alert("Failed to delete card.");
+      }
+    });
+  }
+
+  function fetchCards(url = currentPageUrl) {
+    fetch(url)
+      .then(res => res.json())
+      .then(data => {
+        const cardList = document.getElementById("card-list");
+        cardList.innerHTML = "";
+
+        // Handle empty list
+        if (data.results.length === 0) {
+          cardList.innerHTML = `
+            <div class="empty-container">
+              <img src="/static/images/kitty.png" alt="Sad Cat Illustration" />
+              <h2>No cards yet</h2>
+              <p>This deck doesn't have any cards yet. How about creating your first one?</p>
+              <a href="/create-card/">
+                <button class="create-button">➕ Add Your First Card</button>
+              </a>
+            </div>
+          `;
+
+          const style = document.createElement('style');
+          style.innerHTML = `
+            .empty-container {
+              text-align: center;
+              background-color: white;
+              padding: 3rem;
+              border-radius: 10px;
+              box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+              margin: 3rem auto;
+              max-width: 500px;
+            }
+
+            .empty-container img {
+              width: 200px;
+              height: auto;
+              margin-bottom: 1.5rem;
+            }
+
+            .empty-container h2 {
+              font-size: 2rem;
+              color: #333;
+            }
+
+            .empty-container p {
+              font-size: 1.1rem;
+              color: #666;
+              margin: 1rem 0 2rem;
+            }
+
+            .create-button {
+              background-color: #4CAF50;
+              color: white;
+              padding: 0.7rem 1.5rem;
+              font-size: 1rem;
+              border: none;
+              border-radius: 5px;
+              text-decoration: none;
+              cursor: pointer;
+            }
+
+            .create-button:hover {
+              background-color: #388E3C;
+            }
+          `;
+          document.head.appendChild(style);
+          return;
         }
-      }).then(res => {
-        if (res.ok) {
-          button.closest('li').remove();
-        } else {
-          alert("Failed to delete card.");
+
+        // Render cards
+        data.results.forEach(card => {
+          const li = document.createElement("li");
+          li.className = "card-item";
+          li.innerHTML = `
+            <span class="card-word">${card.word}</span>
+            <div class="actions">
+              <a class="button-link" href="/cards/${card.id}/view/">
+                <button class="circle-button btn-view" title="View Card">👁️</button>
+              </a>
+              <a class="button-link" href="/cards/${card.id}/edit/">
+                <button class="circle-button btn-edit" title="Edit Card">✏️</button>
+              </a>
+              <button class="circle-button btn-delete" title="Delete Card" onclick="deleteCard(${card.id}, this)">🗑️</button>
+            </div>
+          `;
+          cardList.appendChild(li);
+        });
+
+        // Update pagination
+        currentPageUrl = url;
+        const prevBtn = document.getElementById('prev-page');
+        const nextBtn = document.getElementById('next-page');
+
+        if (prevBtn && nextBtn) {
+          prevBtn.disabled = !data.previous;
+          nextBtn.disabled = !data.next;
+
+          prevBtn.onclick = () => fetchCards(data.previous);
+          nextBtn.onclick = () => fetchCards(data.next);
         }
       });
-    }
+  }
 
-    function fetchCards(url = currentPageUrl) {
-      fetch(url)
-        .then(res => res.json())
-        .then(data => {
-          const cardList = document.getElementById("card-list");
-          cardList.innerHTML = "";
-
-          data.results.forEach(card => {
-            const li = document.createElement("li");
-            li.className = "card-item";
-            li.innerHTML = `
-              <span class="card-word">${card.word}</span>
-              <div class="actions">
-                <a class="button-link" href="/cards/${card.id}/view/">
-                  <button class="circle-button btn-view" title="View Card">👁️</button>
-                </a>
-                <a class="button-link" href="/cards/${card.id}/edit/">
-                  <button class="circle-button btn-edit" title="Edit Card">✏️</button>
-                </a>
-                <button class="circle-button btn-delete" title="Delete Card" onclick="deleteCard(${card.id}, this)">🗑️</button>
-              </div>
-            `;
-            cardList.appendChild(li);
-          });
-
-          // Set current URL
-          currentPageUrl = url;
-
-          // Handle pagination buttons
-          document.getElementById('prev-page').disabled = !data.previous;
-          document.getElementById('next-page').disabled = !data.next;
-
-          document.getElementById('prev-page').onclick = () => fetchCards(data.previous);
-          document.getElementById('next-page').onclick = () => fetchCards(data.next);
-        });
-    }
-
-    // Initial fetch
-    fetchCards();
+  // Initial load
+  fetchCards();
   </script>
 </body>
 </html>
-

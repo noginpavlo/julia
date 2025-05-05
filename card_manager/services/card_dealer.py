@@ -102,24 +102,21 @@ def get_and_save(input_word, deck_name, user):
 
 @log_errors
 def create_deck(deck_name, user):
-    deck, created = Deck.objects.get_or_create(user=user, deck_name=deck_name)
+    Deck.objects.get_or_create(user=user, deck_name=deck_name)
     return f"Deck {deck_name} created"
+
 
 @log_errors
 def delete_card(card_id, user):
-    print("delete_card triggered")
 
-    #Initialize card object with specified id and .delete() it
-    # deck__user=user specifies that card is related to a deck that has user info. Cards don't have user inf.
     card_to_delete = Card.objects.get(id=card_id, deck__user=user)
     card_to_delete.delete()
     return f"Card id {card_id} deleted successfully"
 
+
 @log_errors
 def delete_deck(deck_id, user):
-    print("delete_deck() triggered")
 
-    # init deck obj and delete if user is logged in
     deck_to_delete = Deck.objects.get(id=deck_id, user=user)
     deck_to_delete.delete()
     return f"Deck id {deck_id} deleted successfully"
