@@ -1,5 +1,6 @@
 from rest_framework import generics, permissions
 from .serializers import DeckSerializer, CardSerializer
+from .pagination import CustomPageNumberPagination
 from card_manager.models import Deck, Card
 
 class DeckListView(generics.ListAPIView):
@@ -13,6 +14,7 @@ class DeckListView(generics.ListAPIView):
 class CardListByDeckView(generics.ListAPIView):
     serializer_class = CardSerializer
     permission_classes = [permissions.IsAuthenticated]
+    pagination_class = CustomPageNumberPagination
 
     def get_queryset(self):
         deck_id = self.kwargs['deck_id']

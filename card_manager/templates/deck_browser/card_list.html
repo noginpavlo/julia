@@ -117,153 +117,181 @@
     .pagination-btn:hover:not(:disabled) {
       background-color: #bdbdbd;
     }
+      .pagination {
+      text-align: center;
+      margin: 2rem 0;
+    }
+
+    .pagination button {
+      margin: 0 0.2rem;
+      padding: 0.5rem 0.8rem;
+      border: none;
+      background-color: #f0f0f0;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .pagination button:hover:not(:disabled) {
+      background-color: #ccc;
+    }
+
+    .pagination button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
   </style>
 </head>
 <body>
-  <ul id="card-list">
+    <ul id="card-list">
     <!-- Cards will be injected here -->
-  </ul>
+    </ul>
 
-  <div id="pagination-controls">
-    <button id="prev-page" class="pagination-btn" disabled>⬅️ Prev</button>
-    <button id="next-page" class="pagination-btn" disabled>Next ➡️</button>
-  </div>
+    <div id="pagination" class="pagination"></div>
 
- <script>
-  const deckId = window.location.pathname.split('/')[2];
-  let currentPageUrl = `/api/decks/${deckId}/cards/`;
 
-  function getCSRFToken() {
-    const name = 'csrftoken';
-    const cookies = document.cookie.split(';');
-    for (let cookie of cookies) {
-      const [key, value] = cookie.trim().split('=');
-      if (key === name) return decodeURIComponent(value);
-    }
-    return '';
-  }
+    <script>
+      const deckId = window.location.pathname.split('/')[2];
+      let currentPageUrl = `/api/decks/${deckId}/cards/`;
 
-  function deleteCard(cardId, button) {
-    if (!confirm("Delete this card?")) return;
-
-    fetch(`/api/cards/${cardId}/`, {
-      method: 'DELETE',
-      headers: {
-        'X-CSRFToken': getCSRFToken()
-      }
-    }).then(res => {
-      if (res.ok) {
-        button.closest('li').remove();
-      } else {
-        alert("Failed to delete card.");
-      }
-    });
-  }
-
-  function fetchCards(url = currentPageUrl) {
-    fetch(url)
-      .then(res => res.json())
-      .then(data => {
-        const cardList = document.getElementById("card-list");
-        cardList.innerHTML = "";
-
-        // Handle empty list
-        if (data.results.length === 0) {
-          cardList.innerHTML = `
-            <div class="empty-container">
-              <img src="/static/images/kitty.png" alt="Sad Cat Illustration" />
-              <h2>No cards yet</h2>
-              <p>This deck doesn't have any cards yet. How about creating your first one?</p>
-              <a href="/create-card/">
-                <button class="create-button">➕ Add Your First Card</button>
-              </a>
-            </div>
-          `;
-
-          const style = document.createElement('style');
-          style.innerHTML = `
-            .empty-container {
-              text-align: center;
-              background-color: white;
-              padding: 3rem;
-              border-radius: 10px;
-              box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-              margin: 3rem auto;
-              max-width: 500px;
-            }
-
-            .empty-container img {
-              width: 200px;
-              height: auto;
-              margin-bottom: 1.5rem;
-            }
-
-            .empty-container h2 {
-              font-size: 2rem;
-              color: #333;
-            }
-
-            .empty-container p {
-              font-size: 1.1rem;
-              color: #666;
-              margin: 1rem 0 2rem;
-            }
-
-            .create-button {
-              background-color: #4CAF50;
-              color: white;
-              padding: 0.7rem 1.5rem;
-              font-size: 1rem;
-              border: none;
-              border-radius: 5px;
-              text-decoration: none;
-              cursor: pointer;
-            }
-
-            .create-button:hover {
-              background-color: #388E3C;
-            }
-          `;
-          document.head.appendChild(style);
-          return;
+      function getCSRFToken() {
+        const name = 'csrftoken';
+        const cookies = document.cookie.split(';');
+        for (let cookie of cookies) {
+          const [key, value] = cookie.trim().split('=');
+          if (key === name) return decodeURIComponent(value);
         }
+        return '';
+      }
 
-        // Render cards
-        data.results.forEach(card => {
-          const li = document.createElement("li");
-          li.className = "card-item";
-          li.innerHTML = `
-            <span class="card-word">${card.word}</span>
-            <div class="actions">
-              <a class="button-link" href="/cards/${card.id}/view/">
-                <button class="circle-button btn-view" title="View Card">👁️</button>
-              </a>
-              <a class="button-link" href="/cards/${card.id}/edit/">
-                <button class="circle-button btn-edit" title="Edit Card">✏️</button>
-              </a>
-              <button class="circle-button btn-delete" title="Delete Card" onclick="deleteCard(${card.id}, this)">🗑️</button>
-            </div>
-          `;
-          cardList.appendChild(li);
+      function deleteCard(cardId, button) {
+        if (!confirm("Delete this card?")) return;
+
+        fetch(`/api/cards/${cardId}/`, {
+          method: 'DELETE',
+          headers: {
+            'X-CSRFToken': getCSRFToken()
+          }
+        }).then(res => {
+          if (res.ok) {
+            button.closest('li').remove();
+          } else {
+            alert("Failed to delete card.");
+          }
         });
+      }
 
-        // Update pagination
-        currentPageUrl = url;
-        const prevBtn = document.getElementById('prev-page');
-        const nextBtn = document.getElementById('next-page');
+      function fetchCards(url = currentPageUrl) {
+        fetch(url)
+          .then(res => res.json())
+          .then(data => {
+            const cardList = document.getElementById("card-list");
+            cardList.innerHTML = "";
 
-        if (prevBtn && nextBtn) {
-          prevBtn.disabled = !data.previous;
-          nextBtn.disabled = !data.next;
+            // Handle empty list
+            if (data.results.length === 0) {
+              cardList.innerHTML = `
+                <div class="empty-container">
+                  <img src="/static/images/kitty.png" alt="Sad Cat Illustration" />
+                  <h2>No cards yet</h2>
+                  <p>This deck doesn't have any cards yet. How about creating your first one?</p>
+                  <a href="/create-card/">
+                    <button class="create-button">➕ Add Your First Card</button>
+                  </a>
+                </div>
+              `;
 
-          prevBtn.onclick = () => fetchCards(data.previous);
-          nextBtn.onclick = () => fetchCards(data.next);
-        }
-      });
-  }
+              return;
+            }
 
-  // Initial load
-  fetchCards();
-  </script>
+            // Render cards
+            data.results.forEach(card => {
+              const li = document.createElement("li");
+              li.className = "card-item";
+              li.innerHTML = `
+                <span class="card-word">${card.word}</span>
+                <div class="actions">
+                  <a class="button-link" href="/cards/${card.id}/view/">
+                    <button class="circle-button btn-view" title="View Card">👁️</button>
+                  </a>
+                  <a class="button-link" href="/cards/${card.id}/edit/">
+                    <button class="circle-button btn-edit" title="Edit Card">✏️</button>
+                  </a>
+                  <button class="circle-button btn-delete" title="Delete Card" onclick="deleteCard(${card.id}, this)">🗑️</button>
+                </div>
+              `;
+              cardList.appendChild(li);
+            });
+
+            // Update pagination
+            currentPageUrl = url;
+            buildPagination(data.count, data.previous, data.next, data.current, data.total_pages);
+
+            // scroll up
+            document.getElementById("card-list").scrollIntoView({ behavior: "smooth" });
+          });
+      }
+
+      function buildPagination(totalItems, previousUrl, nextUrl, currentPage, totalPages) {
+          const paginationContainer = document.getElementById("pagination");
+          paginationContainer.innerHTML = "";
+
+          const createButton = (label, url, disabled = false, isCurrent = false) => {
+            const btn = document.createElement("button");
+            btn.textContent = label;
+            btn.disabled = disabled;
+            if (isCurrent) {
+              btn.style.fontWeight = "bold";
+              btn.style.backgroundColor = "#ddd";
+            }
+            if (url) {
+              btn.onclick = () => fetchCards(url);
+            }
+            paginationContainer.appendChild(btn);
+          };
+
+          const pageUrl = pageNum => `/api/decks/${deckId}/cards/?page=${pageNum}`;
+          const current = currentPage || 1;
+          const total = totalPages || Math.ceil(totalItems / 10);
+
+          // First and Prev
+          createButton("« First", pageUrl(1), current === 1);
+          createButton("‹ Prev", previousUrl, !previousUrl);
+
+          // Page numbers
+          const pageButtons = [];
+
+          // Always show first page
+          pageButtons.push(1);
+
+          // Pages around current
+          if (current > 3) pageButtons.push("...");
+          for (let i = Math.max(2, current - 1); i <= Math.min(total - 1, current + 1); i++) {
+            pageButtons.push(i);
+          }
+          if (current + 2 < total) pageButtons.push("...");
+
+          // Always show last page if more than 1
+          if (total > 1) pageButtons.push(total);
+
+          // Render number buttons
+          for (let i of pageButtons) {
+            if (i === "...") {
+              const span = document.createElement("span");
+              span.textContent = "...";
+              span.style.padding = "0 0.5rem";
+              paginationContainer.appendChild(span);
+            } else {
+              createButton(i, pageUrl(i), false, i === current);
+            }
+          }
+
+          // Next and Last
+          createButton("Next ›", nextUrl, !nextUrl);
+          createButton("Last »", pageUrl(total), current === total);
+    }
+      // Initial load
+      fetchCards();
+    </script>
 </body>
 </html>

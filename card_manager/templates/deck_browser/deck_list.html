@@ -91,96 +91,48 @@
     a.button-link {
       text-decoration: none;
     }
+    .pagination {
+      text-align: center;
+      margin: 2rem 0;
+    }
+
+    .pagination button {
+      margin: 0 0.2rem;
+      padding: 0.5rem 0.8rem;
+      border: none;
+      background-color: #f0f0f0;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .pagination button:hover:not(:disabled) {
+      background-color: #ccc;
+    }
+
+    .pagination button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+  }
   </style>
 </head>
 <body>
   <ul id="deck-list">
     <!-- Decks will be injected here -->
   </ul>
-
+  <div id="pagination" class="pagination"></div>
   <script>
-    fetch('/api/decks/')
-      .then(response => response.json())
-      .then(data => {
-        const deckList = document.getElementById("deck-list");
+    let currentPage = 1;
+    const decksPerPage = 10;
 
-        // Check if there are no decks
-        if (data.results.length === 0) {
-          deckList.innerHTML = `
-            <div class="empty-container">
-              <img src="/static/images/kitty.png" alt="Sad Cat Illustration" />
-              <h2>No decks yet</h2>
-              <p>You haven’t created any cards or decks yet. Start by creating your first card.</p>
-              <a href="/create-card/">
-                <button class="create-button">➕ Create Your First Card</button>
-              </a>
-            </div>
-          `;
-
-          const style = document.createElement('style');
-          style.innerHTML = `
-            .empty-container {
-              text-align: center;
-              background-color: white;
-              padding: 3rem;
-              border-radius: 10px;
-              box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-              margin: 3rem auto;
-              max-width: 500px;
-            }
-            .empty-container img {
-              width: 200px;
-              height: auto;
-              margin-bottom: 1.5rem;
-            }
-            .empty-container h2 {
-              font-size: 2rem;
-              color: #333;
-            }
-            .empty-container p {
-              font-size: 1.1rem;
-              color: #666;
-              margin: 1rem 0 2rem;
-            }
-            .create-button {
-              background-color: #4CAF50;
-              color: white;
-              padding: 0.7rem 1.5rem;
-              font-size: 1rem;
-              border: none;
-              border-radius: 5px;
-              text-decoration: none;
-              cursor: pointer;
-            }
-            .create-button:hover {
-              background-color: #388E3C;
-            }
-          `;
-          document.head.appendChild(style);
-          return;
-        }
-
-        // Otherwise, render the decks
-        data.results.forEach(deck => {
-          const listItem = document.createElement("li");
-          listItem.className = "deck-item";
-
-          listItem.innerHTML = `
-            <span class="deck-name">${deck.deck_name}</span>
-            <div class="actions">
-              <a class="button-link" href="/decks/${deck.id}/cards/">
-                <button class="circle-button btn-view" title="View Cards">👁️</button>
-              </a>
-              <a class="button-link" href="/learn/${deck.id}/">
-                <button class="circle-button btn-learn" title="Learn Deck">📚</button>
-              </a>
-              <button class="circle-button btn-delete" title="Delete Deck" onclick="deleteDeck(${deck.id}, this)">🗑️</button>
-            </div>
-          `;
-          deckList.appendChild(listItem);
-        });
-      });
-
+    function getCSRFToken() {
+      const name = 'csrftoken';
+      const cookies = document.cookie.split(';');
+      for (let cookie of cookies) {
+        let [key, value] = cookie.trim().split('=');
+        if (key === name) return decodeURIComponent(value);
+      }
+      return '';
+    }
 
     function deleteDeck(deckId, button) {
       if (!confirm("Are you sure you want to delete this deck?")) return;
@@ -199,15 +151,133 @@
       });
     }
 
-    function getCSRFToken() {
-      const name = 'csrftoken';
-      const cookies = document.cookie.split(';');
-      for (let cookie of cookies) {
-        let [key, value] = cookie.trim().split('=');
-        if (key === name) return decodeURIComponent(value);
-      }
-      return '';
+    function fetchDecks(page = 1) {
+      fetch(`/api/decks/?page=${page}`)
+        .then(response => response.json())
+        .then(data => {
+          const deckList = document.getElementById("deck-list");
+          deckList.innerHTML = "";
+          currentPage = page;
+
+          if (data.results.length === 0 && page === 1) {
+            deckList.innerHTML = `
+              <div class="empty-container">
+                <img src="/static/images/kitty.png" alt="Sad Cat Illustration" />
+                <h2>No decks yet</h2>
+                <p>You haven’t created any cards or decks yet. Start by creating your first card.</p>
+                <a href="/create-card/">
+                  <button class="create-button">➕ Create Your First Card</button>
+                </a>
+              </div>
+            `;
+
+            const style = document.createElement('style');
+            style.innerHTML = `
+              .empty-container {
+                text-align: center;
+                background-color: white;
+                padding: 3rem;
+                border-radius: 10px;
+                box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+                margin: 3rem auto;
+                max-width: 500px;
+              }
+              .empty-container img {
+                width: 200px;
+                height: auto;
+                margin-bottom: 1.5rem;
+              }
+              .empty-container h2 {
+                font-size: 2rem;
+                color: #333;
+              }
+              .empty-container p {
+                font-size: 1.1rem;
+                color: #666;
+                margin: 1rem 0 2rem;
+              }
+              .create-button {
+                background-color: #4CAF50;
+                color: white;
+                padding: 0.7rem 1.5rem;
+                font-size: 1rem;
+                border: none;
+                border-radius: 5px;
+                text-decoration: none;
+                cursor: pointer;
+              }
+              .create-button:hover {
+                background-color: #388E3C;
+              }
+            `;
+            document.head.appendChild(style);
+            return;
+          }
+
+          // Render deck items
+          data.results.forEach(deck => {
+            const listItem = document.createElement("li");
+            listItem.className = "deck-item";
+
+            listItem.innerHTML = `
+              <span class="deck-name">${deck.deck_name}</span>
+              <div class="actions">
+                <a class="button-link" href="/decks/${deck.id}/cards/">
+                  <button class="circle-button btn-view" title="View Cards">👁️</button>
+                </a>
+                <a class="button-link" href="/learn/${deck.id}/">
+                  <button class="circle-button btn-learn" title="Learn Deck">📚</button>
+                </a>
+                <button class="circle-button btn-delete" title="Delete Deck" onclick="deleteDeck(${deck.id}, this)">🗑️</button>
+              </div>
+            `;
+            deckList.appendChild(listItem);
+          });
+
+          // Build pagination
+          buildPagination(data.count, page);
+        });
     }
+
+    function buildPagination(totalItems, currentPage) {
+      const paginationContainer = document.getElementById("pagination");
+      paginationContainer.innerHTML = "";
+
+      const totalPages = Math.ceil(totalItems / decksPerPage);
+
+      const createButton = (label, page, disabled = false, isCurrent = false) => {
+        const btn = document.createElement("button");
+        btn.textContent = label;
+        btn.disabled = disabled;
+        btn.style.margin = "0 3px";
+        if (isCurrent) {
+          btn.style.fontWeight = "bold";
+          btn.style.backgroundColor = "#ddd";
+        }
+        btn.onclick = () => fetchDecks(page);
+        paginationContainer.appendChild(btn);
+      };
+
+      // First and Prev
+      createButton("« First", 1, currentPage === 1);
+      createButton("‹ Prev", currentPage - 1, currentPage === 1);
+
+      // Pages
+      let start = Math.max(1, currentPage - 2);
+      let end = Math.min(start + 4, totalPages);
+      if (end - start < 4) start = Math.max(1, end - 4);
+
+      for (let i = start; i <= end; i++) {
+        createButton(i, i, false, i === currentPage);
+      }
+
+      // Next and Last
+      createButton("Next ›", currentPage + 1, currentPage === totalPages);
+      createButton("Last »", totalPages, currentPage === totalPages);
+    }
+
+    // Initial call
+    fetchDecks();
   </script>
 </body>
 </html>
