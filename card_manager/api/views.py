@@ -6,9 +6,10 @@ from card_manager.models import Deck, Card
 class DeckListView(generics.ListAPIView):
     serializer_class = DeckSerializer
     permission_classes = [permissions.IsAuthenticated]
+    pagination_class = CustomPageNumberPagination
 
     def get_queryset(self):
-        return Deck.objects.filter(user=self.request.user).order_by('-date_created')
+        return Deck.objects.filter(user=self.request.user).order_by('-date_updated')
 
 
 class CardListByDeckView(generics.ListAPIView):
