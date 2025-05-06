@@ -27,7 +27,7 @@ class Card(models.Model):
         related_name='cards'
     )
     json_data = models.JSONField()
-    word = models.CharField(max_length=255)
+    word = models.CharField(max_length=255, db_index=True)
     quality = models.FloatField(default=1)
     ef = models.FloatField(default=1.3)
     repetitions = models.FloatField(default=0.0)

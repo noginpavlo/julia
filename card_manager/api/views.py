@@ -2,6 +2,7 @@ from rest_framework import generics, permissions
 from .serializers import DeckSerializer, CardSerializer
 from .pagination import CustomPageNumberPagination
 from card_manager.models import Deck, Card
+from django.db.models import Q
 
 class DeckListView(generics.ListAPIView):
     serializer_class = DeckSerializer
@@ -9,7 +10,13 @@ class DeckListView(generics.ListAPIView):
     pagination_class = CustomPageNumberPagination
 
     def get_queryset(self):
-        return Deck.objects.filter(user=self.request.user).order_by('-date_updated')
+        deck_queryset = Deck.objects.filter(user=self.request.user).order_by('-date_updated')
+
+        search_query = self.request.GET.get('search', '')
+        if search_query:
+            deck_queryset = deck_queryset.filter(deck_name__istartswith=search_query)
+
+        return deck_queryset
 
 
 class CardListByDeckView(generics.ListAPIView):
@@ -19,4 +26,13 @@ class CardListByDeckView(generics.ListAPIView):
 
     def get_queryset(self):
         deck_id = self.kwargs['deck_id']
-        return Card.objects.filter(deck__id=deck_id, deck__user=self.request.user).order_by('due_date')
+        card_queryset = Card.objects.filter(
+            deck__id=deck_id,
+            deck__user=self.request.user
+        ).order_by('due_date')
+
+        search_query = self.request.GET.get('search', '')
+        if search_query:
+            card_queryset = card_queryset.filter(word__istartswith=search_query)
+
+        return card_queryset
