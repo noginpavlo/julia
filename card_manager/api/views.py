@@ -2,7 +2,7 @@ from rest_framework import generics, permissions
 from .serializers import DeckSerializer, CardSerializer
 from .pagination import CustomPageNumberPagination
 from card_manager.models import Deck, Card
-from django.db.models import Q
+
 
 class DeckListView(generics.ListAPIView):
     serializer_class = DeckSerializer
