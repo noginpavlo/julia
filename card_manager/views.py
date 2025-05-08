@@ -56,13 +56,13 @@ def oops_view(request):
 #
 #     return JsonResponse({"message": f"Word '{result}' saved successfully!"})
 
-
-@login_required
-@catch_views_errors
-def delete_card_view(request):
-    card_id = 1
-    result = delete_card(card_id, request.user)
-    return HttpResponse(result)
+""" Deprecated """
+# @login_required
+# @catch_views_errors
+# def delete_card_view(request):
+#     card_id = 1
+#     result = delete_card(card_id, request.user)
+#     return HttpResponse(result)
 
 
 @login_required

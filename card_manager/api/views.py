@@ -86,3 +86,19 @@ class CardDeleteView(DestroyAPIView):
 
         return Response({"message": "Card deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
 
+
+class DeckDeleteView(DestroyAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Deck.objects.filter(user=self.request.user)
+
+    def delete(self, request, *args, **kwargs):
+        deck_id = kwargs.get("pk")
+        deck = get_object_or_404(Deck, id=deck_id, user=request.user)
+        deck.delete() # deletes the deck and all cards in deck (CASCADE)
+
+        return Response(
+            {"message": "Deck and all its cards deleted successfully."},
+            status=status.HTTP_204_NO_CONTENT
+        )
