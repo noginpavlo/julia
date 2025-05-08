@@ -1,14 +1,14 @@
-from rest_framework import serializers
+from rest_framework.serializers import Serializer, ModelSerializer, CharField
 from card_manager.models import Deck, Card
 
 
-class DeckSerializer(serializers.ModelSerializer):
+class DeckSerializer(ModelSerializer):
     class Meta:
         model = Deck
         fields = ['id', 'deck_name', 'date_updated']
 
 
-class CardSerializer(serializers.ModelSerializer):
+class CardSerializer(ModelSerializer):
     class Meta:
         model = Card
         fields= [
@@ -18,9 +18,9 @@ class CardSerializer(serializers.ModelSerializer):
         ]
 
 
-class CardCreateSerializer(serializers.Serializer):
-    word = serializers.CharField()
-    deck_name = serializers.CharField()
+class CardCreateSerializer(Serializer):
+    word = CharField()
+    deck_name = CharField()
 
     def create(self, validated_data):
         user = self.context["request"].user

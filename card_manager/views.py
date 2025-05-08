@@ -30,31 +30,31 @@ def oops_view(request):
     return render(request, "errors/oops.html")
 
 
-@login_required
-def get_and_save_view(request):
-    if request.method != 'POST':
-        return HttpResponse("Invalid request method.", status=400)
-
-    word = request.POST.get("word")
-    deck_name = request.POST.get("deck_name")
-
-    deck, _ = Deck.objects.get_or_create(user=request.user, deck_name=deck_name)
-
-    if Card.objects.filter(deck=deck, json_data__word__iexact=word).exists():
-        return JsonResponse(
-            {"message": f"Word '{word}' already exists in your '{deck_name}' deck."},
-            status=400,
-        )
-
-    try:
-        result = get_and_save(word, deck_name, request.user)
-    except Exception:
-        return JsonResponse({"error": "Oops, something went wrong on our end."}, status=500)
-
-    if isinstance(result, str) and result.startswith("Data not available for word"):
-        return JsonResponse({"message": result}, status=400)
-
-    return JsonResponse({"message": f"Word '{result}' saved successfully!"})
+# @login_required
+# def get_and_save_view(request):
+#     if request.method != 'POST':
+#         return HttpResponse("Invalid request method.", status=400)
+#
+#     word = request.POST.get("word")
+#     deck_name = request.POST.get("deck_name")
+#
+#     deck, _ = Deck.objects.get_or_create(user=request.user, deck_name=deck_name)
+#
+#     if Card.objects.filter(deck=deck, json_data__word__iexact=word).exists():
+#         return JsonResponse(
+#             {"message": f"Word '{word}' already exists in your '{deck_name}' deck."},
+#             status=400,
+#         )
+#
+#     try:
+#         result = get_and_save(word, deck_name, request.user)
+#     except Exception:
+#         return JsonResponse({"error": "Oops, something went wrong on our end."}, status=500)
+#
+#     if isinstance(result, str) and result.startswith("Data not available for word"):
+#         return JsonResponse({"message": result}, status=400)
+#
+#     return JsonResponse({"message": f"Word '{result}' saved successfully!"})
 
 
 @login_required

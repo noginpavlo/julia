@@ -28,7 +28,6 @@ urlpatterns = [
     path('decks/<int:deck_id>/cards/', card_views.show_cards, name='show-cards'),
     path('oops/', card_views.oops_view, name='oops'),
     path('create-card/', card_views.create_card_view, name='create-card'),
-    path('get-and-save/', card_views.get_and_save_view, name='get_save'),
     path('delete-card/', card_views.delete_card_view, name='delete-card'),
     path('delete-deck/', card_views.delete_deck_view, name='delete-deck'),
     path('show-card/', card_views.show_card_view, name='show-card'),

@@ -1,11 +1,11 @@
 from rest_framework import status
-from rest_framework.generics import CreateAPIView, ListAPIView
+from rest_framework.generics import CreateAPIView, DestroyAPIView, ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from .serializers import DeckSerializer, CardSerializer, CardCreateSerializer
-from rest_framework.exceptions import ValidationError
 from .pagination import CustomPageNumberPagination
 from card_manager.models import Deck, Card
+from django.shortcuts import get_object_or_404
 
 
 class DeckListView(ListAPIView):
@@ -63,7 +63,7 @@ class CardCreateView(CreateAPIView):
             )
 
         try:
-            result = serializer.save() # this == serializer.create(serializer.validated_data), but conventional
+            result = serializer.save() # calls serializer.create(serializer.validated_data)
         except Exception:
             return Response({"error": "Something went wrong."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -71,3 +71,18 @@ class CardCreateView(CreateAPIView):
             return Response({"message": result}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response({"message": f"Word '{result}' saved successfully!"}, status=status.HTTP_201_CREATED)
+
+
+class CardDeleteView(DestroyAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Card.objects.filter(deck__user=self.request.user)
+
+    def delete(self, request, *args, **kwargs):
+        card_id = kwargs.get("pk")
+        card = get_object_or_404(Card, id=card_id, deck__user=request.user)
+        card.delete()
+
+        return Response({"message": "Card deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
+
