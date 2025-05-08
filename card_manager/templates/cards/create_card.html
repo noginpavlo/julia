@@ -76,7 +76,7 @@
     <div class="card-container">
         <h2>Create a New Flashcard</h2>
 
-        <form method="POST" action="/get-and-save/">
+        <form method="POST" action="{% url 'create-cards' %}">
             {% csrf_token %}
             <div class="field">
                 <label for="deck-name">Deck Name</label>

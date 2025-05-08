@@ -8,8 +8,6 @@ from django.utils import timezone
 from datetime import timedelta
 from django.db.models import F
 from card_manager.models import Card, Deck, ShowCardDailyStat
-from django.shortcuts import redirect
-from django.urls import reverse
 
 
 # Set the default settings module for Django and initialize Django
@@ -87,7 +85,6 @@ def save_data(response, deck_name, user):
         json_data=cleaned_data,
         word=word,
     )
-    print(f"Successfully recorded data for word '{word}'")
     return word if word else "success"
 
 
