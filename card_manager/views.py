@@ -65,12 +65,12 @@ def oops_view(request):
 #     return HttpResponse(result)
 
 
-@login_required
-@catch_views_errors
-def delete_deck_view(request):
-    deck_id = 1
-    result = delete_deck(deck_id, request.user)
-    return HttpResponse(result)
+# @login_required
+# @catch_views_errors
+# def delete_deck_view(request):
+#     deck_id = 1
+#     result = delete_deck(deck_id, request.user)
+#     return HttpResponse(result)
 
 
 @login_required

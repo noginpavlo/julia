@@ -28,8 +28,6 @@ urlpatterns = [
     path('decks/<int:deck_id>/cards/', card_views.show_cards, name='show-cards'),
     path('oops/', card_views.oops_view, name='oops'),
     path('create-card/', card_views.create_card_view, name='create-card'),
-    # path('delete-card/', card_views.delete_card_view, name='delete-card'),
-    path('delete-deck/', card_views.delete_deck_view, name='delete-deck'),
     path('show-card/', card_views.show_card_view, name='show-card'),
     path('update-card/', card_views.update_card_view, name='update-card'),
     path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
