@@ -1,14 +1,10 @@
 from django.contrib.auth.decorators import login_required
 from card_manager.services.card_dealer import (
-    get_and_save, show_card, delete_card, delete_deck, sm2, update_card
+    show_card, delete_card, delete_deck, sm2, update_card
     )
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
-from .models import Deck, Card
-from django.http import JsonResponse
-from rest_framework.response import Response
-from rest_framework.decorators import api_view
-from rest_framework import status
+
 
 
 def catch_views_errors(func):
@@ -29,32 +25,32 @@ def create_card_view(request):
 def oops_view(request):
     return render(request, "errors/oops.html")
 
-
-@login_required
-def get_and_save_view(request):
-    if request.method != 'POST':
-        return HttpResponse("Invalid request method.", status=400)
-
-    word = request.POST.get("word")
-    deck_name = request.POST.get("deck_name")
-
-    deck, _ = Deck.objects.get_or_create(user=request.user, deck_name=deck_name)
-
-    if Card.objects.filter(deck=deck, json_data__word__iexact=word).exists():
-        return JsonResponse(
-            {"message": f"Word '{word}' already exists in your '{deck_name}' deck."},
-            status=400,
-        )
-
-    try:
-        result = get_and_save(word, deck_name, request.user)
-    except Exception:
-        return JsonResponse({"error": "Oops, something went wrong on our end."}, status=500)
-
-    if isinstance(result, str) and result.startswith("Data not available for word"):
-        return JsonResponse({"message": result}, status=400)
-
-    return JsonResponse({"message": f"Word '{result}' saved successfully!"})
+""" Deprecated """
+# @login_required
+# def get_and_save_view(request):
+#     if request.method != 'POST':
+#         return HttpResponse("Invalid request method.", status=400)
+#
+#     word = request.POST.get("word")
+#     deck_name = request.POST.get("deck_name")
+#
+#     deck, _ = Deck.objects.get_or_create(user=request.user, deck_name=deck_name)
+#
+#     if Card.objects.filter(deck=deck, json_data__word__iexact=word).exists():
+#         return JsonResponse(
+#             {"message": f"Word '{word}' already exists in your '{deck_name}' deck."},
+#             status=400,
+#         )
+#
+#     try:
+#         result = get_and_save(word, deck_name, request.user)
+#     except Exception:
+#         return JsonResponse({"error": "Oops, something went wrong on our end."}, status=500)
+#
+#     if isinstance(result, str) and result.startswith("Data not available for word"):
+#         return JsonResponse({"message": result}, status=400)
+#
+#     return JsonResponse({"message": f"Word '{result}' saved successfully!"})
 
 
 @login_required
@@ -103,22 +99,22 @@ def update_card_view(request):
 
     return redirect('show-card')
 
-
-@api_view(['GET'])
-def deck_list(request):
-    if request.user.is_authenticated:
-        decks = Deck.objects.filter(user=request.user)
-        deck_data = [{"id": deck.id, "deck_name": deck.deck_name} for deck in decks]
-        return Response(deck_data)
-    else:
-        return JsonResponse({"error": "Authentication required."}, status=status.HTTP_401_UNAUTHORIZED)
-
-
-def show_decks(request):
-    return render(request, 'deck_browser/deck_list.html')
-
-def show_cards(request, deck_id):
-    deck = Deck.objects.get(id=deck_id, user=request.user)
-    cards = Card.objects.filter(deck=deck)
-    return render(request, 'deck_browser/card_list.html', {'deck': deck, 'cards': cards})
-
+""" Deprecated """
+# @api_view(['GET'])
+# def deck_list(request):
+#     if request.user.is_authenticated:
+#         decks = Deck.objects.filter(user=request.user)
+#         deck_data = [{"id": deck.id, "deck_name": deck.deck_name} for deck in decks]
+#         return Response(deck_data)
+#     else:
+#         return JsonResponse({"error": "Authentication required."}, status=status.HTTP_401_UNAUTHORIZED)
+#
+#
+# def show_decks(request):
+#     return render(request, 'deck_browser/deck_list.html')
+#
+# def show_cards(request, deck_id):
+#     deck = Deck.objects.get(id=deck_id, user=request.user)
+#     cards = Card.objects.filter(deck=deck)
+#     return render(request, 'deck_browser/card_list.html', {'deck': deck, 'cards': cards})
+#
