@@ -76,7 +76,7 @@ def oops_view(request):
 @login_required
 @catch_views_errors
 def show_card_view(request):
-    deck_name = "animals"
+    deck_name = "big deck"
 
     if request.method == "POST":
         card_id = request.POST.get("card_id")
@@ -116,6 +116,7 @@ def deck_list(request):
 
 def show_decks(request):
     return render(request, 'deck_browser/deck_list.html')
+
 
 def show_cards(request, deck_id):
     deck = Deck.objects.get(id=deck_id, user=request.user)

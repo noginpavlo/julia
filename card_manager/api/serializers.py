@@ -1,4 +1,4 @@
-from rest_framework.serializers import Serializer, ModelSerializer, CharField
+from rest_framework.serializers import Serializer, ModelSerializer, SerializerMethodField, CharField
 from card_manager.models import Deck, Card
 
 
@@ -30,3 +30,13 @@ class CardCreateSerializer(Serializer):
         from card_manager.services.card_dealer import get_and_save
         return get_and_save(word, deck_name, user)
 
+
+class ShowCardSerializer(ModelSerializer):
+    definition = SerializerMethodField()
+
+    class Meta:
+        model = Card
+        fields = ['id', 'word', 'definition']
+
+    def get_definition(self, obj):
+        return obj.json_data.get("definition", "")

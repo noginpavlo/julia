@@ -1,11 +1,13 @@
 from rest_framework import status
 from rest_framework.generics import CreateAPIView, DestroyAPIView, ListAPIView
+from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from .serializers import DeckSerializer, CardSerializer, CardCreateSerializer
+from .serializers import DeckSerializer, CardSerializer, CardCreateSerializer, ShowCardSerializer
 from .pagination import CustomPageNumberPagination
 from card_manager.models import Deck, Card
 from django.shortcuts import get_object_or_404
+from card_manager.services.card_dealer import sm2, show_card
 
 
 class DeckListView(ListAPIView):
@@ -40,7 +42,6 @@ class CardListByDeckView(ListAPIView):
             card_queryset = card_queryset.filter(word__istartswith=search_query)
 
         return card_queryset
-
 
 
 class CardCreateView(CreateAPIView):
@@ -102,3 +103,35 @@ class DeckDeleteView(DestroyAPIView):
             {"message": "Deck and all its cards deleted successfully."},
             status=status.HTTP_204_NO_CONTENT
         )
+
+
+class ShowCardAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    deck_name = "big deck"  # NOTE THAT THIS IS HARDCODED FOR TESTING
+
+    def get(self, request):
+        result = show_card(self.deck_name, request.user)
+
+        if result == "No cards left for today":
+            return Response(
+                {"message": f"Congratulations☺️ You've learned all cards in '{self.deck_name}' deck for today."},
+                status=status.HTTP_200_OK
+            )
+
+        serializer = ShowCardSerializer(result)
+        return Response(serializer.data)
+
+    def post(self, request):
+        card_id = request.data.get("card_id")
+        user_feedback = request.data.get("user_feedback")
+
+        if not card_id or not user_feedback:
+            return Response({"error": "Missing card_id or user_feedback."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user_feedback = int(user_feedback)
+            sm2(card_id, user_feedback, request.user)
+        except Exception as e:
+            return Response({"error": "Failed to update card."}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({"message": "Card updated successfully."}, status=status.HTTP_200_OK)

@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import DeckListView, CardListByDeckView, CardCreateView, CardDeleteView, DeckDeleteView
+from .views import DeckListView, CardListByDeckView, CardCreateView, CardDeleteView, DeckDeleteView, ShowCardAPIView
 
 
 urlpatterns = [
@@ -8,5 +8,5 @@ urlpatterns = [
     path("cards/", CardCreateView.as_view(), name="create-cards"),
     path("cards/<int:pk>/", CardDeleteView.as_view(), name="delete-cards"),
     path("decks/<int:pk>/", DeckDeleteView.as_view(), name="delete-decks"),
-
+    path("study/", ShowCardAPIView.as_view(), name="study-card"),
 ]
