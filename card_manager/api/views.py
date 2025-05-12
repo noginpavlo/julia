@@ -107,7 +107,7 @@ class DeckDeleteView(DestroyAPIView):
 
 class ShowCardAPIView(APIView):
     permission_classes = [IsAuthenticated]
-    deck_name = "big deck"  # NOTE THAT THIS IS HARDCODED FOR TESTING
+    deck_name = "animals"  # NOTE THAT THIS IS HARDCODED FOR TESTING
 
     def get(self, request):
         result = show_card(self.deck_name, request.user)

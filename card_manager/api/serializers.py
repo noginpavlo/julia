@@ -32,11 +32,6 @@ class CardCreateSerializer(Serializer):
 
 
 class ShowCardSerializer(ModelSerializer):
-    definition = SerializerMethodField()
-
     class Meta:
         model = Card
-        fields = ['id', 'word', 'definition']
-
-    def get_definition(self, obj):
-        return obj.json_data.get("definition", "")
+        fields = ['id', 'word', 'json_data']

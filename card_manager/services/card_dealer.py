@@ -138,7 +138,7 @@ def show_card(deck_name, user):
     )
 
     if not all_cards_ids:
-        return "No cards left for today" # this will be handled in show_card_view() in views.py
+        return "No cards left for today"
 
     card_id = random.choice(all_cards_ids)
     card_to_show = Card.objects.get(id=card_id, deck__user=user)
