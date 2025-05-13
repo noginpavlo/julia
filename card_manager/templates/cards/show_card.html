@@ -91,6 +91,13 @@
             background-color: #f44336;
             color: white;
         }
+
+        .message {
+            text-align: center;
+            font-size: 1.2rem;
+            color: green;
+            margin-top: 2rem;
+        }
     </style>
 </head>
 <body>
@@ -103,111 +110,167 @@
 
         <div class="field">
             <label>Word:</label>
-            <div class="static" id="word-display">{{ card.json_data.word }}</div>
-            <input type="text" id="word-input" style="display:none;" value="{{ card.json_data.word }}">
+            <div class="static" id="word-display"></div>
+            <input type="text" id="word-input" style="display:none;">
         </div>
 
         <div class="field">
             <label>Phonetic:</label>
-            <div class="static" id="phonetic-display">{{ card.json_data.phonetic }}</div>
-            <input type="text" id="phonetic-input" style="display:none;" value="{{ card.json_data.phonetic }}">
+            <div class="static" id="phonetic-display"></div>
+            <input type="text" id="phonetic-input" style="display:none;">
         </div>
 
         <div class="field">
             <label>Meaning 1:</label>
-            <div class="static" id="meaning1-display">{{ card.json_data.definitions.0 }}</div>
-            <textarea id="meaning1-input" style="display:none;">{{ card.json_data.definitions.0 }}</textarea>
+            <div class="static" id="meaning1-display"></div>
+            <textarea id="meaning1-input" style="display:none;"></textarea>
         </div>
 
         <div class="field">
             <label>Meaning 2:</label>
-            <div class="static" id="meaning2-display">{{ card.json_data.definitions.1 }}</div>
-            <textarea id="meaning2-input" style="display:none;">{{ card.json_data.definitions.1 }}</textarea>
+            <div class="static" id="meaning2-display"></div>
+            <textarea id="meaning2-input" style="display:none;"></textarea>
         </div>
 
         <div class="field">
             <label>Example 1:</label>
-            <div class="static" id="example1-display">{{ card.json_data.examples.0 }}</div>
-            <textarea id="example1-input" style="display:none;">{{ card.json_data.examples.0 }}</textarea>
+            <div class="static" id="example1-display"></div>
+            <textarea id="example1-input" style="display:none;"></textarea>
         </div>
 
         <div class="field">
             <label>Example 2:</label>
-            <div class="static" id="example2-display">{{ card.json_data.examples.1 }}</div>
-            <textarea id="example2-input" style="display:none;">{{ card.json_data.examples.1 }}</textarea>
+            <div class="static" id="example2-display"></div>
+            <textarea id="example2-input" style="display:none;"></textarea>
         </div>
 
         <button class="save-button" id="save-btn" onclick="saveEdits()">Save</button>
         <button class="cancel-button" id="cancel-btn" onclick="cancelEdits()">Cancel</button>
 
         <div class="buttons">
-            <form method="post" action="{% url 'show-card' %}">
-                {% csrf_token %}
-                <input type="hidden" name="card_id" value="{{ card.id }}">
-                <input type="hidden" name="changed" id="changed-flag" value="false">
-
-                <input type="hidden" name="word" id="word-hidden">
-                <input type="hidden" name="phonetic" id="phonetic-hidden">
-                <input type="hidden" name="meaning1" id="meaning1-hidden">
-                <input type="hidden" name="meaning2" id="meaning2-hidden">
-                <input type="hidden" name="example1" id="example1-hidden">
-                <input type="hidden" name="example2" id="example2-hidden">
-
-                <button name="user_feedback" value="1">Again</button>
-                <button name="user_feedback" value="3">Hard</button>
-                <button name="user_feedback" value="4">Medium</button>
-                <button name="user_feedback" value="5">Easy</button>
-            </form>
-
+            <button onclick="sendFeedback(1)">Again</button>
+            <button onclick="sendFeedback(3)">Hard</button>
+            <button onclick="sendFeedback(4)">Medium</button>
+            <button onclick="sendFeedback(5)">Easy</button>
         </div>
+
+        <div class="message" id="message-box"></div>
     </div>
 
-    <script>
-        let isEditing = false;
-        let originalValues = {};
-        const fields = ['word', 'phonetic', 'meaning1', 'meaning2', 'example1', 'example2'];
+<script>
+    let cardId = null;
+    let isEditing = false;
+    let originalValues = {};
+    const fields = ['word', 'phonetic', 'meaning1', 'meaning2', 'example1', 'example2'];
 
-        function toggleEditMode() {
-            isEditing = !isEditing;
+    async function loadCard() {
+        try {
+            const response = await fetch('/api/study/');
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const data = await response.json();
 
-            if (isEditing) {
-                fields.forEach(field => {
-                    originalValues[field] = document.getElementById(`${field}-display`).textContent;
-                    const input = document.getElementById(`${field}-input`);
-                    input.value = originalValues[field];
-
-                    // Attach event listener to detect changes
-                    input.addEventListener('input', () => {
-                        document.getElementById('changed-flag').value = 'true';
-                    });
-                });
+            if (data.message) {
+                document.getElementById("message-box").innerText = data.message;
+                document.querySelector(".card-container").style.display = "none";
+                return;
             }
 
-            document.querySelectorAll('[id$="-display"]').forEach(el => el.style.display = isEditing ? 'none' : 'block');
-            document.querySelectorAll('[id$="-input"]').forEach(el => el.style.display = isEditing ? 'block' : 'none');
-            document.getElementById('save-btn').style.display = isEditing ? 'inline-block' : 'none';
-            document.getElementById('cancel-btn').style.display = isEditing ? 'inline-block' : 'none';
+            cardId = data.id;
+            const json = typeof data.json_data === 'string' ? JSON.parse(data.json_data) : data.json_data;
+
+            // Set display values safely
+            document.getElementById("word-display").innerText = json.word || "";
+            document.getElementById("phonetic-display").innerText = json.phonetic || "";
+            document.getElementById("meaning1-display").innerText = (json.definitions && json.definitions[0]) || "";
+            document.getElementById("meaning2-display").innerText = (json.definitions && json.definitions[1]) || "";
+            document.getElementById("example1-display").innerText = (json.examples && json.examples[0]) || "";
+            document.getElementById("example2-display").innerText = (json.examples && json.examples[1]) || "";
+
+            // Also set the hidden inputs (for form postback if needed)
+            document.getElementById("word-hidden").value = json.word || "";
+            document.getElementById("phonetic-hidden").value = json.phonetic || "";
+            document.getElementById("meaning1-hidden").value = (json.definitions && json.definitions[0]) || "";
+            document.getElementById("meaning2-hidden").value = (json.definitions && json.definitions[1]) || "";
+            document.getElementById("example1-hidden").value = (json.examples && json.examples[0]) || "";
+            document.getElementById("example2-hidden").value = (json.examples && json.examples[1]) || "";
+
+        } catch (error) {
+            console.error("Failed to load card:", error);
+        }
+    }
+
+    function toggleEditMode() {
+        isEditing = !isEditing;
+
+        if (isEditing) {
+            fields.forEach(field => {
+                const display = document.getElementById(`${field}-display`);
+                const input = document.getElementById(`${field}-input`);
+                originalValues[field] = display.textContent;
+                input.value = originalValues[field];
+            });
         }
 
-        function saveEdits() {
-            const fields = ['word', 'phonetic', 'meaning1', 'meaning2', 'example1', 'example2'];
+        document.querySelectorAll('[id$="-display"]').forEach(el => el.style.display = isEditing ? 'none' : 'block');
+        document.querySelectorAll('[id$="-input"]').forEach(el => el.style.display = isEditing ? 'block' : 'none');
+        document.getElementById('save-btn').style.display = isEditing ? 'inline-block' : 'none';
+        document.getElementById('cancel-btn').style.display = isEditing ? 'inline-block' : 'none';
+    }
 
-            fields.forEach(field => {
-                const value = document.getElementById(`${field}-input`).value;
-                document.getElementById(`${field}-display`).textContent = value;
-                document.getElementById(`${field}-hidden`).value = value;
+    function saveEdits() {
+        fields.forEach(field => {
+            const value = document.getElementById(`${field}-input`).value;
+            document.getElementById(`${field}-display`).textContent = value;
+            document.getElementById(`${field}-hidden`).value = value;
+        });
+
+        toggleEditMode();
+    }
+
+    function cancelEdits() {
+        fields.forEach(field => {
+            document.getElementById(`${field}-input`).value = originalValues[field];
+        });
+        toggleEditMode();
+    }
+
+    async function sendFeedback(value) {
+        if (!cardId) return;
+
+        try {
+            const response = await fetch('/api/study/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken()
+                },
+                body: JSON.stringify({
+                    card_id: cardId,
+                    user_feedback: value
+                })
             });
 
-            toggleEditMode();
+            const result = await response.json();
+            document.getElementById("message-box").innerText = result.message || "Card updated.";
+            await loadCard(); // Load next card
+        } catch (error) {
+            console.error("Failed to send feedback:", error);
+            document.getElementById("message-box").innerText = "Error sending feedback.";
         }
+    }
 
-        function cancelEdits() {
-            // Revert input fields to original values
-            fields.forEach(field => {
-                document.getElementById(`${field}-input`).value = originalValues[field];
-            });
-            toggleEditMode(); // Exit edit mode
+    function getCSRFToken() {
+        const name = 'csrftoken';
+        const cookies = document.cookie.split(';');
+        for (let cookie of cookies) {
+            let [key, val] = cookie.trim().split('=');
+            if (key === name) return decodeURIComponent(val);
         }
-    </script>
+        return '';
+    }
+
+    window.onload = loadCard;
+</script>
 </body>
 </html>
+

@@ -28,7 +28,7 @@ urlpatterns = [
     path('decks/<int:deck_id>/cards/', card_views.show_cards, name='show-cards'),
     path('oops/', card_views.oops_view, name='oops'),
     path('create-card/', card_views.create_card_view, name='create-card'),
-    path('show-card/', card_views.show_card_view, name='show-card'),
+    path('study/page/', card_views.show_card_template_view, name='show-card-page'),
     path('update-card/', card_views.update_card_view, name='update-card'),
     path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='/'), name='logout'),
