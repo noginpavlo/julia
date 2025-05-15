@@ -239,14 +239,18 @@
             });
 
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
             const result = await response.json();
             document.getElementById("message-box").innerText = result.message || "Updated!";
+
+            // Reload the updated card data and then toggle edit mode off
+            await loadCard();
+            toggleEditMode();
+
         } catch (error) {
             console.error("Update failed:", error);
             document.getElementById("message-box").innerText = "Failed to update card.";
         }
-
-        toggleEditMode();
     }
 
     async function sendFeedback(value) {
