@@ -178,10 +178,11 @@ class CardUpdateView(UpdateAPIView):
         return Card.objects.filter(deck__user=self.request.user)
 
     def patch(self, request, *args, **kwargs):
-        card = get_object_or_404(self.get_queryset(), pk=kwargs["pk"])
-        serializer = self.get_serializer(card, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
+        card = self.get_object()
+        serializer = CardUpdateSerializer(card, data=request.data, partial=True)
+        if not serializer.is_valid():
+            print("Validation errors:", serializer.errors)
+            return Response(serializer.errors, status=400)
         serializer.save()
-        return Response(
-            {"message": "Card updated successfully."}, status=status.HTTP_200_OK
-        )
+        return Response({"status": "updated"}, status=200)
+

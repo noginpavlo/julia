@@ -217,20 +217,35 @@
         document.getElementById('cancel-btn').style.display = isEditing ? 'inline-block' : 'none';
     }
 
-    function saveEdits() {
-        fields.forEach(field => {
-            const value = document.getElementById(`${field}-input`).value;
-            document.getElementById(`${field}-display`).textContent = value;
-            document.getElementById(`${field}-hidden`).value = value;
-        });
+    async function saveEdits() {
+        const payload = {
+            word: document.getElementById("word-input").value,
+            phonetic: document.getElementById("phonetic-input").value,
+            meaning1: document.getElementById("meaning1-input").value,
+            meaning2: document.getElementById("meaning2-input").value,
+            example1: document.getElementById("example1-input").value,
+            example2: document.getElementById("example2-input").value,
+            changed: true
+        };
 
-        toggleEditMode();
-    }
+        try {
+            const response = await fetch(`/api/cards-update/${cardId}/`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken()
+                },
+                body: JSON.stringify(payload)
+            });
 
-    function cancelEdits() {
-        fields.forEach(field => {
-            document.getElementById(`${field}-input`).value = originalValues[field];
-        });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const result = await response.json();
+            document.getElementById("message-box").innerText = result.message || "Updated!";
+        } catch (error) {
+            console.error("Update failed:", error);
+            document.getElementById("message-box").innerText = "Failed to update card.";
+        }
+
         toggleEditMode();
     }
 

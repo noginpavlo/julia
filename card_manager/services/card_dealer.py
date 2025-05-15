@@ -233,3 +233,38 @@ def update_card(request, user):
         card.save()
 
     return card
+
+
+@log_errors
+def update_data(card, updated_fields: dict):
+    """
+    Update a card's json_data field with selectively updated fields
+    (word, phonetic, definitions, examples).
+    """
+    card_data = card.json_data or {}
+
+    word = updated_fields.get("word", card_data.get("word", ""))
+    phonetic = updated_fields.get("phonetic", card_data.get("phonetic", ""))
+
+    definitions = [
+        updated_fields.get("meaning1", ""),
+        updated_fields.get("meaning2", "")
+    ]
+
+    examples = [
+        updated_fields.get("example1", ""),
+        updated_fields.get("example2", "")
+    ]
+
+    cleaned_data = {
+        "word": word,
+        "phonetic": phonetic,
+        "definitions": definitions,
+        "examples": examples,
+    }
+
+    card.word = word
+    card.json_data = cleaned_data
+    card.save()
+
+    return "success"

@@ -44,10 +44,12 @@ class ShowCardSerializer(ModelSerializer):
 
 
 class CardUpdateSerializer(ModelSerializer):
-    meaning1 = CharField(write_only=True, required=False)
-    meaning2 = CharField(write_only=True, required=False)
-    example1 = CharField(write_only=True, required=False)
-    example2 = CharField(write_only=True, required=False)
+    word = CharField(write_only=True, required=False, allow_blank=True)
+    phonetic = CharField(write_only=True, required=False, allow_blank=True)
+    meaning1 = CharField(write_only=True, required=False, allow_blank=True)
+    meaning2 = CharField(write_only=True, required=False, allow_blank=True)
+    example1 = CharField(write_only=True, required=False, allow_blank=True)
+    example2 = CharField(write_only=True, required=False, allow_blank=True)
     changed = BooleanField(write_only=True, required=False)
 
     class Meta:
@@ -62,28 +64,19 @@ class CardUpdateSerializer(ModelSerializer):
             "example2",
             "changed",
         ]
+        extra_kwargs = {"id": {"read_only": True}}
 
     def update(self, instance, validated_data):
+        from card_manager.services.card_dealer import update_data
+
         if validated_data.get("changed"):
-            card_data = instance.json_data
-
-            word = validated_data.get("word", card_data.get("word", ""))
-            card_data["word"] = word
-            card_data["phonetic"] = validated_data.get(
-                "phonetic", card_data.get("phonetic", "")
-            )
-            card_data["definitions"] = [
-                validated_data.get("meaning1", ""),
-                validated_data.get("meaning2", ""),
-            ]
-            card_data["examples"] = [
-                validated_data.get("example1", ""),
-                validated_data.get("example2", ""),
-            ]
-
-            instance.json_data = card_data
-            instance.word = word
-
-            instance.save()
+            try:
+                result = update_data(instance, validated_data)
+                if result != "success":
+                    print(f"update_data failed: {result}")
+            except Exception as e:
+                print(f"Exception in update_data: {e}")
 
         return instance
+
+

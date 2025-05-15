@@ -17,5 +17,5 @@ urlpatterns = [
     path("cards/<int:pk>/", CardDeleteView.as_view(), name="delete-cards"),
     path("decks/<int:pk>/", DeckDeleteView.as_view(), name="delete-decks"),
     path("study/", ShowCardAPIView.as_view(), name="study-card"),
-    path("api/cards/<int:pk>/", CardUpdateView.as_view(), name="card-update"),
+    path("cards-update/<int:pk>/", CardUpdateView.as_view(), name="card-update"),
 ]
