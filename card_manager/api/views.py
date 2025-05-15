@@ -185,4 +185,3 @@ class CardUpdateView(UpdateAPIView):
             return Response(serializer.errors, status=400)
         serializer.save()
         return Response({"status": "updated"}, status=200)
-

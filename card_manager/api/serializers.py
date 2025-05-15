@@ -78,5 +78,3 @@ class CardUpdateSerializer(ModelSerializer):
                 print(f"Exception in update_data: {e}")
 
         return instance
-
-

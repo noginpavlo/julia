@@ -248,13 +248,10 @@ def update_data(card, updated_fields: dict):
 
     definitions = [
         updated_fields.get("meaning1", ""),
-        updated_fields.get("meaning2", "")
+        updated_fields.get("meaning2", ""),
     ]
 
-    examples = [
-        updated_fields.get("example1", ""),
-        updated_fields.get("example2", "")
-    ]
+    examples = [updated_fields.get("example1", ""), updated_fields.get("example2", "")]
 
     cleaned_data = {
         "word": word,

@@ -7,7 +7,6 @@ from card_manager.services.card_dealer import (
     sm2,
     update_card,
 )
-from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from .models import Deck, Card
 from django.http import JsonResponse
@@ -65,10 +64,12 @@ def deck_list(request):
         )
 
 
+@login_required
 def show_decks(request):
     return render(request, "deck_browser/deck_list.html")
 
 
+@login_required
 def show_cards(request, deck_id):
     deck = Deck.objects.get(id=deck_id, user=request.user)
     cards = Card.objects.filter(deck=deck)
