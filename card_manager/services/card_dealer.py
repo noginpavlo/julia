@@ -21,7 +21,9 @@ django.setup()
 class WordNotFoundError(Exception):
     def __init__(self, word):
         self.word = word
-        super().__init__(f"Data not available for word {word}. Are you sure you spelled '{word}' correctly?")
+        super().__init__(
+            f"Data not available for word {word}. Are you sure you spelled '{word}' correctly?"
+        )
 
 
 def log_errors(func):
@@ -31,12 +33,13 @@ def log_errors(func):
         except Exception as e:
             print(f"Unexpected error in {func.__name__}: {e}")
             raise
+
     return wrapper
 
 
 @log_errors
 def get_data(input_word):
-    url = f'https://api.dictionaryapi.dev/api/v2/entries/en/{input_word}'
+    url = f"https://api.dictionaryapi.dev/api/v2/entries/en/{input_word}"
     response = requests.get(url)
 
     if response.status_code == 404:
@@ -76,10 +79,10 @@ def save_data(response, deck_name, user):
         "word": word,
         "phonetic": phonetic,
         "definitions": definitions,
-        "examples": examples
+        "examples": examples,
     }
 
-    #Record cleaned data to cards_card table
+    # Record cleaned data to cards_card table
     Card.objects.create(
         deck=deck,
         json_data=cleaned_data,
@@ -124,7 +127,7 @@ def delete_deck(deck_id, user):
 @log_errors
 def show_card(deck_name, user):
 
-    #this function counts cards learned by user every day and saves the data to db
+    # this function counts cards learned by user every day and saves the data to db
     increment_daily_learning(user)
 
     now = timezone.now()
@@ -133,8 +136,8 @@ def show_card(deck_name, user):
         Card.objects.filter(
             deck__deck_name=deck_name,
             deck__user=user,
-            due_date__lte=now  # __lte stands for 'less than or equal to'
-        ).values_list('id', flat=True)
+            due_date__lte=now,  # __lte stands for 'less than or equal to'
+        ).values_list("id", flat=True)
     )
 
     if not all_cards_ids:
@@ -145,6 +148,7 @@ def show_card(deck_name, user):
 
     return card_to_show
 
+
 @log_errors
 def increment_daily_learning(user):
     today = date.today()
@@ -152,7 +156,7 @@ def increment_daily_learning(user):
     stat, created = ShowCardDailyStat.objects.get_or_create(user=user, date=today)
 
     if not created:
-        stat.count = F('count') + 1
+        stat.count = F("count") + 1
     else:
         stat.count = 1  # First time today, set count to 1
 
@@ -178,18 +182,15 @@ def sm2(card_id, user_feedback, user):
     else:
         if card.repetitions == 0:
             Card.objects.filter(id=card.id).update(
-                interval=1,
-                repetitions=F('repetitions') + 1
-               )
+                interval=1, repetitions=F("repetitions") + 1
+            )
         elif card.repetitions == 1:
             Card.objects.filter(id=card.id).update(
-                interval=3,
-                repetitions=F('repetitions') + 1
-                )
+                interval=3, repetitions=F("repetitions") + 1
+            )
         else:
             Card.objects.filter(id=card.id).update(
-                interval=F('interval') * F('ef'),
-                repetitions=F('repetitions') + 1
+                interval=F("interval") * F("ef"), repetitions=F("repetitions") + 1
             )
 
     card.refresh_from_db(fields=["interval", "repetitions", "ef"])
@@ -214,14 +215,16 @@ def update_card(request, user):
 
         word = request.POST.get("word", card_data.get("word", ""))
         card_data["word"] = request.POST.get("word", card_data.get("word", ""))
-        card_data["phonetic"] = request.POST.get("phonetic", card_data.get("phonetic", ""))
+        card_data["phonetic"] = request.POST.get(
+            "phonetic", card_data.get("phonetic", "")
+        )
         card_data["definitions"] = [
             request.POST.get("meaning1", ""),
-            request.POST.get("meaning2", "")
+            request.POST.get("meaning2", ""),
         ]
         card_data["examples"] = [
             request.POST.get("example1", ""),
-            request.POST.get("example2", "")
+            request.POST.get("example2", ""),
         ]
 
         card.json_data = card_data
@@ -230,4 +233,3 @@ def update_card(request, user):
         card.save()
 
     return card
-
