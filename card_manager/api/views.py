@@ -87,12 +87,9 @@ class CardCreateView(CreateAPIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
-        if isinstance(result, str) and result.startswith("Data not available for word"):
-            return Response({"message": result}, status=status.HTTP_400_BAD_REQUEST)
-
         return Response(
-            {"message": f"Word '{result}' curated successfully!"},
-            status=status.HTTP_201_CREATED,
+            {"message": f"Card for '{result}' is being created. This may take a moment."},
+            status=status.HTTP_202_ACCEPTED,  # 202 = Accepted for processing
         )
 
 
