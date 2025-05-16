@@ -91,7 +91,7 @@ class CardCreateView(CreateAPIView):
             return Response({"message": result}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(
-            {"message": f"Word '{result}' saved successfully!"},
+            {"message": f"Word '{result}' curated successfully!"},
             status=status.HTTP_201_CREATED,
         )
 
