@@ -1,29 +1,10 @@
 from django.contrib.auth.decorators import login_required
-from card_manager.services.card_dealer import (
-    get_and_save,
-    show_card,
-    delete_card,
-    delete_deck,
-    sm2,
-    update_card,
-)
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from .models import Deck, Card
 from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
-
-
-def catch_views_errors(func):
-    def wrapper(request, *args, **kwargs):
-        try:
-            return func(request, *args, **kwargs)
-        except Exception as e:
-            print(f"Error in {func.__name__}: {e}")
-            return redirect("oops")
-
-    return wrapper
 
 
 @login_required
@@ -39,17 +20,6 @@ def oops_view(request):
 @login_required
 def show_card_template_view(request):
     return render(request, "cards/show_card.html")
-
-
-# In this function later AJAX will be applied with JsonResponse so here is no @catch_views_errors
-@login_required
-def update_card_view(request):
-    user = request.user
-
-    if request.method == "POST":
-        update_card(request, user)
-
-    return redirect("show-card")
 
 
 @api_view(["GET"])
