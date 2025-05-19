@@ -36,7 +36,10 @@ class CardCreateSerializer(Serializer):
         Curated card creation in Celery. Keep old code as it returns just a word and now get_and_save result
         """
         from card_manager.tasks import create_card_task
-        create_card_task.delay(word, deck_name, user.id) # curates card creation in Redis for Celery to pick up later
+
+        create_card_task.delay(
+            word, deck_name, user.id
+        )  # curates card creation in Redis for Celery to pick up later
         return word
 
 

@@ -107,7 +107,7 @@
         </form>
     </div>
 
-    <div id="notification" class="notification"></div>
+    <div id="notification" class="notification" style="display: none;"></div>
 
 <script>
     function getCookie(name) {
@@ -130,9 +130,8 @@
     const form = document.querySelector('form');
     const notification = document.getElementById('notification');
 
-    form.addEventListener('submit', async (e) => {
+   form.addEventListener('submit', async (e) => {
         e.preventDefault();
-
         const formData = new FormData(form);
 
         try {
@@ -145,20 +144,25 @@
                 }
             });
 
-            const data = await response.json();
+            let data = {};
+            try {
+                data = await response.json();
+            } catch (jsonErr) {
+                console.error("Failed to parse JSON:", jsonErr);
+            }
+
+            console.log("Form submit response", response.status, data);
 
             if (response.status === 202) {
-                // Card accepted and queued
                 showNotification(data.message || 'Card is being created...', 'info');
             } else if (response.ok) {
-                // If for any reason backend returns 200/201
                 showNotification(data.message || 'Card created!', 'success');
             } else {
-                // Error — word not found or unknown
                 showNotification(data.error || data.message || 'An error occurred.', 'error');
             }
 
         } catch (error) {
+            console.error("Form submit error:", error);
             showNotification('An error occurred. Please try again.', 'error');
         }
     });
@@ -178,8 +182,39 @@
             notification.style.display = 'none';
         }, 5000);
     }
-</script>
 
+    // ✅ WebSocket connection
+    const socketProtocol = window.location.protocol === "https:" ? "wss" : "ws";
+    const socketUrl = `${socketProtocol}://${window.location.host}/ws/cards/`;
+
+    const socket = new WebSocket(socketUrl);
+
+   socket.onmessage = function(event) {
+        console.log("WebSocket message received:", event.data);
+        try {
+            const data = JSON.parse(event.data);
+            if (data.message && data.type) {
+                showNotification(data.message, data.type);
+            } else {
+                console.warn("WebSocket message missing 'message' or 'type':", data);
+            }
+        } catch (e) {
+            console.error("Error parsing WebSocket message:", e, event.data);
+        }
+    };
+
+    socket.onopen = function() {
+        console.log("✅ WebSocket connected");
+    };
+
+    socket.onerror = function(error) {
+        console.error("❌ WebSocket error:", error);
+    };
+
+    socket.onclose = function() {
+        console.warn("⚠️ WebSocket closed");
+    };
+</script>
 </body>
 </html>
 

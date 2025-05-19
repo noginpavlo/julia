@@ -45,9 +45,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
-
 INSTALLED_APPS = [
     "users",
     "card_manager",
@@ -64,6 +62,7 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
     "allauth.socialaccount.providers.github",
+    "channels",
 ]
 
 MIDDLEWARE = [
@@ -96,6 +95,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "julia.wsgi.application"
+ASGI_APPLICATION = "julia.asgi.application"
 
 
 # Database
@@ -176,3 +176,13 @@ REST_FRAMEWORK = {
 CELERY_BROKER_URL = "redis://localhost:6379/0"  # Redis URL (usually default)
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
+
+# Redis channel for WebSocket
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}

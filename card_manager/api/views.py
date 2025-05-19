@@ -88,7 +88,9 @@ class CardCreateView(CreateAPIView):
             )
 
         return Response(
-            {"message": f"Card for '{result}' is being created. This may take a moment."},
+            {
+                "message": f"Card for '{result}' is being created. This may take a moment."
+            },
             status=status.HTTP_202_ACCEPTED,  # 202 = Accepted for processing
         )
 
