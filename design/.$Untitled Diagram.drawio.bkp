@@ -1,13 +1,13 @@
 <mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/26.0.16 Chrome/132.0.6834.196 Electron/34.2.0 Safari/537.36" version="26.0.16">
   <diagram id="prtHgNgQTEPvFCAcTncT" name="Page-1">
-    <mxGraphModel dx="1760" dy="1066" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1035" dy="627" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="xBK4IhRz2KjYCHd948Yb-1" value="Frontend" style="swimlane;html=1;startSize=20;horizontal=0;" vertex="1" parent="1">
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-1" value="Frontend" style="swimlane;html=1;startSize=20;horizontal=0;fillColor=#b1ddf0;strokeColor=#10739e;swimlaneFillColor=none;" vertex="1" parent="1">
           <mxGeometry x="80" y="160" width="930" height="180" as="geometry" />
         </mxCell>
-        <mxCell id="xBK4IhRz2KjYCHd948Yb-14" value="Form (AJAX)" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-1">
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-14" value="Form (AJAX)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#b1ddf0;strokeColor=#10739e;swimlaneFillColor=default;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-1">
           <mxGeometry x="60" y="60" width="250" height="95" as="geometry">
             <mxRectangle x="30" y="15" width="140" height="30" as="alternateBounds" />
           </mxGeometry>
@@ -24,7 +24,7 @@
         <mxCell id="xBK4IhRz2KjYCHd948Yb-71" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="xBK4IhRz2KjYCHd948Yb-1" source="xBK4IhRz2KjYCHd948Yb-36" target="xBK4IhRz2KjYCHd948Yb-65">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="xBK4IhRz2KjYCHd948Yb-36" value="What user sees" style="swimlane;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-1">
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-36" value="What user sees" style="swimlane;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;swimlaneFillColor=default;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-1">
           <mxGeometry x="340" y="10" width="290" height="95" as="geometry">
             <mxRectangle x="30" y="15" width="140" height="30" as="alternateBounds" />
           </mxGeometry>
@@ -35,7 +35,7 @@
         <mxCell id="xBK4IhRz2KjYCHd948Yb-38" value="&lt;b&gt;&lt;font style=&quot;font-size: 10px;&quot;&gt;#card_manager/templates/cards/create_card.html&lt;/font&gt;&lt;/b&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-36">
           <mxGeometry x="120" y="30" width="60" height="15" as="geometry" />
         </mxCell>
-        <mxCell id="xBK4IhRz2KjYCHd948Yb-65" value="&amp;lt;script&amp;gt;" style="swimlane;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-1">
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-65" value="&amp;lt;script&amp;gt;" style="swimlane;whiteSpace=wrap;html=1;fillColor=#fa6800;strokeColor=#C73500;swimlaneFillColor=default;fontColor=#000000;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-1">
           <mxGeometry x="660" y="60" width="250" height="90" as="geometry">
             <mxRectangle x="30" y="15" width="140" height="30" as="alternateBounds" />
           </mxGeometry>
@@ -46,7 +46,7 @@
         <mxCell id="xBK4IhRz2KjYCHd948Yb-67" value="&lt;b&gt;&lt;font style=&quot;font-size: 10px;&quot;&gt;#card_manager/templates/cards/create_card.html&lt;/font&gt;&lt;/b&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-65">
           <mxGeometry x="70" y="25" width="110" height="35" as="geometry" />
         </mxCell>
-        <mxCell id="xBK4IhRz2KjYCHd948Yb-5" value="DRF" style="swimlane;html=1;startSize=20;horizontal=0;" vertex="1" parent="1">
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-5" value="DRF" style="swimlane;html=1;startSize=20;horizontal=0;fillColor=#fad9d5;strokeColor=#ae4132;" vertex="1" parent="1">
           <mxGeometry x="80" y="340" width="930" height="180" as="geometry" />
         </mxCell>
         <mxCell id="xBK4IhRz2KjYCHd948Yb-35" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="xBK4IhRz2KjYCHd948Yb-5">
@@ -55,7 +55,7 @@
             <mxPoint x="350" y="110" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="xBK4IhRz2KjYCHd948Yb-23" value="CardCreateView" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-5">
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-23" value="CardCreateView" style="swimlane;whiteSpace=wrap;html=1;fillColor=#fad9d5;strokeColor=#ae4132;swimlaneFillColor=default;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-5">
           <mxGeometry x="550" y="25" width="290" height="130" as="geometry">
             <mxRectangle x="30" y="15" width="140" height="30" as="alternateBounds" />
           </mxGeometry>
@@ -72,7 +72,7 @@
             <mxPoint x="550" y="70" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="xBK4IhRz2KjYCHd948Yb-28" value="CardCreateSerializer" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-5">
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-28" value="CardCreateSerializer" style="swimlane;whiteSpace=wrap;html=1;fillColor=#fad9d5;strokeColor=#ae4132;swimlaneFillColor=default;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-5">
           <mxGeometry x="60" y="30" width="290" height="110" as="geometry">
             <mxRectangle x="30" y="15" width="140" height="30" as="alternateBounds" />
           </mxGeometry>
@@ -83,13 +83,13 @@
         <mxCell id="xBK4IhRz2KjYCHd948Yb-30" value="&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;&lt;font style=&quot;font-size: 10px;&quot;&gt;1.Serializes user data and passes it to CardCreateView&lt;/font&gt;&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;&lt;font style=&quot;font-size: 10px;&quot;&gt;2.Creates task in Redis for Celery to pick up.&lt;/font&gt;&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-28">
           <mxGeometry x="35" y="60" width="230" height="32.5" as="geometry" />
         </mxCell>
-        <mxCell id="xBK4IhRz2KjYCHd948Yb-17" value="WebSocket" style="swimlane;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-17" value="WebSocket" style="swimlane;whiteSpace=wrap;html=1;fillColor=#fa6800;strokeColor=#C73500;fontColor=#000000;" vertex="1" parent="1">
           <mxGeometry x="1011" y="160" width="239" height="540" as="geometry" />
         </mxCell>
         <mxCell id="xBK4IhRz2KjYCHd948Yb-72" value="" style="shape=singleArrow;whiteSpace=wrap;html=1;arrowWidth=0.4;arrowSize=0.4;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1;startSize=23;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-17">
           <mxGeometry x="-35" y="85" width="80" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="xBK4IhRz2KjYCHd948Yb-101" value="CardProgressConsumer" style="swimlane;whiteSpace=wrap;html=1;startSize=23;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-17">
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-101" value="CardProgressConsumer" style="swimlane;whiteSpace=wrap;html=1;startSize=23;fillColor=#e1d5e7;strokeColor=#9673a6;swimlaneFillColor=default;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-17">
           <mxGeometry x="39" y="380" width="175" height="120" as="geometry">
             <mxRectangle x="30" y="15" width="140" height="30" as="alternateBounds" />
           </mxGeometry>
@@ -109,10 +109,10 @@
         <mxCell id="xBK4IhRz2KjYCHd948Yb-108" value="" style="verticalLabelPosition=bottom;verticalAlign=top;html=1;strokeWidth=2;shape=mxgraph.arrows2.arrow;dy=0.6;dx=40;notch=0;rotation=-90;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-17">
           <mxGeometry x="82.75" y="60" width="73.5" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="xBK4IhRz2KjYCHd948Yb-42" value="External Services" style="swimlane;html=1;startSize=20;horizontal=0;" vertex="1" parent="1">
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-42" value="External Services" style="swimlane;html=1;startSize=20;horizontal=0;fillColor=#bac8d3;strokeColor=#23445d;" vertex="1" parent="1">
           <mxGeometry x="80" y="520" width="640" height="180" as="geometry" />
         </mxCell>
-        <mxCell id="xBK4IhRz2KjYCHd948Yb-44" value="Celery Worker" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-42">
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-44" value="Celery Worker" style="swimlane;whiteSpace=wrap;html=1;fillColor=#bac8d3;strokeColor=#23445d;swimlaneFillColor=default;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-42">
           <mxGeometry x="350" y="35" width="250" height="115" as="geometry">
             <mxRectangle x="30" y="15" width="140" height="30" as="alternateBounds" />
           </mxGeometry>
@@ -123,7 +123,7 @@
         <mxCell id="xBK4IhRz2KjYCHd948Yb-46" value="&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;span style=&quot;font-size: 10px; background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;1.Listenes to Refis for tasks to pick up&lt;br&gt;2. Executes tasks from Redis que that are defined in tasks.py&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-44">
           <mxGeometry x="10" y="65" width="230" height="32.5" as="geometry" />
         </mxCell>
-        <mxCell id="xBK4IhRz2KjYCHd948Yb-48" value="Message Broker (Redis)" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-42">
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-48" value="Message Broker (Redis)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#bac8d3;strokeColor=#23445d;swimlaneFillColor=default;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-42">
           <mxGeometry x="70" y="40" width="230" height="110" as="geometry">
             <mxRectangle x="30" y="15" width="140" height="30" as="alternateBounds" />
           </mxGeometry>
@@ -139,10 +139,10 @@
             <mxPoint x="265" y="480" as="sourcePoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="xBK4IhRz2KjYCHd948Yb-53" value="card_manager (root level)" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-53" value="card_manager (root level)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
           <mxGeometry x="720" y="520" width="290" height="180" as="geometry" />
         </mxCell>
-        <mxCell id="xBK4IhRz2KjYCHd948Yb-54" value="create_card_task" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-53">
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-54" value="create_card_task" style="swimlane;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;swimlaneFillColor=default;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-53">
           <mxGeometry x="30" y="30" width="245" height="130" as="geometry">
             <mxRectangle x="30" y="15" width="140" height="30" as="alternateBounds" />
           </mxGeometry>
@@ -158,7 +158,7 @@
             <mxPoint x="750" y="613" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="xBK4IhRz2KjYCHd948Yb-63" value="Business logic" style="swimlane;horizontal=0;whiteSpace=wrap;html=1;startSize=20;" vertex="1" parent="1">
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-63" value="Business logic" style="swimlane;horizontal=0;whiteSpace=wrap;html=1;startSize=20;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
           <mxGeometry x="80" y="700" width="1170" height="230" as="geometry" />
         </mxCell>
         <mxCell id="xBK4IhRz2KjYCHd948Yb-80" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="xBK4IhRz2KjYCHd948Yb-63" source="xBK4IhRz2KjYCHd948Yb-76">
@@ -178,7 +178,7 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="xBK4IhRz2KjYCHd948Yb-76" value="get_and_save" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-63">
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-76" value="get_and_save" style="swimlane;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;swimlaneFillColor=default;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-63">
           <mxGeometry x="830" y="35" width="245" height="130" as="geometry">
             <mxRectangle x="30" y="15" width="140" height="30" as="alternateBounds" />
           </mxGeometry>
@@ -189,7 +189,7 @@
         <mxCell id="xBK4IhRz2KjYCHd948Yb-78" value="&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;span style=&quot;font-size: 10px;&quot;&gt;1. Calls get_data()&amp;nbsp;&lt;br&gt;2. Calls save_data()&lt;br&gt;3. Returns status message (success/failure) of the opperation.&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-76">
           <mxGeometry x="20" y="57.5" width="207.5" height="52.5" as="geometry" />
         </mxCell>
-        <mxCell id="xBK4IhRz2KjYCHd948Yb-81" value="save_data" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-63">
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-81" value="save_data" style="swimlane;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;swimlaneFillColor=default;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-63">
           <mxGeometry x="420" y="30" width="245" height="130" as="geometry">
             <mxRectangle x="30" y="15" width="140" height="30" as="alternateBounds" />
           </mxGeometry>
@@ -208,7 +208,7 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="xBK4IhRz2KjYCHd948Yb-84" value="get_data" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-63">
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-84" value="get_data" style="swimlane;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;swimlaneFillColor=default;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-63">
           <mxGeometry x="89" y="30" width="245" height="130" as="geometry">
             <mxRectangle x="30" y="15" width="140" height="30" as="alternateBounds" />
           </mxGeometry>
