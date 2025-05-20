@@ -1,0 +1,263 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/26.0.16 Chrome/132.0.6834.196 Electron/34.2.0 Safari/537.36" version="26.0.16">
+  <diagram id="prtHgNgQTEPvFCAcTncT" name="Page-1">
+    <mxGraphModel dx="1760" dy="1066" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-1" value="Frontend" style="swimlane;html=1;startSize=20;horizontal=0;" vertex="1" parent="1">
+          <mxGeometry x="80" y="160" width="930" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-14" value="Form (AJAX)" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-1">
+          <mxGeometry x="60" y="60" width="250" height="95" as="geometry">
+            <mxRectangle x="30" y="15" width="140" height="30" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-16" value="&lt;div&gt;&lt;font style=&quot;font-size: 10px;&quot;&gt;User submits deck_name and word to create card&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-14">
+          <mxGeometry x="10" y="60" width="230" height="32.5" as="geometry" />
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-21" value="&lt;b&gt;&lt;font style=&quot;font-size: 10px;&quot;&gt;#card_manager/templates/cards/create_card.html&lt;/font&gt;&lt;/b&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-14">
+          <mxGeometry x="70" y="25" width="110" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-70" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitX=0;exitY=0.25;exitDx=0;exitDy=0;" edge="1" parent="xBK4IhRz2KjYCHd948Yb-1" source="xBK4IhRz2KjYCHd948Yb-36" target="xBK4IhRz2KjYCHd948Yb-14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-71" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="xBK4IhRz2KjYCHd948Yb-1" source="xBK4IhRz2KjYCHd948Yb-36" target="xBK4IhRz2KjYCHd948Yb-65">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-36" value="What user sees" style="swimlane;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-1">
+          <mxGeometry x="340" y="10" width="290" height="95" as="geometry">
+            <mxRectangle x="30" y="15" width="140" height="30" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-37" value="&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;span style=&quot;font-size: 10px; background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;1. Fields to submit the data.&lt;br&gt;2. Notifications&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-36">
+          <mxGeometry x="30" y="45" width="230" height="32.5" as="geometry" />
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-38" value="&lt;b&gt;&lt;font style=&quot;font-size: 10px;&quot;&gt;#card_manager/templates/cards/create_card.html&lt;/font&gt;&lt;/b&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-36">
+          <mxGeometry x="120" y="30" width="60" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-65" value="&amp;lt;script&amp;gt;" style="swimlane;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-1">
+          <mxGeometry x="660" y="60" width="250" height="90" as="geometry">
+            <mxRectangle x="30" y="15" width="140" height="30" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-66" value="&lt;span style=&quot;font-size: 10px;&quot;&gt;Openes WebSocket as soon as user loggs in.&lt;br&gt;Defines the scope of WebSocket by user id.&lt;/span&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-65">
+          <mxGeometry x="5" y="47.5" width="230" height="32.5" as="geometry" />
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-67" value="&lt;b&gt;&lt;font style=&quot;font-size: 10px;&quot;&gt;#card_manager/templates/cards/create_card.html&lt;/font&gt;&lt;/b&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-65">
+          <mxGeometry x="70" y="25" width="110" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-5" value="DRF" style="swimlane;html=1;startSize=20;horizontal=0;" vertex="1" parent="1">
+          <mxGeometry x="80" y="340" width="930" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-35" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="xBK4IhRz2KjYCHd948Yb-5">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="550" y="110" as="sourcePoint" />
+            <mxPoint x="350" y="110" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-23" value="CardCreateView" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-5">
+          <mxGeometry x="550" y="25" width="290" height="130" as="geometry">
+            <mxRectangle x="30" y="15" width="140" height="30" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-25" value="&lt;div&gt;&lt;span style=&quot;font-size: 10px;&quot;&gt;&lt;b&gt;#card_manager/api/view.py&lt;/b&gt;&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-23">
+          <mxGeometry x="115" y="30" width="60" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-24" value="&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;span style=&quot;font-size: 10px; background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;1.Checks if the card alreay exists in paritcular deck and calls serializer.create() back in CardCreateSerializer&lt;br&gt;2. Notifies tha user that card is begin created. (synchronously).&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-23">
+          <mxGeometry x="30" y="70" width="230" height="32.5" as="geometry" />
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-33" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" edge="1" parent="xBK4IhRz2KjYCHd948Yb-5">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="350" y="70" as="sourcePoint" />
+            <mxPoint x="550" y="70" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-28" value="CardCreateSerializer" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-5">
+          <mxGeometry x="60" y="30" width="290" height="110" as="geometry">
+            <mxRectangle x="30" y="15" width="140" height="30" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-29" value="&lt;div&gt;&lt;span style=&quot;font-size: 10px;&quot;&gt;&lt;b&gt;#card_manager/api/serializers.py&lt;/b&gt;&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-28">
+          <mxGeometry x="115" y="30" width="60" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-30" value="&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;&lt;font style=&quot;font-size: 10px;&quot;&gt;1.Serializes user data and passes it to CardCreateView&lt;/font&gt;&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;&lt;font style=&quot;font-size: 10px;&quot;&gt;2.Creates task in Redis for Celery to pick up.&lt;/font&gt;&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-28">
+          <mxGeometry x="35" y="60" width="230" height="32.5" as="geometry" />
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-17" value="WebSocket" style="swimlane;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="1011" y="160" width="239" height="540" as="geometry" />
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-72" value="" style="shape=singleArrow;whiteSpace=wrap;html=1;arrowWidth=0.4;arrowSize=0.4;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1;startSize=23;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-17">
+          <mxGeometry x="-35" y="85" width="80" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-101" value="CardProgressConsumer" style="swimlane;whiteSpace=wrap;html=1;startSize=23;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-17">
+          <mxGeometry x="39" y="380" width="175" height="120" as="geometry">
+            <mxRectangle x="30" y="15" width="140" height="30" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-102" value="&lt;span style=&quot;font-size: 10px;&quot;&gt;&lt;b&gt;#card_manager/consumers.py&lt;/b&gt;&lt;/span&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-101">
+          <mxGeometry x="8" y="25" width="160" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-103" value="&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;span style=&quot;font-size: 10px;&quot;&gt;1. Picks up a message from Django Chennels&lt;br&gt;2. Sends the messgage to the frontend.&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-101">
+          <mxGeometry x="24.25" y="40" width="127.5" height="72.5" as="geometry" />
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-106" value="" style="verticalLabelPosition=bottom;verticalAlign=top;html=1;strokeWidth=2;shape=mxgraph.arrows2.arrow;dy=0.6;dx=40;notch=0;rotation=-90;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-17">
+          <mxGeometry x="82.75" y="300" width="73.5" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-107" value="" style="verticalLabelPosition=bottom;verticalAlign=top;html=1;strokeWidth=2;shape=mxgraph.arrows2.arrow;dy=0.6;dx=40;notch=0;rotation=-90;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-17">
+          <mxGeometry x="82.75" y="180" width="73.5" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-108" value="" style="verticalLabelPosition=bottom;verticalAlign=top;html=1;strokeWidth=2;shape=mxgraph.arrows2.arrow;dy=0.6;dx=40;notch=0;rotation=-90;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-17">
+          <mxGeometry x="82.75" y="60" width="73.5" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-42" value="External Services" style="swimlane;html=1;startSize=20;horizontal=0;" vertex="1" parent="1">
+          <mxGeometry x="80" y="520" width="640" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-44" value="Celery Worker" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-42">
+          <mxGeometry x="350" y="35" width="250" height="115" as="geometry">
+            <mxRectangle x="30" y="15" width="140" height="30" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-45" value="&lt;div&gt;&lt;span style=&quot;font-size: 10px;&quot;&gt;&lt;b&gt;#runs in a separate terminal&lt;/b&gt;&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-44">
+          <mxGeometry x="50" y="29" width="160" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-46" value="&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;span style=&quot;font-size: 10px; background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;1.Listenes to Refis for tasks to pick up&lt;br&gt;2. Executes tasks from Redis que that are defined in tasks.py&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-44">
+          <mxGeometry x="10" y="65" width="230" height="32.5" as="geometry" />
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-48" value="Message Broker (Redis)" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-42">
+          <mxGeometry x="70" y="40" width="230" height="110" as="geometry">
+            <mxRectangle x="30" y="15" width="140" height="30" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-49" value="&lt;span style=&quot;font-size: 10px;&quot;&gt;&lt;b&gt;# redis-server&lt;/b&gt;&lt;/span&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-48">
+          <mxGeometry x="67.5" y="35" width="85" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-50" value="&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;span style=&quot;font-size: 10px;&quot;&gt;Serves as a task list for Celery worker to pick up.&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-48">
+          <mxGeometry x="5" y="55" width="220" height="32.5" as="geometry" />
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-52" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" target="xBK4IhRz2KjYCHd948Yb-48">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="265" y="480" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-53" value="card_manager (root level)" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="720" y="520" width="290" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-54" value="create_card_task" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-53">
+          <mxGeometry x="30" y="30" width="245" height="130" as="geometry">
+            <mxRectangle x="30" y="15" width="140" height="30" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-55" value="&lt;span style=&quot;font-size: 10px;&quot;&gt;&lt;b&gt;#card_manager/tasks.py&lt;/b&gt;&lt;/span&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-54">
+          <mxGeometry x="35" y="25" width="160" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-56" value="&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;span style=&quot;font-size: 10px;&quot;&gt;1.Calls get_and_save() to actually create a card.&lt;br&gt;2. Receives the message returned from get_and_save indicating card creation status.&lt;br&gt;3. Sends the message to Django Chennels&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-54">
+          <mxGeometry x="20" y="57.5" width="207.5" height="52.5" as="geometry" />
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-60" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="xBK4IhRz2KjYCHd948Yb-44">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="750" y="613" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-63" value="Business logic" style="swimlane;horizontal=0;whiteSpace=wrap;html=1;startSize=20;" vertex="1" parent="1">
+          <mxGeometry x="80" y="700" width="1170" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-80" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="xBK4IhRz2KjYCHd948Yb-63" source="xBK4IhRz2KjYCHd948Yb-76">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="840" y="-20" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="952" y="20" />
+              <mxPoint x="840" y="20" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-93" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="xBK4IhRz2KjYCHd948Yb-63" source="xBK4IhRz2KjYCHd948Yb-76" target="xBK4IhRz2KjYCHd948Yb-84">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="953" y="180" />
+              <mxPoint x="211" y="180" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-76" value="get_and_save" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-63">
+          <mxGeometry x="830" y="35" width="245" height="130" as="geometry">
+            <mxRectangle x="30" y="15" width="140" height="30" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-77" value="&lt;span style=&quot;font-size: 10px;&quot;&gt;&lt;b&gt;#card_manager/services/card_dealer.py&lt;/b&gt;&lt;/span&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-76">
+          <mxGeometry x="35" y="25" width="160" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-78" value="&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;span style=&quot;font-size: 10px;&quot;&gt;1. Calls get_data()&amp;nbsp;&lt;br&gt;2. Calls save_data()&lt;br&gt;3. Returns status message (success/failure) of the opperation.&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-76">
+          <mxGeometry x="20" y="57.5" width="207.5" height="52.5" as="geometry" />
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-81" value="save_data" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-63">
+          <mxGeometry x="420" y="30" width="245" height="130" as="geometry">
+            <mxRectangle x="30" y="15" width="140" height="30" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-82" value="&lt;span style=&quot;font-size: 10px;&quot;&gt;&lt;b&gt;#card_manager/services/card_dealer.py&lt;/b&gt;&lt;/span&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-81">
+          <mxGeometry x="35" y="25" width="160" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-83" value="&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;span style=&quot;font-size: 10px;&quot;&gt;1. Takes data from get_data().&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;font-size: 10px;&quot;&gt;2. Removes excessive&amp;nbsp;amount of data and serializes it.&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;span style=&quot;font-size: 10px;&quot;&gt;3. Saves precessed data to the DB.&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;font-size: 10px;&quot;&gt;4. Returns status of the operation.&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-81">
+          <mxGeometry x="20" y="57.5" width="207.5" height="52.5" as="geometry" />
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-94" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="xBK4IhRz2KjYCHd948Yb-63" source="xBK4IhRz2KjYCHd948Yb-84" target="xBK4IhRz2KjYCHd948Yb-76">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="211" y="180" />
+              <mxPoint x="953" y="180" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-84" value="get_data" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-63">
+          <mxGeometry x="89" y="30" width="245" height="130" as="geometry">
+            <mxRectangle x="30" y="15" width="140" height="30" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-85" value="&lt;span style=&quot;font-size: 10px;&quot;&gt;&lt;b&gt;#card_manager/services/card_dealer.py&lt;/b&gt;&lt;/span&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-84">
+          <mxGeometry x="35" y="25" width="160" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-86" value="&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;span style=&quot;font-size: 10px;&quot;&gt;1. Sends a request to 3rd party API with the word.&lt;br&gt;2. Gets response from it with word data (definition, example, etc.&lt;br&gt;3. Returns data or error.&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-84">
+          <mxGeometry x="20" y="57.5" width="207.5" height="52.5" as="geometry" />
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-97" value="" style="shape=singleArrow;whiteSpace=wrap;html=1;arrowWidth=0.4;arrowSize=0.4;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;startSize=23;rotation=90;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-63">
+          <mxGeometry x="480" y="140" width="120" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-69" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitX=0.25;exitY=0;exitDx=0;exitDy=0;" edge="1" parent="1" source="xBK4IhRz2KjYCHd948Yb-23" target="xBK4IhRz2KjYCHd948Yb-36">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="703" y="310" />
+              <mxPoint x="565" y="310" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-79" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" edge="1" parent="1" source="xBK4IhRz2KjYCHd948Yb-54" target="xBK4IhRz2KjYCHd948Yb-76">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-91" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" target="xBK4IhRz2KjYCHd948Yb-76">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="740" y="800" as="sourcePoint" />
+            <mxPoint x="860" y="760" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-98" value="" style="fontColor=#0066CC;verticalAlign=top;verticalLabelPosition=bottom;labelPosition=center;align=center;html=1;outlineConnect=0;fillColor=#CCCCCC;strokeColor=#6881B3;gradientColor=none;gradientDirection=north;strokeWidth=2;shape=mxgraph.networks.storage;" vertex="1" parent="1">
+          <mxGeometry x="550" y="990" width="140" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-99" value="" style="verticalLabelPosition=bottom;verticalAlign=top;html=1;strokeWidth=2;shape=mxgraph.arrows2.arrow;dy=0.6;dx=40;notch=0;fillColor=#e1d5e7;container=1;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="980" y="585" width="90" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-100" value="&lt;font style=&quot;font-size: 8px;&quot;&gt;Django Chennels&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="xBK4IhRz2KjYCHd948Yb-99">
+          <mxGeometry x="4.5" y="19" width="72" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-110" value="" style="verticalLabelPosition=bottom;verticalAlign=top;html=1;strokeWidth=2;shape=mxgraph.arrows2.arrow;dy=0.6;dx=40;notch=0;rotation=-130;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="1020" y="70" width="73.5" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-111" value="" style="verticalLabelPosition=bottom;verticalAlign=top;html=1;strokeWidth=2;shape=mxgraph.arrows2.arrow;dy=0.6;dx=40;notch=0;rotation=-180;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="850" y="50" width="73.5" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="xBK4IhRz2KjYCHd948Yb-113" value="" style="verticalLabelPosition=bottom;verticalAlign=top;html=1;strokeWidth=2;shape=mxgraph.arrows2.arrow;dy=0.6;dx=40;notch=0;rotation=-210;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="690" y="80" width="73.5" height="40" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
