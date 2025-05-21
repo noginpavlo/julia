@@ -25,6 +25,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("users.urls")),
     path("api/", include("card_manager.api.urls")),
+    path("quiz-api/", include("card_quiz.quiz_api.urls")),
     path("decks/", card_views.show_decks, name="show-decks"),
     path("decks/<int:deck_id>/cards/", card_views.show_cards, name="show-cards"),
     path("oops/", card_views.oops_view, name="oops"),

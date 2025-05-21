@@ -128,10 +128,10 @@ class DeckDeleteView(DestroyAPIView):
         )
 
 
-# is this function redundant after using Celery task in tasks.py???
 class ShowCardAPIView(APIView):
     permission_classes = [IsAuthenticated]
-    deck_name = "animals"  # NOTE THAT THIS IS HARDCODED FOR TESTING
+    # deck_name is hardcoded because 'Learn' redirects to the ShowCardAPIView instead of DeckListView (intended)
+    deck_name = "animals"
 
     def get(self, request):
         result = show_card(self.deck_name, request.user)
