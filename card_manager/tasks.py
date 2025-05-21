@@ -9,9 +9,12 @@ from channels.layers import get_channel_layer
 
 logger = logging.getLogger(__name__)
 
+
 @shared_task(bind=True)
 def create_card_task(self, word, deck_name, user_id):
-    logger.info(f"🚀 Task started: create_card_task(word={word}, deck={deck_name}, user_id={user_id})")
+    logger.info(
+        f"🚀 Task started: create_card_task(word={word}, deck={deck_name}, user_id={user_id})"
+    )
 
     user_model = get_user_model()
     channel_layer = get_channel_layer()
@@ -81,6 +84,8 @@ def create_card_task(self, word, deck_name, user_id):
                 logger.error("❌ Failed to send error message via WebSocket:")
                 traceback.print_exc()
         else:
-            logger.warning("⚠️ Cannot send error WebSocket message: channel_layer is None")
+            logger.warning(
+                "⚠️ Cannot send error WebSocket message: channel_layer is None"
+            )
 
         return error_msg

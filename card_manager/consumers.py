@@ -5,17 +5,17 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 class CardProgressConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         user = self.scope["user"]
-        print("🔍 Connected user:", user, "THIS IS FROM CUSROMER")
 
         if user.is_authenticated:
-            self.group_name = f"user_{user.id}"  # 👈 FIX: store group name for later use
+            self.group_name = (
+                f"user_{user.id}"  # 👈 FIX: store group name for later use
+            )
 
             await self.channel_layer.group_add(
                 self.group_name,
                 self.channel_name,
             )
             await self.accept()
-            print(f"✅ User {user.id} added to group {self.group_name} THIS IS FROM CUSROMER")
         else:
             print("❌ WebSocket rejected: user not authenticated")
             await self.close()
@@ -32,5 +32,4 @@ class CardProgressConsumer(AsyncWebsocketConsumer):
             print("⚠️ No group_name found — skipping group discard.")
 
     async def card_status(self, event):
-        print(f"📨 Sending card status to client: {event['content']}THIS IS FROM CONSUMER")
         await self.send(text_data=json.dumps(event["content"]))
