@@ -131,6 +131,7 @@ class DeckDeleteView(DestroyAPIView):
 class ShowCardAPIView(APIView):
     permission_classes = [IsAuthenticated]
     # deck_name is hardcoded because 'Learn' redirects to the ShowCardAPIView instead of DeckListView (intended)
+    # so when the correct redirect will be implemented the ShowCardAPIView will accept a deck selected by user
     deck_name = "animals"
 
     def get(self, request):
