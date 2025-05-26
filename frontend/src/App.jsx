@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import NavBar from './components/NavBar';
 import Header from './components/Header';
 import Homepage from './components/Homepage';
+import Banner from './components/Banner';
+import MainContent from './components/MainContent';
 import './assets/css/main.css';
 
 function App() {
@@ -16,6 +18,8 @@ function App() {
       <Header onToggleMenu={() => setMenuVisible(true)} />
       <NavBar onCloseMenu={() => setMenuVisible(false)} />
       <Homepage />
+      <Banner />
+      <MainContent />
     </>
   );
 }
