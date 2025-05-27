@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import NavBar from './components/NavBar';
 import Header from './components/Header';
 import Home from './pages/Home';
+import StudyPage from './pages/StudyPage';
 import './assets/css/main.css';
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
 
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/study/page" element={<StudyPage />} />
       </Routes>
     </Router>
   );
