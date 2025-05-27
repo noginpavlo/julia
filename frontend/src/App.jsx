@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import NavBar from './components/NavBar';
 import Header from './components/Header';
-import Homepage from './components/Homepage';
-import Banner from './components/Banner';
-import MainContent from './components/MainContent';
+import Home from './pages/Home';
 import './assets/css/main.css';
-
 
 function App() {
   const [menuVisible, setMenuVisible] = useState(false);
@@ -15,15 +13,15 @@ function App() {
   }, [menuVisible]);
 
   return (
-    <>
+    <Router>
       <Header onToggleMenu={() => setMenuVisible(true)} />
       <NavBar onCloseMenu={() => setMenuVisible(false)} />
-      <Homepage />
-      <Banner />
-      <MainContent />
-    </>
+
+      <Routes>
+        <Route path="/" element={<Home />} />
+      </Routes>
+    </Router>
   );
 }
 
 export default App;
-
