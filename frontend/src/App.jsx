@@ -6,6 +6,7 @@ import Banner from './components/Banner';
 import MainContent from './components/MainContent';
 import './assets/css/main.css';
 
+
 function App() {
   const [menuVisible, setMenuVisible] = useState(false);
 

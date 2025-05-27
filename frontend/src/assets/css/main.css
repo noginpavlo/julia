@@ -3397,6 +3397,7 @@ input, select, textarea {
 		max-height: 32em;
 		min-height: 22em;
 		position: relative;
+		padding: 6em 4em 2em 4em;
 		top: -3.25em;
 	}
 
@@ -3431,7 +3432,10 @@ input, select, textarea {
 			-webkit-transition: opacity 1.5s ease, -webkit-transform 0.5s ease-out, -webkit-filter 0.5s ease, -webkit-filter 0.5s ease;
 			-ms-transition: opacity 1.5s ease, -ms-transform 0.5s ease-out, -ms-filter 0.5s ease, -webkit-filter 0.5s ease;
 			transition: opacity 1.5s ease, transform 0.5s ease-out, filter 0.5s ease, -webkit-filter 0.5s ease;
-			padding: 0 !important;
+            max-width: 100% !important;
+            width: 100%;
+            margin: 0 !important;
+            padding: 0 !important;
 			position: relative;
 			z-index: 2;
 		}

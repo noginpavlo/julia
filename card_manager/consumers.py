@@ -7,9 +7,7 @@ class CardProgressConsumer(AsyncWebsocketConsumer):
         user = self.scope["user"]
 
         if user.is_authenticated:
-            self.group_name = (
-                f"user_{user.id}" # store group name for later use
-            )
+            self.group_name = f"user_{user.id}"  # store group name for later use
 
             await self.channel_layer.group_add(
                 self.group_name,

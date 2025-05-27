@@ -3,6 +3,7 @@ import React from 'react';
 export default function Header({ onToggleMenu }) {
   return (
     <header id="header" className="alt">
+
       <a href="index.html" className="logo">
         <strong>Julia</strong> <span>by highlander-95</span>
       </a>
