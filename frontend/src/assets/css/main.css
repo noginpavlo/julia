@@ -4022,3 +4022,108 @@ body,
   font-size: 1rem;
 }
 
+/* ===== SECTION ONE STYLES ===== */
+
+#section-one {
+  background-color: #2e3450;
+  padding: 2em 1em;
+}
+
+#section-one-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5em;
+  justify-content: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+#section-one .section-one-tile {
+  position: relative;
+  display: block;
+  width: 45%;
+  min-height: 18em;
+  text-decoration: none;
+  border-radius: 1em;
+  overflow: hidden;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  color: white;
+  flex: 1 1 45%;
+}
+
+#section-one .section-one-tile:hover {
+  transform: scale(1.03);
+  opacity: 0.9;
+}
+
+#section-one .section-one-content {
+  height: 100%;
+  padding: 3em 2em;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  position: relative;
+  z-index: 2;
+}
+
+#section-one .section-one-header h3 {
+  font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+  margin-bottom: 0.5em;
+}
+
+#section-one .section-one-header p {
+  font-size: clamp(0.9rem, 2vw, 1.1rem);
+  margin: 0;
+}
+
+/* Specific backgrounds */
+#tile-create::before,
+#tile-learn::before,
+#tile-stats::before,
+#tile-quiz::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  opacity: 0.85;
+  transition: opacity 0.3s ease;
+}
+
+#tile-create::before { background-color: #6fc3df; }
+#tile-learn::before { background-color: #8d82c4; }
+#tile-stats::before { background-color: #ec8d81; }
+#tile-quiz::before { background-color: #87c5a4; }
+
+#section-one .section-one-tile:hover::before {
+  opacity: 0.5;
+}
+
+/* ===== Responsive Tweaks (Only Affects Section One) ===== */
+
+@media (max-width: 1024px) {
+  #section-one .section-one-tile {
+    width: 48%;
+    flex: 1 1 48%;
+  }
+}
+
+@media (max-width: 768px) {
+  #section-one .section-one-tile {
+    width: 100%;
+    flex: 1 1 100%;
+  }
+
+  #section-one .section-one-content {
+    padding: 2em 1.5em;
+  }
+}
+
+@media (max-width: 480px) {
+  #section-one .section-one-header h3 {
+    font-size: 1.2rem;
+  }
+
+  #section-one .section-one-header p {
+    font-size: 0.95rem;
+  }
+}

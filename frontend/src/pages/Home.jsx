@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import createImg from '../assets/images/create.jpg';
 import learnImg from '../assets/images/learn.jpg';
 import chartImg from '../assets/images/chart.jpg';
@@ -28,32 +29,46 @@ export default function Home() {
       {/* MAIN CONTENT */}
       <div id="main">
         {/* Section One */}
-        <section id="one" className="tiles">
-          <Article
-            img={createImg}
-            title="Create"
-            description="Make your cards easy and fast"
-            link="#"
-          />
-          <Article
-            img={learnImg}
-            title="Learn"
-            description="Study your cards"
-            link="#"
-          />
-          <Article
-            img={chartImg}
-            title="Stats"
-            description="Track your progress with comprehensive charts"
-            link="#"
-          />
-          <Article
-            img={bannerImg}
-            title="Test yourself"
-            description="Take a quiz to put your knowledge to the test"
-            link="#"
-          />
+        <section id="section-one">
+          <div id="section-one-grid">
+            <a href="/create" className="section-one-tile" id="tile-create">
+              <div className="section-one-content">
+                <header className="section-one-header">
+                  <h3>Create</h3>
+                  <p>Make your cards easy and fast</p>
+                </header>
+              </div>
+            </a>
+
+            <a href="/study/page" className="section-one-tile" id="tile-learn">
+              <div className="section-one-content">
+                <header className="section-one-header">
+                  <h3>Learn</h3>
+                  <p>Study your cards</p>
+                </header>
+              </div>
+            </a>
+
+            <a href="/stats" className="section-one-tile" id="tile-stats">
+              <div className="section-one-content">
+                <header className="section-one-header">
+                  <h3>Stats</h3>
+                  <p>Track your progress with charts</p>
+                </header>
+              </div>
+            </a>
+
+            <a href="/quiz" className="section-one-tile" id="tile-quiz">
+              <div className="section-one-content">
+                <header className="section-one-header">
+                  <h3>Test Yourself</h3>
+                  <p>Take a quiz to test your knowledge</p>
+                </header>
+              </div>
+            </a>
+          </div>
         </section>
+
 
         {/* Section Two */}
         <section id="two">
@@ -81,11 +96,13 @@ export default function Home() {
 function Article({ img, title, description, link }) {
   return (
     <article>
-      <span className="image">
-        <img src={img} alt="" />
-      </span>
+      <Link to={link} className="image-link">
+        <span className="image">
+          <img src={img} alt={title} />
+        </span>
+      </Link>
       <header className="major">
-        <h3><a href={link} className="link">{title}</a></h3>
+        <h3>{title}</h3>
         <p>{description}</p>
       </header>
     </article>
