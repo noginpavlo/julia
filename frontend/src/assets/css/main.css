@@ -3985,43 +3985,26 @@ body,
   align-items: stretch;
   gap: 1.5rem;
   width: 100%;
-  perspective: 1000px;
 }
 
-/* Card Flip Container */
+/* Flashcard Container (cleaned up) */
 .flashcard {
   position: relative;
   width: 100%;
-  transform-style: preserve-3d;
-  transition: transform 0.6s ease;
-  cursor: pointer;
 }
 
-/* Flipped state */
-.flashcard.flipped {
-  transform: rotateY(180deg);
-}
-
-/* Card faces stacked */
+/* Flashcard Face (front or back) */
 .flashcard-face {
-  position: absolute;
-  top: 0;
-  left: 0;
+  position: relative;
   width: 100%;
   padding: 2rem;
   background: #7F8CAA;
-  backface-visibility: hidden;
   border-radius: 0.5rem;
   box-shadow: 0 0 1rem rgba(0, 0, 0, 0.1);
   overflow-wrap: break-word;
   word-wrap: break-word;
   hyphens: auto;
   box-sizing: border-box;
-}
-
-/* Back side flipped */
-.flashcard-face.back {
-  transform: rotateY(180deg);
 }
 
 /* Buttons under card */
