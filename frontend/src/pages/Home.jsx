@@ -31,7 +31,8 @@ export default function Home() {
         {/* Section One */}
         <section id="section-one">
           <div id="section-one-grid">
-            <a href="/create" className="section-one-tile" id="tile-create">
+            <a href="/create" className="section-one-tile" id="tile-create" style={{ backgroundImage: `url(${createImg})` }}>
+              <div className="section-one-overlay"></div>
               <div className="section-one-content">
                 <header className="section-one-header">
                   <h3>Create</h3>
@@ -40,7 +41,8 @@ export default function Home() {
               </div>
             </a>
 
-            <a href="/study/page" className="section-one-tile" id="tile-learn">
+            <a href="/study/page" className="section-one-tile" id="tile-learn" style={{ backgroundImage: `url(${learnImg})` }}>
+              <div className="section-one-overlay"></div>
               <div className="section-one-content">
                 <header className="section-one-header">
                   <h3>Learn</h3>
@@ -49,7 +51,8 @@ export default function Home() {
               </div>
             </a>
 
-            <a href="/stats" className="section-one-tile" id="tile-stats">
+            <a href="/stats" className="section-one-tile" id="tile-stats" style={{ backgroundImage: `url(${chartImg})` }}>
+              <div className="section-one-overlay"></div>
               <div className="section-one-content">
                 <header className="section-one-header">
                   <h3>Stats</h3>
@@ -58,7 +61,8 @@ export default function Home() {
               </div>
             </a>
 
-            <a href="/quiz" className="section-one-tile" id="tile-quiz">
+            <a href="/quiz" className="section-one-tile" id="tile-quiz" style={{ backgroundImage: `url(${bannerImg})` }}>
+              <div className="section-one-overlay"></div>
               <div className="section-one-content">
                 <header className="section-one-header">
                   <h3>Test Yourself</h3>

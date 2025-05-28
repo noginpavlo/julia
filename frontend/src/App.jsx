@@ -4,6 +4,9 @@ import NavBar from './components/NavBar';
 import Header from './components/Header';
 import Home from './pages/Home';
 import StudyPage from './pages/StudyPage';
+import CreatePage from './pages/CreatePage';
+import Footer from './components/Footer';
+import './assets/css/CreatePage.css';
 import './assets/css/main.css';
 
 function App() {
@@ -21,7 +24,9 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/study/page" element={<StudyPage />} />
+        <Route path="/create" element={<CreatePage />} />
       </Routes>
+      <Footer />
     </Router>
   );
 }

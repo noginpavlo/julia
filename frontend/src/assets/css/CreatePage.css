@@ -1,0 +1,79 @@
+/* Create Page Styles - Highly Specific to #create-section */
+
+#create-section {
+  background-color: #2e3450; /* DARK BACKGROUND as requested */
+  min-height: 100vh;
+  padding: 4rem 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#create-section .create-card-container {
+  background-color: #3c445f; /* LIGHTER CARD AREA */
+  color: #ffffff;
+  padding: 2rem;
+  border-radius: 12px;
+  max-width: 600px;
+  width: 100%;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.25);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#create-section h2 {
+  margin-top: 0;
+  font-size: 1.8rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+#create-section .create-field {
+  margin-bottom: 1.5rem;
+}
+
+#create-section .create-field label {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 0.4rem;
+  font-size: 1rem;
+}
+
+#create-section .create-field input {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  outline: none;
+}
+
+#create-section .create-submit-button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.3s ease;
+}
+
+#create-section .create-submit-button:hover {
+  background-color: #45a049;
+}
+
+/* Responsive */
+@media screen and (max-width: 768px) {
+  #create-section {
+    padding: 2rem 1rem;
+  }
+
+  #create-section .create-card-container {
+    padding: 1.5rem;
+  }
+
+  #create-section h2 {
+    font-size: 1.5rem;
+  }
+}

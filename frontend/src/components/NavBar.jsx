@@ -5,9 +5,9 @@ export default function NavBar({ onCloseMenu }) {
     <nav id="menu">
       <div className="inner">
         <ul className="links">
-          <li><a href="index.html">Home</a></li>
-          <li><a href="landing.html">Create cards</a></li>
-          <li><a href="landing.html">Learn my cards</a></li>
+          <li><a href="/">Home</a></li>
+          <li><a href="/create">Create cards</a></li>
+          <li><a href="/study/page">Learn my cards</a></li>
           <li><a href="generic.html">My stats</a></li>
           <li><a href="elements.html">About</a></li>
         </ul>
