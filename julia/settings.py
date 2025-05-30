@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     "allauth.socialaccount.providers.google",
     "allauth.socialaccount.providers.github",
     "channels",
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
@@ -74,6 +75,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
 ]
 
 ROOT_URLCONF = "julia.urls"
@@ -197,3 +199,8 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+# Allow React frontend
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+]
