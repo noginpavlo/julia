@@ -1,7 +1,12 @@
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework import generics, permissions
 from rest_framework.response import Response
 from .serializers import RegisterSerializer
 from rest_framework.views import APIView
+from rest_framework import status
+
+
+IS_PRODUCTION = False
 
 
 class RegisterView(generics.CreateAPIView):
@@ -16,3 +21,54 @@ class DashboardAPIView(APIView):
         return Response(
             {"message": f"Hello {request.user.username}, welcome to your dashboard!"}
         )
+
+
+class CookieTokenObtainPairView(TokenObtainPairView):
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+
+        if response.status_code == 200:
+            refresh_token = response.data.get("refresh")
+            access_token = response.data.get("access")
+
+            cookie_max_age = 7 * 24 * 60 * 60 # 7 days in seconds
+
+            response.set_cookie(
+                key="refresh_token",
+                value=refresh_token,
+                httponly=True,
+                # secure=True, | this ensures that data is sent via HTTPS only (which means that can't be used in dev)
+                samesite="Strict",
+                max_age=cookie_max_age,
+                path="/api/users/token/refresh/",
+            )
+
+            response.data.pop("refresh")
+            response.data = {"access": access_token}
+
+        return response
+
+
+class CookieTokenRefreshView(TokenRefreshView):
+    def post(self, request, *args, **kwargs):
+        refresh_token = request.COOKIES.get("refresh_token")
+        if refresh_token is None:
+            return Response(
+                {"detail": "Refresh token cookie not found."},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+
+        # Replace request.data to include refresh token from cookie
+        request.data._mutable = True
+        request.data["refresh"] = refresh_token
+        request.data._mutable = False
+
+        return super().post(request, *args, **kwargs)
+
+
+class LogoutView(APIView):
+    def post(self, request):
+        response = Response({"detail": "Logged out"}, status=200)
+        response.delete_cookie("refresh_token", path="/api/users/token/refresh/")
+        return response
+
