@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from .serializers import RegisterSerializer
 from rest_framework.views import APIView
 from rest_framework import status
+import json
 
 
 IS_PRODUCTION = False
@@ -46,6 +47,19 @@ class CookieTokenObtainPairView(TokenObtainPairView):
             response.data.pop("refresh")
             response.data = {"access": access_token}
 
+            # 🔽 Print response info
+            print("=== Response Info ===")
+            print("Status Code:", response.status_code)
+            print("Headers:")
+            for k, v in response.items():
+                print(f"{k}: {v}")
+            print("Cookies Set:")
+            for c in response.cookies.values():
+                print(c.output())
+            print("Body:")
+            print(json.dumps(response.data, indent=4))
+            print("=======================")
+
         return response
 
 
@@ -58,11 +72,12 @@ class CookieTokenRefreshView(TokenRefreshView):
                 status=status.HTTP_401_UNAUTHORIZED,
             )
 
-        # Replace request.data to include refresh token from cookie
+        # Include refresh token to request.data body (HTTP-only cookies, no refresh token in body)
         request.data._mutable = True
         request.data["refresh"] = refresh_token
         request.data._mutable = False
 
+        # how in this function the token is sent via COOKIES only if there is no lines that remove refresh tok from the body?
         return super().post(request, *args, **kwargs)
 
 

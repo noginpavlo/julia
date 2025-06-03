@@ -12,7 +12,7 @@ function LoginPage() {
     e.preventDefault();
     setError('');
 
-    // Basic validation: username should not contain '@'
+    // Assumes that username does not contain @ for some reason (think ones again about it)
     if (username.includes('@')) {
       setError("Username should not contain '@'");
       return;
@@ -24,6 +24,7 @@ function LoginPage() {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Allow cookies
         body: JSON.stringify({ username, password }),
       });
 
@@ -37,11 +38,11 @@ function LoginPage() {
       }
 
       const data = await response.json();
-      // Save tokens (e.g., in localStorage)
-      localStorage.setItem('accessToken', data.access);
-      localStorage.setItem('refreshToken', data.refresh);
 
-      // Redirect user after successful login (for example, to dashboard)
+      window.accessToken = data.access; // Store access token in memory
+
+      // Refresh token is set via HTTP-only cookie by backend
+
       navigate('/dashboard');
     } catch (err) {
       setError('Network error. Please check your connection.');

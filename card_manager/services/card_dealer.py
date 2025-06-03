@@ -82,7 +82,6 @@ def save_data(response, deck_name, user):
         "examples": examples,
     }
 
-    # Record cleaned data to cards_card table
     Card.objects.create(
         deck=deck,
         json_data=cleaned_data,
