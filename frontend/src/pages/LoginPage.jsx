@@ -1,18 +1,21 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../assets/css/LoginPage.css';
+import { useUser } from '../context/UserContext';
 
 function LoginPage() {
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState(''); // local input
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+
+  // Get context functions with aliasing
+  const { setAccessToken, setUsername: setContextUsername } = useUser();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
-    // Assumes that username does not contain @ for some reason (think ones again about it)
     if (username.includes('@')) {
       setError("Username should not contain '@'");
       return;
@@ -24,26 +27,23 @@ function LoginPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include', // Allow cookies
+        credentials: 'include',
         body: JSON.stringify({ username, password }),
       });
 
       if (!response.ok) {
-        if (response.status === 401) {
-          setError('Invalid username or password.');
-        } else {
-          setError('Server error. Please try again later.');
-        }
+        setError(response.status === 401
+          ? 'Invalid username or password.'
+          : 'Server error. Please try again later.');
         return;
       }
 
       const data = await response.json();
 
-      window.accessToken = data.access; // Store access token in memory
+      setAccessToken(data.access);        // update token in context
+      setContextUsername(username);       // update username in context
 
-      // Refresh token is set via HTTP-only cookie by backend
-
-      navigate('/dashboard');
+      navigate('/');
     } catch (err) {
       setError('Network error. Please check your connection.');
     }
