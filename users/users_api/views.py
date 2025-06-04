@@ -1,10 +1,11 @@
+import json
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 from rest_framework import generics, permissions
 from rest_framework.response import Response
-from .serializers import RegisterSerializer
 from rest_framework.views import APIView
 from rest_framework import status
-import json
+from .serializers import RegisterSerializer
 
 
 IS_PRODUCTION = False
@@ -32,7 +33,7 @@ class CookieTokenObtainPairView(TokenObtainPairView):
             refresh_token = response.data.get("refresh")
             access_token = response.data.get("access")
 
-            cookie_max_age = 7 * 24 * 60 * 60 # 7 days in seconds
+            cookie_max_age = 7 * 24 * 60 * 60  # 7 days in seconds
 
             response.set_cookie(
                 key="refresh_token",
@@ -66,19 +67,23 @@ class CookieTokenObtainPairView(TokenObtainPairView):
 class CookieTokenRefreshView(TokenRefreshView):
     def post(self, request, *args, **kwargs):
         refresh_token = request.COOKIES.get("refresh_token")
-        if refresh_token is None:
+        if not refresh_token:
             return Response(
                 {"detail": "Refresh token cookie not found."},
                 status=status.HTTP_401_UNAUTHORIZED,
             )
 
-        # Include refresh token to request.data body (HTTP-only cookies, no refresh token in body)
-        request.data._mutable = True
-        request.data["refresh"] = refresh_token
-        request.data._mutable = False
+        # Manually pass refresh token to the serializer
+        serializer = TokenRefreshSerializer(data={"refresh": refresh_token})
+        try:
+            serializer.is_valid(raise_exception=True)
+        except Exception:
+            return Response(
+                {"detail": "Invalid or expired refresh token."},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
 
-        # how in this function the token is sent via COOKIES only if there is no lines that remove refresh tok from the body?
-        return super().post(request, *args, **kwargs)
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
 
 class LogoutView(APIView):
@@ -86,4 +91,3 @@ class LogoutView(APIView):
         response = Response({"detail": "Logged out"}, status=200)
         response.delete_cookie("refresh_token", path="/api/users/token/refresh/")
         return response
-
