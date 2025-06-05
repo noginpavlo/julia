@@ -1,12 +1,12 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useEffect, useContext, useRef } from 'react';
 
 const UserContext = createContext();
 
 export function UserProvider({ children }) {
   const [accessToken, setAccessTokenState] = useState(null);
   const [username, setUsernameState] = useState(null);
+  const refreshIntervalRef = useRef(null); // 🆕 Ref to hold interval ID
 
-  // ✅ Restore token and username on page load (no refresh)
   useEffect(() => {
     const storedToken = localStorage.getItem('accessToken');
     const storedUsername = localStorage.getItem('username');
@@ -14,13 +14,12 @@ export function UserProvider({ children }) {
     if (storedUsername) setUsernameState(storedUsername);
   }, []);
 
-  // ✅ Start periodic refresh loop, but don't refresh immediately
   useEffect(() => {
     const refreshAccessToken = async () => {
       try {
         const response = await fetch('http://localhost:8000/api/users/token/refresh/', {
           method: 'POST',
-          credentials: 'include', // Send HTTP-only refresh token
+          credentials: 'include',
         });
 
         if (response.ok) {
@@ -36,9 +35,9 @@ export function UserProvider({ children }) {
       }
     };
 
-    const interval = setInterval(refreshAccessToken, 10 * 60 * 1000); // 🔁 auto-refresh every 10 minutes
+    refreshIntervalRef.current = setInterval(refreshAccessToken, 10 * 60 * 1000);
 
-    return () => clearInterval(interval); // Cleanup on unmount
+    return () => clearInterval(refreshIntervalRef.current); // Clear on unmount
   }, []);
 
   const setAccessToken = (token) => {
@@ -56,6 +55,10 @@ export function UserProvider({ children }) {
     localStorage.removeItem('username');
     setAccessTokenState(null);
     setUsernameState(null);
+
+    if (refreshIntervalRef.current) {
+      clearInterval(refreshIntervalRef.current);
+    }
   };
 
   return (

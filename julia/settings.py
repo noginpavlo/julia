@@ -136,7 +136,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Authentication Redirects
 LOGIN_URL = "/login/"
-LOGIN_REDIRECT_URL = "/dashboard/"
+LOGIN_REDIRECT_URL = 'http://localhost:5173/'
 LOGOUT_REDIRECT_URL = "/"
 SITE_ID = 1
 

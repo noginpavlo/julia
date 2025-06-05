@@ -4,12 +4,11 @@ import '../assets/css/LoginPage.css';
 import { useUser } from '../context/UserContext';
 
 function LoginPage() {
-  const [username, setUsername] = useState(''); // local input
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  // Get context functions with aliasing
   const { setAccessToken, setUsername: setContextUsername } = useUser();
 
   const handleSubmit = async (e) => {
@@ -32,17 +31,17 @@ function LoginPage() {
       });
 
       if (!response.ok) {
-        setError(response.status === 401
-          ? 'Invalid username or password.'
-          : 'Server error. Please try again later.');
+        setError(
+          response.status === 401
+            ? 'Invalid username or password.'
+            : 'Server error. Please try again later.'
+        );
         return;
       }
 
       const data = await response.json();
-
-      setAccessToken(data.access);        // update token in context
-      setContextUsername(username);       // update username in context
-
+      setAccessToken(data.access);
+      setContextUsername(username);
       navigate('/');
     } catch (err) {
       setError('Network error. Please check your connection.');
@@ -79,7 +78,7 @@ function LoginPage() {
             />
           </div>
 
-          {error && <p style={{ color: 'red' }}>{error}</p>}
+          {error && <p className="error-message">{error}</p>}
 
           <button type="submit" id="login-submit">Login</button>
         </form>
@@ -87,17 +86,29 @@ function LoginPage() {
         <div id="social-login">
           <p>Or login with</p>
           <div className="social-buttons">
-            <button className="social-btn" id="google-login">
+            <a
+              className="social-btn"
+              id="google-login"
+              href='http://localhost:8000/accounts/google/login/?next=http://localhost:5173/'
+            >
               <i className="fab fa-google"></i> Google
-            </button>
-            <button className="social-btn" id="github-login">
+            </a>
+
+            <a
+              className="social-btn"
+              id="github-login"
+              href='http://localhost:8000/accounts/google/login/?next=http://localhost:5173/'
+            >
               <i className="fab fa-github"></i> GitHub
-            </button>
+            </a>
           </div>
         </div>
 
         <div id="register-link">
-          <p>Don't have an account? <Link to="/register">Register here</Link></p>
+          <p>
+            Don't have an account?{' '}
+            <Link to="/register">Register here</Link>
+          </p>
         </div>
       </div>
     </section>

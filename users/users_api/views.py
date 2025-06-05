@@ -1,6 +1,8 @@
-import json
+from django.shortcuts import redirect
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -25,43 +27,59 @@ class DashboardAPIView(APIView):
         )
 
 
-class CookieTokenObtainPairView(TokenObtainPairView):
-    def post(self, request, *args, **kwargs):
-        response = super().post(request, *args, **kwargs)
+def generate_jwt_response(user):
+    refresh = RefreshToken.for_user(user)
+    access_token = str(refresh.access_token)
+    refresh_token = str(refresh)
 
-        if response.status_code == 200:
-            refresh_token = response.data.get("refresh")
-            access_token = response.data.get("access")
+    cookie_max_age = 7 * 24 * 60 * 60  # 7 days
 
-            cookie_max_age = 7 * 24 * 60 * 60  # 7 days in seconds
+    response = Response({"access": access_token})
+    response.set_cookie(
+        key="refresh_token",
+        value=refresh_token,
+        httponly=True,
+        secure=IS_PRODUCTION, # this is used on prod to ensure HTTPS
+        samesite="Strict",
+        max_age=cookie_max_age,
+        path="/api/users/",
+    )
 
-            response.set_cookie(
-                key="refresh_token",
-                value=refresh_token,
-                httponly=True,
-                # secure=True, | this ensures that data is sent via HTTPS only (which means that can't be used in dev)
-                samesite="Strict",
-                max_age=cookie_max_age,
-                path="/api/users/token/refresh/",
-            )
+    return response
 
-            response.data.pop("refresh")
-            response.data = {"access": access_token}
 
-            # 🔽 Print response info
-            print("=== Response Info ===")
-            print("Status Code:", response.status_code)
-            print("Headers:")
-            for k, v in response.items():
-                print(f"{k}: {v}")
-            print("Cookies Set:")
-            for c in response.cookies.values():
-                print(c.output())
-            print("Body:")
-            print(json.dumps(response.data, indent=4))
-            print("=======================")
+class OAuthCallbackView(APIView):
+    def get(self, request, *args, **kwargs):
+        user = request.user  # the user authenticated by OAuth
+
+        if not user.is_authenticated:
+            return redirect('http://localhost:5173/login')
+
+        response = generate_jwt_response(user)
+
+        response.status_code = 302
+        response['Location'] = 'http://localhost:5173/'
 
         return response
+
+
+class SocialLoginJWTView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        return generate_jwt_response(request.user)
+
+
+class CookieTokenObtainPairView(TokenObtainPairView):
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        try:
+            serializer.is_valid(raise_exception=True)
+        except Exception:
+            return Response({"detail": "Invalid credentials"}, status=401)
+
+        user = serializer.user
+        return generate_jwt_response(user)
 
 
 class CookieTokenRefreshView(TokenRefreshView):
