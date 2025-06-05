@@ -4,7 +4,7 @@ from card_manager.models import Card
 def get_quiz_cards(user, deck_ids):
     def fetch_cards(queryset, count):
         return list(
-            queryset.order_by("?")[:count]
+            queryset.order_by("?")[:count] # ukrainian django docs you have say that you need to avoid order_by(?). Study why!
         )  # returns rows in random order (SQL =>ORDER BY RANDOM())
 
     base_qs = Card.objects.filter(deck__user=user, deck_id__in=deck_ids)
