@@ -1,8 +1,8 @@
 import React from 'react';
-import { useUser } from '../context/UserContext'; // Import your user context
+import { useUser } from '../context/UserContext';
 
 export default function NavBar({ onCloseMenu }) {
-  const { username } = useUser();
+  const { isLoggedIn, username } = useUser();
 
   return (
     <nav id="menu">
@@ -15,9 +15,9 @@ export default function NavBar({ onCloseMenu }) {
           <li><a href="/">About</a></li>
         </ul>
 
-        {username ? (
+        {isLoggedIn ? (
           <div style={{ padding: '1rem', color: '#ccc', textAlign: 'center', fontWeight: 'bold' }}>
-            Hey, {username}!
+            Hey, {username || 'User'}!
           </div>
         ) : (
           <ul className="actions stacked">
@@ -38,4 +38,3 @@ export default function NavBar({ onCloseMenu }) {
     </nav>
   );
 }
-

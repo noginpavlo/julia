@@ -5,13 +5,21 @@ const UserContext = createContext();
 export function UserProvider({ children }) {
   const [accessToken, setAccessTokenState] = useState(null);
   const [username, setUsernameState] = useState(null);
-  const refreshIntervalRef = useRef(null); // 🆕 Ref to hold interval ID
+  const refreshIntervalRef = useRef(null);
 
   useEffect(() => {
     const storedToken = localStorage.getItem('accessToken');
-    const storedUsername = localStorage.getItem('username');
-    if (storedToken) setAccessTokenState(storedToken);
-    if (storedUsername) setUsernameState(storedUsername);
+    if (storedToken) {
+      const payload = parseJwt(storedToken);
+      const isExpired = payload?.exp * 1000 < Date.now();
+
+      if (!isExpired) {
+        setAccessToken(storedToken);
+        setUsernameState(payload?.username || null);
+      } else {
+        console.warn('Stored token is expired');
+      }
+    }
   }, []);
 
   useEffect(() => {
@@ -26,33 +34,30 @@ export function UserProvider({ children }) {
           const data = await response.json();
           setAccessToken(data.access);
         } else {
-          console.warn("Refresh token expired or invalid");
+          console.warn('Refresh token expired or invalid');
           logout();
         }
       } catch (err) {
-        console.error("Network error while refreshing access token", err);
+        console.error('Network error while refreshing access token', err);
         logout();
       }
     };
 
-    refreshIntervalRef.current = setInterval(refreshAccessToken, 10 * 60 * 1000);
+    refreshIntervalRef.current = setInterval(refreshAccessToken, 1 * 60 * 1000);
 
-    return () => clearInterval(refreshIntervalRef.current); // Clear on unmount
+    return () => clearInterval(refreshIntervalRef.current);
   }, []);
 
   const setAccessToken = (token) => {
     localStorage.setItem('accessToken', token);
     setAccessTokenState(token);
-  };
 
-  const setUsername = (name) => {
-    localStorage.setItem('username', name);
-    setUsernameState(name);
+    const payload = parseJwt(token);
+    setUsernameState(payload?.username || null);
   };
 
   const logout = () => {
     localStorage.removeItem('accessToken');
-    localStorage.removeItem('username');
     setAccessTokenState(null);
     setUsernameState(null);
 
@@ -61,8 +66,10 @@ export function UserProvider({ children }) {
     }
   };
 
+  const isLoggedIn = !!accessToken;
+
   return (
-    <UserContext.Provider value={{ accessToken, setAccessToken, username, setUsername, logout }}>
+    <UserContext.Provider value={{ accessToken, setAccessToken, username, isLoggedIn, logout }}>
       {children}
     </UserContext.Provider>
   );
@@ -70,4 +77,20 @@ export function UserProvider({ children }) {
 
 export function useUser() {
   return useContext(UserContext);
+}
+
+function parseJwt(token) {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  } catch {
+    return null;
+  }
 }

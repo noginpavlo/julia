@@ -3,11 +3,10 @@ import { useUser } from '../context/UserContext';
 import { useNavigate } from 'react-router-dom';
 
 export default function LoginPrompt() {
-  const { username } = useUser();
+  const { isLoggedIn } = useUser();
   const navigate = useNavigate();
 
-  // Hide prompt if user is logged in
-  if (username) return null;
+  if (isLoggedIn) return null;
 
   return (
     <div id="login-prompt" role="alert" aria-live="polite">

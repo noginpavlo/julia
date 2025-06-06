@@ -11,7 +11,7 @@ export default function Header({ onToggleMenu }) {
           href="#menu"
           onClick={(e) => {
             e.preventDefault();
-            onToggleMenu(); // Call parent to toggle
+            onToggleMenu();
           }}
         >
           Menu

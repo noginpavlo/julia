@@ -89,7 +89,7 @@ function LoginPage() {
             <a
               className="social-btn"
               id="google-login"
-              href='http://localhost:8000/accounts/google/login/?next=http://localhost:5173/'
+              href='http://localhost:8000/accounts/google/login/?prompt=select_account&next=http://localhost:5173/'
             >
               <i className="fab fa-google"></i> Google
             </a>
@@ -97,7 +97,7 @@ function LoginPage() {
             <a
               className="social-btn"
               id="github-login"
-              href='http://localhost:8000/accounts/google/login/?next=http://localhost:5173/'
+              href='http://localhost:8000/accounts/google/login/?prompt=select_account&next=http://localhost:5173/'
             >
               <i className="fab fa-github"></i> GitHub
             </a>

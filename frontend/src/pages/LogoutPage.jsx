@@ -7,16 +7,26 @@ function LogoutPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    logout();
-    fetch('http://localhost:8000/api/users/logout/', {
-      method: 'POST',
-      credentials: 'include',
-    });
+    async function handleLogout() {
+      try {
+        await fetch('http://localhost:8000/api/users/logout/', {
+          method: 'POST',
+          credentials: 'include',
+        });
 
-    navigate('/login');
+        localStorage.removeItem('accessToken');
+      } catch (err) {
+        console.warn('Logout API call failed:', err);
+      }
+
+      logout();
+      navigate('/login');
+    }
+
+    handleLogout();
   }, [logout, navigate]);
 
-  return null; // Or a loading indicator if you want
+  return null;
 }
 
 export default LogoutPage;

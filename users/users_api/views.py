@@ -50,15 +50,25 @@ def generate_jwt_response(user):
 
 class OAuthCallbackView(APIView):
     def get(self, request, *args, **kwargs):
-        user = request.user  # the user authenticated by OAuth
+        user = request.user
 
         if not user.is_authenticated:
             return redirect('http://localhost:5173/login')
 
-        response = generate_jwt_response(user)
+        refresh = RefreshToken.for_user(user)
 
-        response.status_code = 302
-        response['Location'] = 'http://localhost:5173/'
+        response = Response(status=status.HTTP_302_FOUND)
+        response['Location'] = 'http://localhost:5173/oauth/callback'
+
+        response.set_cookie(
+            key="refresh_token",
+            value=str(refresh),
+            httponly=True,
+            secure=IS_PRODUCTION,
+            samesite="Strict",
+            max_age=7 * 24 * 60 * 60,
+            path="/api/users/",
+        )
 
         return response
 
@@ -107,4 +117,5 @@ class LogoutView(APIView):
     def post(self, request):
         response = Response({"detail": "Logged out"}, status=200)
         response.delete_cookie("refresh_token", path="/api/users/token/refresh/")
+        response.delete_cookie("refresh_token", path="/api/users/")
         return response

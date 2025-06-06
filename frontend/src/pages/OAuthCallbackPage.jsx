@@ -1,37 +1,36 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 
-function OAuthCallbackPage() {
-  const { setAccessToken, setUsername } = useUser();
+export default function OAuthCallbackPage() {
+  const { setAccessToken } = useUser();
   const navigate = useNavigate();
 
   useEffect(() => {
-    async function finishLogin() {
+    async function fetchToken() {
       try {
-        const response = await fetch('http://localhost:8000/api/users/social-login/', {
+        const response = await fetch('http://localhost:8000/api/users/social/token/', {
           method: 'GET',
-          credentials: 'include', // Include refresh token cookie
+          credentials: 'include',
         });
 
-        if (response.ok) {
-          const data = await response.json();
-          setAccessToken(data.access);
-          // Optional: fetch user info if needed
-          setUsername("OAuthUser");
-          navigate('/');
+        if (!response.ok) throw new Error('Token fetch failed');
+
+        const data = await response.json();
+        if (data.access) {
+          setAccessToken(data.access); // This will parse and set username too
+          navigate('/'); // Redirect to homepage
         } else {
-          navigate('/login');
+          throw new Error('No access token in response');
         }
       } catch (err) {
-        navigate('/login');
+        console.error('OAuth login failed:', err);
+        navigate('/login'); // Redirect to login on failure
       }
     }
 
-    finishLogin();
-  }, [setAccessToken, setUsername, navigate]);
+    fetchToken();
+  }, [setAccessToken, navigate]);
 
-  return <p>Logging in...</p>;
+  return <p>Logging you in via Google...</p>;
 }
-
-export default OAuthCallbackPage;
