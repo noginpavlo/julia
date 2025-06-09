@@ -9,16 +9,14 @@ export function UserProvider({ children }) {
 
   useEffect(() => {
     const storedToken = localStorage.getItem('accessToken');
-    if (storedToken) {
-      const payload = parseJwt(storedToken);
-      const isExpired = payload?.exp * 1000 < Date.now();
+    const storedUsername = localStorage.getItem('username');
 
-      if (!isExpired) {
-        setAccessToken(storedToken);
-        setUsernameState(payload?.username || null);
-      } else {
-        console.warn('Stored token is expired');
-      }
+    if (storedToken) {
+      setAccessTokenState(storedToken);
+    }
+
+    if (storedUsername) {
+      setUsernameState(storedUsername);
     }
   }, []);
 
@@ -43,21 +41,34 @@ export function UserProvider({ children }) {
       }
     };
 
-    refreshIntervalRef.current = setInterval(refreshAccessToken, 1 * 60 * 1000);
+    refreshIntervalRef.current = setInterval(refreshAccessToken, 60 * 1000);
 
     return () => clearInterval(refreshIntervalRef.current);
   }, []);
 
   const setAccessToken = (token) => {
-    localStorage.setItem('accessToken', token);
-    setAccessTokenState(token);
+    if (token) {
+      localStorage.setItem('accessToken', token);
+      setAccessTokenState(token);
+    } else {
+      localStorage.removeItem('accessToken');
+      setAccessTokenState(null);
+    }
+  };
 
-    const payload = parseJwt(token);
-    setUsernameState(payload?.username || null);
+  const setContextUsername = (name) => {
+    if (name) {
+      localStorage.setItem('username', name);
+      setUsernameState(name);
+    } else {
+      localStorage.removeItem('username');
+      setUsernameState(null);
+    }
   };
 
   const logout = () => {
     localStorage.removeItem('accessToken');
+    localStorage.removeItem('username');
     setAccessTokenState(null);
     setUsernameState(null);
 
@@ -69,7 +80,14 @@ export function UserProvider({ children }) {
   const isLoggedIn = !!accessToken;
 
   return (
-    <UserContext.Provider value={{ accessToken, setAccessToken, username, isLoggedIn, logout }}>
+    <UserContext.Provider value={{
+      accessToken,
+      setAccessToken,
+      username,
+      setContextUsername,
+      isLoggedIn,
+      logout
+    }}>
       {children}
     </UserContext.Provider>
   );
@@ -77,20 +95,4 @@ export function UserProvider({ children }) {
 
 export function useUser() {
   return useContext(UserContext);
-}
-
-function parseJwt(token) {
-  try {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split('')
-        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-        .join('')
-    );
-    return JSON.parse(jsonPayload);
-  } catch {
-    return null;
-  }
 }

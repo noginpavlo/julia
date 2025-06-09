@@ -3,6 +3,7 @@ import { useUser } from '../context/UserContext';
 
 export default function NavBar({ onCloseMenu }) {
   const { isLoggedIn, username } = useUser();
+  console.log('NavBar:', { isLoggedIn, username });
 
   return (
     <nav id="menu">
@@ -17,7 +18,7 @@ export default function NavBar({ onCloseMenu }) {
 
         {isLoggedIn ? (
           <div style={{ padding: '1rem', color: '#ccc', textAlign: 'center', fontWeight: 'bold' }}>
-            Hey, {username || 'User'}!
+            Hey, {username || 'USER'}!
           </div>
         ) : (
           <ul className="actions stacked">

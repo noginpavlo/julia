@@ -9,7 +9,7 @@ function LoginPage() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const { setAccessToken, setUsername: setContextUsername } = useUser();
+  const { setAccessToken, setContextUsername } = useUser();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,8 +40,10 @@ function LoginPage() {
       }
 
       const data = await response.json();
+      console.log('Login response data:', data);
       setAccessToken(data.access);
-      setContextUsername(username);
+      console.log('Login response data:', data);
+      setContextUsername(data.username);
       navigate('/');
     } catch (err) {
       setError('Network error. Please check your connection.');

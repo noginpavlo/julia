@@ -9,7 +9,7 @@ export default function OAuthCallbackPage() {
   useEffect(() => {
     async function fetchToken() {
       try {
-        const response = await fetch('http://localhost:8000/api/users/social/token/', {
+        const response = await fetch('http://localhost:8000/api/users/social/token/', { // requests access token
           method: 'GET',
           credentials: 'include',
         });
@@ -18,7 +18,8 @@ export default function OAuthCallbackPage() {
 
         const data = await response.json();
         if (data.access) {
-          setAccessToken(data.access); // This will parse and set username too
+          setAccessToken(data.access);
+          setContextUsername(data.username);
           navigate('/'); // Redirect to homepage
         } else {
           throw new Error('No access token in response');

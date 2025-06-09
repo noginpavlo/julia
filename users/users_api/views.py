@@ -27,54 +27,55 @@ class DashboardAPIView(APIView):
         )
 
 
-def generate_jwt_response(user):
+def generate_jwt_response(user, status_code=status.HTTP_200_OK, redirect_url=None):
     refresh = RefreshToken.for_user(user)
     access_token = str(refresh.access_token)
     refresh_token = str(refresh)
 
-    cookie_max_age = 7 * 24 * 60 * 60  # 7 days
+    cookie_max_age = 7 * 24 * 60 * 60  # 7 days in seconds
 
-    response = Response({"access": access_token})
+    response_data = {
+        "access": access_token,
+        "username": user.username,
+    } if not redirect_url else None
+    response = Response(data=response_data, status=status_code)
+
+    if redirect_url:
+        response['Location'] = redirect_url
+
     response.set_cookie(
         key="refresh_token",
         value=refresh_token,
         httponly=True,
-        secure=IS_PRODUCTION, # this is used on prod to ensure HTTPS
+        secure=IS_PRODUCTION,
         samesite="Strict",
         max_age=cookie_max_age,
         path="/api/users/",
     )
 
+    print(response.data)
+
     return response
 
 
+"""Grants refresh token. User is expected to be authenticated via session."""
 class OAuthCallbackView(APIView):
     def get(self, request, *args, **kwargs):
         user = request.user
 
-        if not user.is_authenticated:
+        if not user.is_authenticated: # session authenticated
             return redirect('http://localhost:5173/login')
 
-        refresh = RefreshToken.for_user(user)
-
-        response = Response(status=status.HTTP_302_FOUND)
-        response['Location'] = 'http://localhost:5173/oauth/callback'
-
-        response.set_cookie(
-            key="refresh_token",
-            value=str(refresh),
-            httponly=True,
-            secure=IS_PRODUCTION,
-            samesite="Strict",
-            max_age=7 * 24 * 60 * 60,
-            path="/api/users/",
+        return generate_jwt_response(
+            user,
+            status_code=status.HTTP_302_FOUND,
+            redirect_url='http://localhost:5173/oauth/callback'
         )
 
-        return response
 
-
+"""Grants access token. User has to have JWT already."""
 class SocialLoginJWTView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated] #JWT-authenticated
 
     def get(self, request):
         return generate_jwt_response(request.user)
