@@ -1,7 +1,7 @@
 from django.shortcuts import redirect
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics, permissions
 from rest_framework.response import Response
@@ -27,58 +27,55 @@ class DashboardAPIView(APIView):
         )
 
 
-def generate_jwt_response(user, status_code=status.HTTP_200_OK, redirect_url=None):
-    refresh = RefreshToken.for_user(user)
-    access_token = str(refresh.access_token)
-    refresh_token = str(refresh)
-
-    cookie_max_age = 7 * 24 * 60 * 60  # 7 days in seconds
-
-    response_data = {
-        "access": access_token,
-        "username": user.username,
-    } if not redirect_url else None
-    response = Response(data=response_data, status=status_code)
-
-    if redirect_url:
-        response['Location'] = redirect_url
-
+def set_refresh_cookie(response, refresh_token: str):
     response.set_cookie(
         key="refresh_token",
         value=refresh_token,
         httponly=True,
         secure=IS_PRODUCTION,
-        samesite="Strict",
-        max_age=cookie_max_age,
+        samesite="Lax",
+        max_age= 7 * 24 * 60 * 60, # 7 days in seconds
         path="/api/users/",
     )
-
-    print(response.data)
-
     return response
+
+
+def generate_tokens(user):
+    refresh = RefreshToken.for_user(user)
+    return {
+        "access": str(refresh.access_token),
+        "refresh": str(refresh),
+        "username": user.username, #sends username to display on frontend
+    }
 
 
 """Grants refresh token. User is expected to be authenticated via session."""
 class OAuthCallbackView(APIView):
     def get(self, request, *args, **kwargs):
         user = request.user
-
-        if not user.is_authenticated: # session authenticated
+        if not user.is_authenticated:
             return redirect('http://localhost:5173/login')
 
-        return generate_jwt_response(
-            user,
-            status_code=status.HTTP_302_FOUND,
-            redirect_url='http://localhost:5173/oauth/callback'
+        tokens = generate_tokens(user)
+        response = Response(
+            data={"access": tokens["access"], "username": tokens["username"]},
+            status=status.HTTP_200_OK,
         )
+        set_refresh_cookie(response, tokens["refresh"])
+        return response
 
 
 """Grants access token. User has to have JWT already."""
 class SocialLoginJWTView(APIView):
-    permission_classes = [IsAuthenticated] #JWT-authenticated
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        return generate_jwt_response(request.user)
+        user = request.user
+        access_token = str(AccessToken.for_user(user))
+        return Response(
+            data={"access": access_token, "username": user.username},
+            status=status.HTTP_200_OK,
+        )
 
 
 class CookieTokenObtainPairView(TokenObtainPairView):
@@ -90,7 +87,13 @@ class CookieTokenObtainPairView(TokenObtainPairView):
             return Response({"detail": "Invalid credentials"}, status=401)
 
         user = serializer.user
-        return generate_jwt_response(user)
+        tokens = generate_tokens(user)
+        response = Response(
+            data={"access": tokens["access"], "username": tokens["username"]},
+            status=status.HTTP_200_OK,
+        )
+        set_refresh_cookie(response, tokens["refresh"])
+        return response
 
 
 class CookieTokenRefreshView(TokenRefreshView):
@@ -117,6 +120,5 @@ class CookieTokenRefreshView(TokenRefreshView):
 class LogoutView(APIView):
     def post(self, request):
         response = Response({"detail": "Logged out"}, status=200)
-        response.delete_cookie("refresh_token", path="/api/users/token/refresh/")
-        response.delete_cookie("refresh_token", path="/api/users/")
+        response.delete_cookie("refresh_token", path="/api/")
         return response

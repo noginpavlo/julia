@@ -41,7 +41,7 @@ export function UserProvider({ children }) {
       }
     };
 
-    refreshIntervalRef.current = setInterval(refreshAccessToken, 60 * 1000);
+    refreshIntervalRef.current = setInterval(refreshAccessToken, 10 * 1000);
 
     return () => clearInterval(refreshIntervalRef.current);
   }, []);
