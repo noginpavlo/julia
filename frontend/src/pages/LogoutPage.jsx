@@ -12,6 +12,10 @@ function LogoutPage() {
         await fetch('http://localhost:8000/api/users/logout/', {
           method: 'POST',
           credentials: 'include',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+            'Content-Type': 'application/json', // optional but recommended
+          },
         });
 
         localStorage.removeItem('accessToken');

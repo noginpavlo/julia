@@ -23,7 +23,7 @@ export function UserProvider({ children }) {
   useEffect(() => {
     const refreshAccessToken = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/users/token/refresh/', {
+        const response = await fetch('http://localhost:8000/api/users/token/refresh/', { // /api/users/token/refresh/
           method: 'POST',
           credentials: 'include',
         });
