@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../assets/css/LoginPage.css';
 import { useUser } from '../context/UserContext';
+import { GoogleLogin } from '@react-oauth/google';
 
 function LoginPage() {
   const [username, setUsername] = useState('');
@@ -11,6 +12,7 @@ function LoginPage() {
 
   const { setAccessToken, setContextUsername } = useUser();
 
+  // 🔐 Password login handler
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -40,13 +42,38 @@ function LoginPage() {
       }
 
       const data = await response.json();
-      console.log('Login response data:', data);
       setAccessToken(data.access);
-      console.log('Login response data:', data);
       setContextUsername(data.username);
       navigate('/');
     } catch (err) {
       setError('Network error. Please check your connection.');
+    }
+  };
+
+  // 🔑 Google OAuth handler
+  const handleGoogleLogin = async (credentialResponse) => {
+    const token = credentialResponse.credential;
+
+    try {
+      const response = await fetch('http://localhost:8000/api/auth/google/', { // This url is not valid for now
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem('access_token', data.access);
+        localStorage.setItem('refresh_token', data.refresh);
+        setAccessToken(data.access);
+        setContextUsername(data.username); // Optional if backend returns it
+        navigate('/');
+      } else {
+        setError('Google login failed.');
+      }
+    } catch (error) {
+      setError('Google login network error.');
     }
   };
 
@@ -88,21 +115,21 @@ function LoginPage() {
         <div id="social-login">
           <p>Or login with</p>
           <div className="social-buttons">
-            <a
-              className="social-btn"
-              id="google-login"
-              href='http://localhost:8000/accounts/google/login/?prompt=select_account&next=http://localhost:5173/'
-            >
-              <i className="fab fa-google"></i> Google
-            </a>
+            <div className="social-btn">
+              <GoogleLogin
+                onSuccess={handleGoogleLogin}
+                onError={() => setError('Google login failed.')}
+              />
+            </div>
 
-            <a
+            {/* Optionally keep GitHub if you support it later */}
+            {/* <a
               className="social-btn"
               id="github-login"
-              href='http://localhost:8000/accounts/google/login/?prompt=select_account&next=http://localhost:5173/'
+              href='http://localhost:8000/accounts/github/login/'
             >
               <i className="fab fa-github"></i> GitHub
-            </a>
+            </a> */}
           </div>
         </div>
 

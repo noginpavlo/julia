@@ -31,3 +31,4 @@ Thumbs.db
 
 *.out
 *.o
+node_modules/

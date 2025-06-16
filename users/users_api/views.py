@@ -51,8 +51,32 @@ def generate_tokens(user):
 
 """Grants refresh token. User is expected to be authenticated via session."""
 class OAuthCallbackView(APIView):
+
+    print("OAuthCallbackView is triggered")
+
     def get(self, request, *args, **kwargs):
         user = request.user
+
+        # Print all cookies
+        print("=== COOKIES DEBUG ===")
+        print(f"All cookies: {request.COOKIES}")
+        print(f"Session ID cookie: {request.COOKIES.get('sessionid')}")
+        print(f"CSRF token cookie: {request.COOKIES.get('csrftoken')}")
+
+        # Print session info
+        print("=== SESSION DEBUG ===")
+        print(f"Session key: {request.session.session_key}")
+        print(f"Session data: {dict(request.session)}")
+        print(
+            f"Session exists: {request.session.exists(request.session.session_key) if request.session.session_key else 'No session key'}")
+
+        # Print user info
+        print("=== USER DEBUG ===")
+        print(f"User: {user}")
+        print(f"User authenticated: {user.is_authenticated}")
+        print(f"User ID: {user.id if user.is_authenticated else 'Anonymous'}")
+        print("==================")
+
         if not user.is_authenticated:
             return redirect('http://localhost:5173/login')
 
@@ -126,8 +150,6 @@ class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-
-        print(request.headers.get("Authorization"))
 
         response = Response({"detail": "Logged out"}, status=200)
         response.set_cookie(
