@@ -1,3 +1,4 @@
+import requests
 from django.shortcuts import redirect
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
@@ -8,23 +9,49 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 from .serializers import RegisterSerializer
+from django.contrib.auth import get_user_model
 
 
 IS_PRODUCTION = False
+
+User = get_user_model()
 
 
 class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
     permission_classes = [AllowAny]
 
+class GoogleAuthView(APIView):
+    permission_classes = [AllowAny]
 
-class DashboardAPIView(APIView):
-    permission_classes = [IsAuthenticated]
+    def post(self, request):
+        token_id = request.data.get('token')
+        if not token_id:
+            return Response({'error': 'No token provided'}, status=400)
 
-    def get(self, request):
-        return Response(
-            {"message": f"Hello {request.user.username}, welcome to your dashboard!"}
+        google_response = requests.get(
+            f'https://oauth2.googleapis.com/tokeninfo?id_token={token_id}'
         )
+
+        if not google_response.ok:
+            return Response({'error': 'Invalid Google token'}, status=400)
+
+        payload = google_response.json()
+        email = payload.get('email')
+        name = payload.get('name')
+
+        if not email:
+            return Response({'error': 'Email not provided by Google'}, status=400)
+
+        user, created = User.objects.get_or_create(email=email, defaults={'username': email.split('@')[0], 'first_name': name})
+
+        tokens = generate_tokens(user)
+        response = Response(
+            data={"access": tokens["access"], "username": tokens["username"]},
+            status=status.HTTP_200_OK,
+        )
+        set_refresh_cookie(response, tokens["refresh"])
+        return response
 
 
 def set_refresh_cookie(response, refresh_token: str):
@@ -36,6 +63,7 @@ def set_refresh_cookie(response, refresh_token: str):
         samesite="Lax",
         max_age= 7 * 24 * 60 * 60, # 7 days in seconds
         path="/api/users/",
+        # domain=".myfuturedomain.com" => use it on prod
     )
     return response
 
@@ -49,44 +77,24 @@ def generate_tokens(user):
     }
 
 
-"""Grants refresh token. User is expected to be authenticated via session."""
-class OAuthCallbackView(APIView):
-
-    print("OAuthCallbackView is triggered")
-
-    def get(self, request, *args, **kwargs):
-        user = request.user
-
-        # Print all cookies
-        print("=== COOKIES DEBUG ===")
-        print(f"All cookies: {request.COOKIES}")
-        print(f"Session ID cookie: {request.COOKIES.get('sessionid')}")
-        print(f"CSRF token cookie: {request.COOKIES.get('csrftoken')}")
-
-        # Print session info
-        print("=== SESSION DEBUG ===")
-        print(f"Session key: {request.session.session_key}")
-        print(f"Session data: {dict(request.session)}")
-        print(
-            f"Session exists: {request.session.exists(request.session.session_key) if request.session.session_key else 'No session key'}")
-
-        # Print user info
-        print("=== USER DEBUG ===")
-        print(f"User: {user}")
-        print(f"User authenticated: {user.is_authenticated}")
-        print(f"User ID: {user.id if user.is_authenticated else 'Anonymous'}")
-        print("==================")
-
-        if not user.is_authenticated:
-            return redirect('http://localhost:5173/login')
-
-        tokens = generate_tokens(user)
-        response = Response(
-            data={"access": tokens["access"], "username": tokens["username"]},
-            status=status.HTTP_200_OK,
-        )
-        set_refresh_cookie(response, tokens["refresh"])
-        return response
+# """Grants refresh token. User is expected to be authenticated via session."""
+# class OAuthCallbackView(APIView):
+#
+#     print("OAuthCallbackView is triggered")
+#
+#     def get(self, request, *args, **kwargs):
+#         user = request.user
+#
+#         if not user.is_authenticated:
+#             return redirect('http://localhost:5173/login')
+#
+#         tokens = generate_tokens(user)
+#         response = Response(
+#             data={"access": tokens["access"], "username": tokens["username"]},
+#             status=status.HTTP_200_OK,
+#         )
+#         set_refresh_cookie(response, tokens["refresh"])
+#         return response
 
 
 """Grants access token. User has to have JWT already."""

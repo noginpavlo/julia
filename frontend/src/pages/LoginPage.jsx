@@ -55,7 +55,7 @@ function LoginPage() {
     const token = credentialResponse.credential;
 
     try {
-      const response = await fetch('http://localhost:8000/api/auth/google/', { // This url is not valid for now
+      const response = await fetch('http://localhost:8000/api/users/auth/google/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token }),
