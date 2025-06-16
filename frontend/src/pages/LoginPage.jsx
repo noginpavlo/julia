@@ -28,7 +28,7 @@ function LoginPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include',
+        credentials: 'include', // Important: send/receive cookies
         body: JSON.stringify({ username, password }),
       });
 
@@ -58,14 +58,13 @@ function LoginPage() {
       const response = await fetch('http://localhost:8000/api/users/auth/google/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // Important: ensure cookies are handled
         body: JSON.stringify({ token }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        localStorage.setItem('access_token', data.access);
-        localStorage.setItem('refresh_token', data.refresh);
         setAccessToken(data.access);
         setContextUsername(data.username); // Optional if backend returns it
         navigate('/');
@@ -121,15 +120,6 @@ function LoginPage() {
                 onError={() => setError('Google login failed.')}
               />
             </div>
-
-            {/* Optionally keep GitHub if you support it later */}
-            {/* <a
-              className="social-btn"
-              id="github-login"
-              href='http://localhost:8000/accounts/github/login/'
-            >
-              <i className="fab fa-github"></i> GitHub
-            </a> */}
           </div>
         </div>
 

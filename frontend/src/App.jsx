@@ -12,7 +12,6 @@ import LoginPage from './pages/LoginPage';
 import LogoutPage from './pages/LogoutPage';
 import RegisterPage from './pages/RegisterPage';
 import { UserProvider } from './context/UserContext';
-import OAuthCallbackPage from './pages/OAuthCallbackPage';
 import './assets/css/CreatePage.css';
 import './assets/css/LoginPrompt.css';
 import './assets/css/main.css';
@@ -39,9 +38,7 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/logout" element={<LogoutPage />} />
             <Route path="/register" element={<RegisterPage />} />
-            <Route path="/oauth/callback" element={<OAuthCallbackPage />} />
           </Routes>
-
           <Footer />
         </UserProvider>
       </Router>

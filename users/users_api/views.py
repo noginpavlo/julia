@@ -51,6 +51,10 @@ class GoogleAuthView(APIView):
             status=status.HTTP_200_OK,
         )
         set_refresh_cookie(response, tokens["refresh"])
+        print("THIS IS REFRESH TOKEN FROM GoogleAuthView")
+        # print(tokens["refresh"])
+        print(response.cookies.get("refresh_token"))
+
         return response
 
 

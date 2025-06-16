@@ -7,6 +7,7 @@ export function UserProvider({ children }) {
   const [username, setUsernameState] = useState(null);
   const refreshIntervalRef = useRef(null);
 
+  // Load from localStorage on first render
   useEffect(() => {
     const storedToken = localStorage.getItem('accessToken');
     const storedUsername = localStorage.getItem('username');
@@ -20,10 +21,13 @@ export function UserProvider({ children }) {
     }
   }, []);
 
+  // 🔁 Refresh token logic tied to accessToken
   useEffect(() => {
+    if (!accessToken) return;
+
     const refreshAccessToken = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/users/token/refresh/', { // /api/users/token/refresh/
+        const response = await fetch('http://localhost:8000/api/users/token/refresh/', {
           method: 'POST',
           credentials: 'include',
         });
@@ -42,10 +46,15 @@ export function UserProvider({ children }) {
     };
 
     refreshIntervalRef.current = setInterval(refreshAccessToken, 10 * 1000);
+    console.log('Started refresh interval');
 
-    return () => clearInterval(refreshIntervalRef.current);
-  }, []);
+    return () => {
+      console.log('Clearing refresh interval');
+      clearInterval(refreshIntervalRef.current);
+    };
+  }, [accessToken]);
 
+  // Set access token and persist it
   const setAccessToken = (token) => {
     if (token) {
       localStorage.setItem('accessToken', token);
@@ -56,6 +65,7 @@ export function UserProvider({ children }) {
     }
   };
 
+  // Set username and persist it
   const setContextUsername = (name) => {
     if (name) {
       localStorage.setItem('username', name);
@@ -66,6 +76,7 @@ export function UserProvider({ children }) {
     }
   };
 
+  // Logout and cleanup
   const logout = () => {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('username');
@@ -80,14 +91,16 @@ export function UserProvider({ children }) {
   const isLoggedIn = !!accessToken;
 
   return (
-    <UserContext.Provider value={{
-      accessToken,
-      setAccessToken,
-      username,
-      setContextUsername,
-      isLoggedIn,
-      logout
-    }}>
+    <UserContext.Provider
+      value={{
+        accessToken,
+        setAccessToken,
+        username,
+        setContextUsername,
+        isLoggedIn,
+        logout,
+      }}
+    >
       {children}
     </UserContext.Provider>
   );
