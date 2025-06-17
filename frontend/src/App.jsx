@@ -11,6 +11,8 @@ import Footer from './components/Footer';
 import LoginPage from './pages/LoginPage';
 import LogoutPage from './pages/LogoutPage';
 import RegisterPage from './pages/RegisterPage';
+import DecksBrowserPage from './pages/DecksBrowserPage';
+import CardsBrowserPage from './pages/CardsBrowserPage';
 import { UserProvider } from './context/UserContext';
 import './assets/css/CreatePage.css';
 import './assets/css/LoginPrompt.css';
@@ -38,6 +40,8 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/logout" element={<LogoutPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/browser/decks" element={<DecksBrowserPage />} />
+            <Route path="/browser/cards" element={<CardsBrowserPage />} />
           </Routes>
           <Footer />
         </UserProvider>

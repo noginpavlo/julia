@@ -23,17 +23,17 @@ from django.contrib.auth import views as auth_views
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("users.urls")),
-    path("api/cards/", include("card_manager.api.urls")),
+    path("api/card_manager/", include("card_manager.api.urls")),
     path("api/quiz/", include("card_quiz.quiz_api.urls")),
     path("api/users/", include("users.users_api.urls")),
-    path("decks/", card_views.show_decks, name="show-decks"),
-    path("decks/<int:deck_id>/cards/", card_views.show_cards, name="show-cards"),
-    path("oops/", card_views.oops_view, name="oops"),
-    path("create-card/", card_views.create_card_view, name="create-card"),
-    path("study/page/", card_views.show_card_template_view, name="show-card-page"),
+    path("decks/", card_views.show_decks, name="show-decks"), # deprecated
+    path("decks/<int:deck_id>/cards/", card_views.show_cards, name="show-cards"), # deprecated
+    path("oops/", card_views.oops_view, name="oops"), # deprecated
+    path("create-card/", card_views.create_card_view, name="create-card"), #deprecated
+    path("study/page/", card_views.show_card_template_view, name="show-card-page"), # deprecated
     path(
-        "login/", auth_views.LoginView.as_view(template_name="login.html"), name="login"
+        "login/", auth_views.LoginView.as_view(template_name="login.html"), name="login" # deprecated
     ),
-    path("logout/", auth_views.LogoutView.as_view(next_page="/"), name="logout"),
-    path("accounts/", include("allauth.urls")),
+    path("logout/", auth_views.LogoutView.as_view(next_page="/"), name="logout"), #deprecated
+    path("accounts/", include("allauth.urls")), # deprecated
 ]
