@@ -21,29 +21,32 @@ class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
     permission_classes = [AllowAny]
 
+
 class GoogleAuthView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        token_id = request.data.get('token')
+        token_id = request.data.get("token")
         if not token_id:
-            return Response({'error': 'No token provided'}, status=400)
+            return Response({"error": "No token provided"}, status=400)
 
         google_response = requests.get(
-            f'https://oauth2.googleapis.com/tokeninfo?id_token={token_id}'
+            f"https://oauth2.googleapis.com/tokeninfo?id_token={token_id}"
         )
 
         if not google_response.ok:
-            return Response({'error': 'Invalid Google token'}, status=400)
+            return Response({"error": "Invalid Google token"}, status=400)
 
         payload = google_response.json()
-        email = payload.get('email')
-        name = payload.get('name')
+        email = payload.get("email")
+        name = payload.get("name")
 
         if not email:
-            return Response({'error': 'Email not provided by Google'}, status=400)
+            return Response({"error": "Email not provided by Google"}, status=400)
 
-        user, created = User.objects.get_or_create(email=email, defaults={'username': email.split('@')[0], 'first_name': name})
+        user, created = User.objects.get_or_create(
+            email=email, defaults={"username": email.split("@")[0], "first_name": name}
+        )
 
         tokens = generate_tokens(user)
         response = Response(
@@ -65,7 +68,7 @@ def set_refresh_cookie(response, refresh_token: str):
         httponly=True,
         secure=IS_PRODUCTION,
         samesite="Lax",
-        max_age= 7 * 24 * 60 * 60, # 7 days in seconds
+        max_age=7 * 24 * 60 * 60,  # 7 days in seconds
         path="/api/users/",
         # domain=".myfuturedomain.com" => use it on prod
     )
@@ -77,33 +80,15 @@ def generate_tokens(user):
     return {
         "access": str(refresh.access_token),
         "refresh": str(refresh),
-        "username": user.username, #sends username to display on frontend
+        "username": user.username,  # sends username to display on frontend
     }
 
 
-# """Grants refresh token. User is expected to be authenticated via session."""
-# class OAuthCallbackView(APIView):
-#
-#     print("OAuthCallbackView is triggered")
-#
-#     def get(self, request, *args, **kwargs):
-#         user = request.user
-#
-#         if not user.is_authenticated:
-#             return redirect('http://localhost:5173/login')
-#
-#         tokens = generate_tokens(user)
-#         response = Response(
-#             data={"access": tokens["access"], "username": tokens["username"]},
-#             status=status.HTTP_200_OK,
-#         )
-#         set_refresh_cookie(response, tokens["refresh"])
-#         return response
-
-
 """Grants access token. User has to have JWT already."""
+
+
 class SocialLoginJWTView(APIView):
-    permission_classes = [IsAuthenticated] #JWTauthentication
+    permission_classes = [IsAuthenticated]  # JWTauthentication
 
     def get(self, request):
         user = request.user
@@ -133,6 +118,8 @@ class CookieTokenObtainPairView(TokenObtainPairView):
 
 
 """Refreshes access token when password auth"""
+
+
 class CookieTokenRefreshView(TokenRefreshView):
     def post(self, request, *args, **kwargs):
         refresh_token = request.COOKIES.get("refresh_token")

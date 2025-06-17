@@ -45,7 +45,7 @@ class ShowCardDailyStat(models.Model):
 
     class Meta:
         db_table = "daily_card_learning"
-        unique_together = ("user", "date") #why does date have to be unique?
+        unique_together = ("user", "date")  # why does date have to be unique?
 
     def __str__(self):
         return f"{self.user.username} - {self.date}: {self.count} times"

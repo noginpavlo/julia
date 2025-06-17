@@ -18,7 +18,6 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from card_manager import views as card_views
-from users import views as users_views
 from django.contrib.auth import views as auth_views
 
 urlpatterns = [
@@ -36,7 +35,5 @@ urlpatterns = [
         "login/", auth_views.LoginView.as_view(template_name="login.html"), name="login"
     ),
     path("logout/", auth_views.LogoutView.as_view(next_page="/"), name="logout"),
-    path("dashboard/", users_views.dashboard, name="dashboard"),
-    path("signup/", users_views.signup_view, name="signup"),
     path("accounts/", include("allauth.urls")),
 ]
