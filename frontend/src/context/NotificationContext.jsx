@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { useUser } from '../context/UserContext.jsx';  // Assuming you have a user context with accessToken
+import { useUser } from '../context/UserContext.jsx';
 
 const NotificationContext = createContext();
 
@@ -14,16 +14,21 @@ export function NotificationProvider({ children }) {
   useEffect(() => {
     if (!accessToken) return; // Don't open socket without token
 
-    const socketProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    // Force http/ws protocols for development/local usage
     const backendHost =
       process.env.NODE_ENV === 'development'
         ? 'localhost:8000'
         : window.location.host;
 
-    const socketUrl = `${socketProtocol}://${backendHost}/ws/cards/`;
+    // Force http for backendHost URL if needed:
+    // (usually window.location.host is host:port, so just use it directly)
+    const httpUrl = `http://${backendHost}`;
 
-    // Pass the token as a subprotocol
-    const socket = new WebSocket(socketUrl, [`access-token.${accessToken}`]);
+    // Force ws for websocket
+    const wsUrl = `ws://${backendHost}/ws/cards/`;
+
+    // Use the access token as a subprotocol
+    const socket = new WebSocket(wsUrl, [`access-token.${accessToken}`]);
 
     socket.onopen = () => console.log('✅ WebSocket connected with subprotocol token');
     socket.onmessage = (event) => {

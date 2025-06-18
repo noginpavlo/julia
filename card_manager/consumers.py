@@ -30,7 +30,7 @@ class CardProgressConsumer(AsyncWebsocketConsumer):
                 self.group_name,
                 self.channel_name,
             )
-            await self.accept()
+            await self.accept(subprotocol=f"access-token.{token_str}")
             print(f"✅ WebSocket connected: user {user.username}")
         else:
             print("❌ WebSocket rejected: invalid or missing token")
