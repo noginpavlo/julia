@@ -24,5 +24,5 @@ urlpatterns = [
     path("api/card_manager/", include("card_manager.api.urls")),
     path("api/quiz/", include("card_quiz.quiz_api.urls")),
     path("api/users/", include("users.users_api.urls")),
-    path("accounts/", include("allauth.urls")), # deprecated
+    path("accounts/", include("allauth.urls")),  # deprecated
 ]

@@ -33,7 +33,7 @@ class CardCreateSerializer(Serializer):
         deck_name = validated_data["deck_name"]
 
         """ 
-        Curated card creation in Celery. Keep old code as it returns just a word and now get_and_save result
+        Curated card creation in Celery.
         """
         from card_manager.tasks import create_card_task
 

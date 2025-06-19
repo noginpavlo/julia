@@ -92,6 +92,13 @@ def save_data(response, deck_name, user):
 
 @log_errors
 def get_and_save(input_word, deck_name, user):
+
+    deck = Deck.objects.get(name=deck_name, user=user)
+    word_exists = deck.words.filter(text=input_word).exists()
+
+    if word_exists:
+        return "Word already in the deck"
+
     try:
         response = get_data(input_word)
         return save_data(response.json(), deck_name, user)

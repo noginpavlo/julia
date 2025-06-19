@@ -4,10 +4,15 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
 from asgiref.sync import sync_to_async
 from rest_framework_simplejwt.tokens import AccessToken
-from rest_framework_simplejwt.exceptions import InvalidToken, TokenError, AuthenticationFailed
+from rest_framework_simplejwt.exceptions import (
+    InvalidToken,
+    TokenError,
+    AuthenticationFailed,
+)
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 User = get_user_model()
+
 
 class CardProgressConsumer(AsyncWebsocketConsumer):
     async def connect(self):

@@ -9,46 +9,78 @@ export function useNotification() {
 
 export function NotificationProvider({ children }) {
   const { accessToken } = useUser();
-  const [notification, setNotification] = useState(null);
+  const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
-    if (!accessToken) return; // Don't open socket without token
+    if (!accessToken) return;
 
-    // Force http/ws protocols for development/local usage
     const backendHost =
       process.env.NODE_ENV === 'development'
         ? 'localhost:8000'
         : window.location.host;
 
-    // Force http for backendHost URL if needed:
-    // (usually window.location.host is host:port, so just use it directly)
-    const httpUrl = `http://${backendHost}`;
-
-    // Force ws for websocket
     const wsUrl = `ws://${backendHost}/ws/cards/`;
-
-    // Use the access token as a subprotocol
     const socket = new WebSocket(wsUrl, [`access-token.${accessToken}`]);
 
-    socket.onopen = () => console.log('✅ WebSocket connected with subprotocol token');
+    socket.onopen = () => console.log('✅ WebSocket connected');
     socket.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
-        if (data.message && data.type) {
-          setNotification({ message: data.message, type: data.type });
+        const content = data.content || data; // <- 👈 Fix here
+
+        if (content && content.message && content.type) {
+          console.log('WebSocket message content:', content);
+
+          const { message, type } = content;
+
+          let notifType = 'info';
+          if (type === 'card_created') notifType = 'success';
+          else if (type === 'word_not_found' || type === 'exception') notifType = 'error';
+
+          addNotification({ message, type: notifType });
+        } else {
+          console.log('WebSocket message missing expected keys:', data);
         }
       } catch (e) {
         console.error('WebSocket message parse error', e);
       }
     };
+
     socket.onerror = (error) => console.error('❌ WebSocket error:', error);
     socket.onclose = () => console.warn('⚠️ WebSocket closed');
 
     return () => socket.close();
   }, [accessToken]);
 
+  const addNotification = ({ message, type }) => {
+  const id = Date.now() + Math.random();
+
+  const notification = {
+        id,
+        message,
+        type,
+      };
+
+      setNotifications((prev) => [...prev, notification]);
+
+      // Auto-remove after 5 seconds
+      setTimeout(() => {
+        removeNotification(id);
+      }, 5000);
+    };
+
+  const removeNotification = (id) => {
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
+  };
+
   return (
-    <NotificationContext.Provider value={{ notification, setNotification }}>
+    <NotificationContext.Provider
+      value={{
+        notifications,
+        addNotification,
+        removeNotification,
+      }}
+    >
       {children}
     </NotificationContext.Provider>
   );

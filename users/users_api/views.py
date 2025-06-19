@@ -22,8 +22,10 @@ class RegisterView(generics.CreateAPIView):
 
 
 """Google Oauth and tokens granting. No refresh token needed."""
+
+
 class GoogleAuthView(APIView):
-    permission_classes = [AllowAny] # is it final?
+    permission_classes = [AllowAny]  # is it final?
 
     def post(self, request):
         token_id = request.data.get("token")
@@ -85,6 +87,8 @@ def generate_tokens(user):
 
 
 """Grants access token. User has to have JWT already."""
+
+
 class SocialLoginJWTView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -101,6 +105,8 @@ class SocialLoginJWTView(APIView):
 
 
 """Grants refresh and access JWTs when registered using password. No refresh token needed"""
+
+
 class CookieTokenObtainPairView(TokenObtainPairView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -120,6 +126,8 @@ class CookieTokenObtainPairView(TokenObtainPairView):
 
 
 """Refreshes access token when password auth."""
+
+
 class CookieTokenRefreshView(TokenRefreshView):
     def post(self, request, *args, **kwargs):
         refresh_token = request.COOKIES.get("refresh_token")

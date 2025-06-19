@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { NotificationProvider } from './context/NotificationContext';
 import { UserProvider } from './context/UserContext';
-import NotificationPrompt from './components/NotificationPrompt';
+import NotificationList from './components/NotificationList';
 import NavBar from './components/NavBar';
 import Header from './components/Header';
 import LoginPrompt from './components/LoginPrompt';
@@ -34,7 +34,7 @@ function App() {
         <UserProvider>
           <NotificationProvider>
             <LoginPrompt />
-            <NotificationPrompt/>
+            <NotificationList />
             <Header onToggleMenu={() => setMenuVisible(true)} />
             <NavBar onCloseMenu={() => setMenuVisible(false)} />
 

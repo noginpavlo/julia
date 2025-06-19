@@ -11,30 +11,37 @@ logger = logging.getLogger(__name__)
 
 
 @shared_task(bind=True)
-def create_card_task(self, word, deck_name, user_id):
-    logger.info(
-        f"🚀 Task started: create_card_task(word={word}, deck={deck_name}, user_id={user_id})"
-    )
+def create_card_task(
+    self, word, deck_name, user_id
+):  # do not forget to remove debugging redundant logging lines
 
     user_model = get_user_model()
     channel_layer = get_channel_layer()
 
     try:
         socket.create_connection(("localhost", 6379), timeout=2)
-        logger.info("✅ Redis is reachable from Celery")
     except Exception as e:
-        logger.warning("❌ Redis is NOT reachable from Celery: %s", e)
-
-    logger.debug("📡 Channel layer: %s", channel_layer)
+        logger.warning(
+            "❌ Redis is NOT reachable from Celery: %s(message from #card_manager/tasks.py, create_card_task)",
+            e,
+        )
 
     try:
         user = user_model.objects.get(id=user_id)
-        result = get_and_save(word, deck_name, user)
+        result = get_and_save(
+            word, deck_name, user
+        )  # the frontend notifications depend on what this line returns
 
         if isinstance(result, str) and result.startswith("Data not available for word"):
             message = {
                 "status": "error",
                 "type": "word_not_found",
+                "message": result,
+            }
+        elif isinstance(result, str) and result.startswith("Word already in the deck"):
+            message = {
+                "status": "error",
+                "type": "card_exists",
                 "message": result,
             }
         else:
@@ -44,7 +51,10 @@ def create_card_task(self, word, deck_name, user_id):
                 "message": f"Card for '{result}' created.",
             }
 
-        logger.info("📤 Sending WebSocket message: %s", message)
+        logger.info(
+            "📤 Sending WebSocket message: %s(message from #card_manager/tasks.py, create_card_task)",
+            message,
+        )
 
         if channel_layer:
             async_to_sync(channel_layer.group_send)(
@@ -79,13 +89,17 @@ def create_card_task(self, word, deck_name, user_id):
                         "content": error_msg,
                     },
                 )
-                logger.info("✅ Error message sent to channel layer.")
+                logger.info(
+                    "✅ Error message sent to channel layer.(message from #card_manager/tasks.py, create_card_task)"
+                )
             except Exception:
-                logger.error("❌ Failed to send error message via WebSocket:")
+                logger.error(
+                    "❌ Failed to send error message via WebSocket:(message from #card_manager/tasks.py, create_card_task)"
+                )
                 traceback.print_exc()
         else:
             logger.warning(
-                "⚠️ Cannot send error WebSocket message: channel_layer is None"
+                "⚠️ Cannot send error WebSocket message: channel_layer is None(message from #card_manager/tasks.py, create_card_task)"
             )
 
         return error_msg
