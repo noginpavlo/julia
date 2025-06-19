@@ -45,7 +45,7 @@ export function UserProvider({ children }) {
       }
     };
 
-    refreshIntervalRef.current = setInterval(refreshAccessToken, 5 * 60 * 1000);
+    refreshIntervalRef.current = setInterval(refreshAccessToken, 2 * 60 * 1000);
     console.log('Started refresh interval');
 
     return () => {

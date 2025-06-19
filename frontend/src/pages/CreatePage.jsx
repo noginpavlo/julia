@@ -12,7 +12,7 @@ const CreatePage = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:8000/api/cards/create/', {
+      const response = await fetch('http://localhost:8000/api/card_manager/create/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

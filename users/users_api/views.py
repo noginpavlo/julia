@@ -21,8 +21,9 @@ class RegisterView(generics.CreateAPIView):
     permission_classes = [AllowAny]
 
 
+"""Google Oauth and tokens granting. No refresh token needed."""
 class GoogleAuthView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [AllowAny] # is it final?
 
     def post(self, request):
         token_id = request.data.get("token")
@@ -84,20 +85,22 @@ def generate_tokens(user):
 
 
 """Grants access token. User has to have JWT already."""
-
-
 class SocialLoginJWTView(APIView):
-    permission_classes = [IsAuthenticated]  # JWTauthentication
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         user = request.user
         access_token = str(AccessToken.for_user(user))
+
+        print(f"Access token: {access_token}")
+
         return Response(
             data={"access": access_token, "username": user.username},
             status=status.HTTP_200_OK,
         )
 
 
+"""Grants refresh and access JWTs when registered using password. No refresh token needed"""
 class CookieTokenObtainPairView(TokenObtainPairView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -116,9 +119,7 @@ class CookieTokenObtainPairView(TokenObtainPairView):
         return response
 
 
-"""Refreshes access token when password auth"""
-
-
+"""Refreshes access token when password auth."""
 class CookieTokenRefreshView(TokenRefreshView):
     def post(self, request, *args, **kwargs):
         refresh_token = request.COOKIES.get("refresh_token")
@@ -136,7 +137,7 @@ class CookieTokenRefreshView(TokenRefreshView):
                 {"detail": "Invalid or expired refresh token."},
                 status=status.HTTP_401_UNAUTHORIZED,
             )
-
+        print("This is tokens from CookieTokenRefreshView. WHEN PASSWORD AUTH")
         print(serializer.validated_data)
         tester = Response(serializer.validated_data)
         print(dir(tester))
@@ -148,7 +149,6 @@ class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-
         response = Response({"detail": "Logged out"}, status=200)
         response.set_cookie(
             key="refresh_token",
