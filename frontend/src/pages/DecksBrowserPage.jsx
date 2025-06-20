@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useUser } from '../context/UserContext.jsx';
+import { useUser } from "../context/UserContext.jsx";
 import "../assets/css/DecksBrowserPage.css";
+
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faBookOpen, faTrash } from "@fortawesome/free-solid-svg-icons";
 
 const BrowserPage = () => {
   const { accessToken } = useUser();
@@ -10,17 +13,11 @@ const BrowserPage = () => {
   const [totalCount, setTotalCount] = useState(0);
   const decksPerPage = 10;
 
-  // Keep track of last fetch parameters to avoid infinite loops
-  const [lastFetchParams, setLastFetchParams] = useState({ page: 1, search: "" });
-
   const fetchDecks = async (page, search, token) => {
-    let url = 'http://localhost:8000/api/card_manager/decks/';
-    if (search) url += `?search=${encodeURIComponent(search)}`;
+    let url = `http://localhost:8000/api/card_manager/decks/?page=${page}`;
+    if (search) url += `&search=${encodeURIComponent(search)}`;
 
-    const headers = {};
-    if (token) {
-      headers["Authorization"] = `Bearer ${token}`;
-    }
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
     try {
       const response = await fetch(url, {
@@ -35,10 +32,8 @@ const BrowserPage = () => {
       const data = await response.json();
       setDecks(data.results);
       setTotalCount(data.count);
-      setLastFetchParams({ page, search });
     } catch (error) {
       console.error("Failed to fetch decks:", error);
-      // Optionally clear decks if unauthorized or other error?
       if (error.message.includes("401")) {
         setDecks([]);
         setTotalCount(0);
@@ -46,29 +41,20 @@ const BrowserPage = () => {
     }
   };
 
-  // Run fetch on page or search change
   useEffect(() => {
     fetchDecks(currentPage, searchQuery, accessToken);
   }, [currentPage, searchQuery, accessToken]);
 
-  // To avoid calling fetchDecks multiple times unnecessarily, you can also:
-  //  - add debounce on search input
-  //  - add a loading state, etc.
-
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
-    setCurrentPage(1); // reset to first page on new search
+    setCurrentPage(1);
   };
 
   const handleDeleteDeck = async (deckId) => {
     if (!window.confirm("Are you sure you want to delete this deck?")) return;
 
     try {
-      const headers = {};
-      if (accessToken) {
-        headers["Authorization"] = `Bearer ${accessToken}`;
-      }
-
+      const headers = accessToken ? { Authorization: `Bearer ${accessToken}` } : {};
       const response = await fetch(`/api/card_manager/decks/${deckId}/`, {
         method: "DELETE",
         headers,
@@ -85,44 +71,85 @@ const BrowserPage = () => {
     }
   };
 
-  // Pagination rendering code remains unchanged
-  const renderPagination = () => {
-    const totalPages = Math.ceil(totalCount / decksPerPage);
-    const buttons = [];
+const renderPagination = () => {
+  const totalPages = Math.ceil(totalCount / decksPerPage);
+  if (totalPages <= 1) return null;
 
-    const createButton = (label, page, disabled = false, isCurrent = false) => (
-      <button
-        key={label}
-        disabled={disabled}
-        style={{
-          fontWeight: isCurrent ? "bold" : "normal",
-          backgroundColor: isCurrent ? "#ddd" : undefined,
-        }}
-        onClick={() => setCurrentPage(page)}
-      >
-        {label}
-      </button>
-    );
+  const buttons = [];
 
-    buttons.push(createButton("« First", 1, currentPage === 1));
-    buttons.push(createButton("‹ Prev", currentPage - 1, currentPage === 1));
+  // For arrows, keep buttons
+  const createArrowButton = (label, page, disabled = false, id = "") => (
+    <button
+      key={label + "-" + page}
+      onClick={() => setCurrentPage(page)}
+      disabled={disabled}
+      id={id}
+      className="pagination-arrow"
+      aria-label={label}
+    >
+      {label}
+    </button>
+  );
 
-    let start = Math.max(1, currentPage - 2);
-    let end = Math.min(start + 4, totalPages);
-    if (end - start < 4) start = Math.max(1, end - 4);
+  // For page numbers, use links
+  const createPageLink = (label, page, isCurrent = false, id = "") => (
+    <a
+      key={label + "-" + page}
+      href="#"
+      onClick={(e) => {
+        e.preventDefault();
+        if (!isCurrent) setCurrentPage(page);
+      }}
+      className={`pagination-page-number${isCurrent ? " current-page" : ""}`}
+      id={id}
+      aria-current={isCurrent ? "page" : undefined}
+      tabIndex={isCurrent ? -1 : 0}
+    >
+      {label}
+    </a>
+  );
 
-    for (let i = start; i <= end; i++) {
-      buttons.push(createButton(i, i, false, i === currentPage));
+  // Arrows « First, ‹ Prev
+  buttons.push(createArrowButton("«", 1, currentPage === 1, "btn-page-first"));
+  buttons.push(createArrowButton("‹", currentPage - 1, currentPage === 1, "btn-page-prev"));
+
+  // Always show page 1 as link
+  buttons.push(createPageLink("1", 1, currentPage === 1, "btn-page-1"));
+
+  // Show "..." if currentPage > 4
+  if (currentPage > 4) {
+    buttons.push(<span key="dots-left" className="pagination-dots">...</span>);
+  }
+
+  // Middle pages
+  const start = Math.max(2, currentPage);
+  const end = Math.min(currentPage + 3, totalPages - 1);
+
+  for (let i = start; i <= end; i++) {
+    if (i !== 1 && i !== totalPages) {
+      buttons.push(createPageLink(i.toString(), i, i === currentPage, `btn-page-${i}`));
     }
+  }
 
-    buttons.push(createButton("Next ›", currentPage + 1, currentPage === totalPages));
-    buttons.push(createButton("Last »", totalPages, currentPage === totalPages));
+  // Show "..." if gap before last page
+  if (currentPage + 3 < totalPages - 1) {
+    buttons.push(<span key="dots-right" className="pagination-dots">...</span>);
+  }
 
-    return <div className="pagination">{buttons}</div>;
-  };
+  // Last page as link if > 1
+  if (totalPages > 1) {
+    buttons.push(createPageLink(totalPages.toString(), totalPages, currentPage === totalPages, `btn-page-${totalPages}`));
+  }
+
+  // Arrows › Next, » Last
+  buttons.push(createArrowButton("›", currentPage + 1, currentPage === totalPages, "btn-page-next"));
+  buttons.push(createArrowButton("»", totalPages, currentPage === totalPages, "btn-page-last"));
+
+  return <div className="pagination">{buttons}</div>;
+};
 
   return (
-    <div>
+    <div className="deck-browser-page">
       <div className="search-container">
         <input
           type="text"
@@ -146,21 +173,21 @@ const BrowserPage = () => {
               <span className="deck-name">{deck.deck_name}</span>
               <div className="actions">
                 <a className="button-link" href={`/decks/${deck.id}/cards/`}>
-                  <button className="circle-button btn-view" title="View Cards">
-                    👁️
+                  <button id={`btn-view-${deck.id}`} title="View Cards">
+                    <FontAwesomeIcon icon={faEye} />
                   </button>
                 </a>
                 <a className="button-link" href={`/learn/${deck.id}/`}>
-                  <button className="circle-button btn-learn" title="Learn Deck">
-                    📚
+                  <button id={`btn-learn-${deck.id}`} title="Learn Deck">
+                    <FontAwesomeIcon icon={faBookOpen} />
                   </button>
                 </a>
                 <button
-                  className="circle-button btn-delete"
+                  id={`btn-delete-${deck.id}`}
                   title="Delete Deck"
                   onClick={() => handleDeleteDeck(deck.id)}
                 >
-                  🗑️
+                  <FontAwesomeIcon icon={faTrash} />
                 </button>
               </div>
             </li>
@@ -168,6 +195,7 @@ const BrowserPage = () => {
         )}
       </ul>
 
+      {/* Render full pagination bar here */}
       {renderPagination()}
     </div>
   );

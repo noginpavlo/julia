@@ -1,42 +1,52 @@
-/* DecksBrowserPage.css */
-
-body {
-  font-family: Arial, sans-serif;
-  background-color: #f4f4f4;
-  margin: 0;
+/* Main container */
+.deck-browser-page {
+  background-color: #2e3450;
+  min-height: 100vh;
+  width: 100vw;
+  font-family: 'Poppins', sans-serif;
   padding: 2rem;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
-.search-container {
+/* Search section */
+.deck-browser-page .search-container {
   max-width: 700px;
-  margin: 0 auto 2rem auto;
+  margin: 3rem auto 2rem;
   padding: 0 1rem;
 }
 
-.search-input {
+.deck-browser-page .search-input {
   width: 100%;
   padding: 0.8rem;
   font-size: 1rem;
+  background-color: #6c7394;
   border: 1px solid #ccc;
   border-radius: 6px;
   box-sizing: border-box;
   transition: border-color 0.3s ease;
+  color: #fff;
 }
 
-.search-input:focus {
-  border-color: #4caf50;
+.deck-browser-page .search-input::placeholder {
+  color: #e0e0e0;
+}
+
+.deck-browser-page .search-input:focus {
+  border-color: #99a;
   outline: none;
 }
 
-ul#deck-list {
+/* Deck list */
+.deck-browser-page ul#deck-list {
   list-style: none;
   padding: 0;
   max-width: 700px;
   margin: 0 auto;
 }
 
-li.deck-item {
-  background-color: #fff;
+.deck-browser-page li.deck-item {
+  background-color: #b7bac7;
   border-radius: 8px;
   padding: 1rem;
   margin-bottom: 1rem;
@@ -47,94 +57,184 @@ li.deck-item {
   transition: box-shadow 0.3s ease;
 }
 
-li.deck-item:hover {
+.deck-browser-page li.deck-item:hover {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
-.deck-name {
-  font-size: 1.2rem;
-  color: #333;
+.deck-browser-page .deck-name {
+  font-size: 1.3rem;
+  color: #2e3450;
   font-weight: 500;
 }
 
-.actions {
+/* Action buttons */
+.deck-browser-page .actions {
   display: flex;
   gap: 0.5rem;
 }
 
-.circle-button {
-  width: 40px;
-  height: 40px;
-  border: none;
-  border-radius: 50%;
-  font-size: 1.2rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.2s ease;
-}
-
-.btn-view {
-  background-color: #ddd;
-}
-
-.btn-view:hover {
-  background-color: #ccc;
-}
-
-.btn-learn {
-  background-color: #4caf50;
-  color: white;
-}
-
-.btn-learn:hover {
-  background-color: #45a049;
-}
-
-.btn-delete {
-  background-color: #f44336;
-  color: white;
-}
-
-.btn-delete:hover {
-  background-color: #d32f2f;
-}
-
-a.button-link {
+/* Clean anchor tag for buttons */
+.deck-browser-page a.button-link {
   text-decoration: none;
 }
 
-.pagination {
-  text-align: center;
-  margin: 2rem 0;
-}
-
-.pagination button {
-  margin: 0 0.2rem;
-  padding: 0.5rem 0.8rem;
-  border: none;
-  background-color: #f0f0f0;
+/* Round button base via id selector */
+.deck-browser-page [id^="btn-view"],
+.deck-browser-page [id^="btn-learn"],
+.deck-browser-page [id^="btn-delete"] {
+  all: unset;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  font-size: 1rem;
   cursor: pointer;
-  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   transition: background-color 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
-.pagination button:hover:not(:disabled) {
+/* View button */
+.deck-browser-page [id^="btn-view"] {
+  background-color: #ddd;
+  color: #2e3450;
+}
+.deck-browser-page [id^="btn-view"]:hover {
   background-color: #ccc;
 }
 
-.pagination button:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
+/* Learn button */
+.deck-browser-page [id^="btn-learn"] {
+  background-color: #4caf50;
+  color: white;
+}
+.deck-browser-page [id^="btn-learn"]:hover {
+  background-color: #45a049;
 }
 
-.empty-container {
-  text-align: center;
-  padding: 2rem;
+/* Delete button */
+.deck-browser-page [id^="btn-delete"] {
+  background-color: #f44336;
+  color: white;
+}
+.deck-browser-page [id^="btn-delete"]:hover {
+  background-color: #d32f2f;
 }
 
-.empty-container img {
-  max-width: 200px;
-  margin-bottom: 1rem;
+.deck-browser-page a.button-link {
+  text-decoration: none !important;
+  border: none;
+}
+
+/* Pagination container */
+.deck-browser-page .pagination {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: center !important;
+  gap: 0.4rem !important;
+  margin: 2rem 0 !important;
+}
+
+/* Arrow buttons */
+#btn-page-first,
+#btn-page-prev,
+#btn-page-next,
+#btn-page-last {
+  width: 38px !important;
+  height: 38px !important;
+  text-align: center !important;
+  font-size: 1rem !important;
+  border: none !important;
+  border-radius: 6px !important;
+  background-color: #9aa0b8 !important;
+  cursor: pointer !important;
+  transition: background-color 0.2s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  user-select: none;
+  margin: 0 0.2rem !important;
+}
+
+/* Disabled arrow buttons */
+#btn-page-first:disabled,
+#btn-page-prev:disabled,
+#btn-page-next:disabled,
+#btn-page-last:disabled {
+  opacity: 0.4 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+}
+
+/* Page number links */
+.pagination a.pagination-page-number {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 38px !important;
+  height: 38px !important;
+  margin: 0 0.2rem !important;
+  font-size: 1rem !important;
+  color: #b6b7bf;
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  border-radius: 6px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.pagination a.pagination-page-number:hover {
+  background-color: #9aa0b8 !important;
+  color: #414145 !important;
+}
+
+/* Current page number styling */
+.pagination a.pagination-page-number.current-page {
+  font-weight: bold;
+  cursor: default;
+  color: #000;
+  background-color: #6c7394;
+  text-decoration: none;
+  pointer-events: none;
+}
+
+/* Ellipsis span */
+.deck-browser-page .pagination span.pagination-dots {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 38px !important;
+  height: 38px !important;
+  color: #888 !important;
+  user-select: none;
+  margin: 0 0.2rem !important;
+  font-size: 1rem !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 500px) {
+  /* Smaller arrow buttons */
+  #btn-page-first,
+  #btn-page-prev,
+  #btn-page-next,
+  #btn-page-last {
+    width: 30px !important;
+    height: 30px !important;
+    font-size: 0.75rem !important;
+  }
+
+  /* Smaller page number links */
+  .pagination a.pagination-page-number {
+    width: 30px !important;
+    height: 30px !important;
+    font-size: 0.75rem !important;
+  }
+
+  /* Smaller ellipsis */
+  .deck-browser-page .pagination span.pagination-dots {
+    width: 30px !important;
+    height: 30px !important;
+    font-size: 0.75rem !important;
+  }
 }
