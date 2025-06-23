@@ -238,3 +238,16 @@
     font-size: 0.75rem !important;
   }
 }
+
+.kitty-image {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 300px;
+}
+
+.empty-container {
+  text-align: center;
+  padding: 1rem;
+}

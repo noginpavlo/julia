@@ -40,7 +40,7 @@ function App() {
 
             <Routes>
               <Route path="/" element={<Home />} />
-              <Route path="/study/page" element={<StudyPage />} />
+              <Route path="/study/page" element={<DecksBrowserPage />} />
               <Route path="/create" element={<CreatePage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/logout" element={<LogoutPage />} />

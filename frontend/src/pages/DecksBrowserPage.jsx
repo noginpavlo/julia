@@ -5,6 +5,8 @@ import "../assets/css/DecksBrowserPage.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faBookOpen, faTrash } from "@fortawesome/free-solid-svg-icons";
 
+import kittyImage from '../assets/images/kitty.png';
+
 const BrowserPage = () => {
   const { accessToken } = useUser();
   const [decks, setDecks] = useState([]);
@@ -163,7 +165,7 @@ const renderPagination = () => {
       <ul id="deck-list">
         {decks.length === 0 ? (
           <div className="empty-container">
-            <img src="/static/images/kitty.png" alt="Sad Cat Illustration" />
+            <img src={kittyImage} alt="Sad Cat Illustration" className="kitty-image" />
             <h2>No decks found</h2>
             <p>We couldn't find any decks that match your search.</p>
           </div>
