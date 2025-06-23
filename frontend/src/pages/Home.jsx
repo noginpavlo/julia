@@ -41,7 +41,7 @@ export default function Home() {
               </div>
             </a>
 
-            <a href="/study/page" className="section-one-tile" id="tile-learn" style={{ backgroundImage: `url(${learnImg})` }}>
+            <a href="/browser/decks" className="section-one-tile" id="tile-learn" style={{ backgroundImage: `url(${learnImg})` }}>
               <div className="section-one-overlay"></div>
               <div className="section-one-content">
                 <header className="section-one-header">
@@ -81,11 +81,8 @@ export default function Home() {
               <h2>Massa libero</h2>
             </header>
             <p>
-              Nullam et orci eu lorem consequat tincidunt vivamus et sagittis libero.
-              Mauris aliquet magna magna sed nunc rhoncus pharetra. Pellentesque condimentum sem.
-              In efficitur ligula tate urna. Maecenas laoreet massa vel lacinia pellentesque lorem ipsum dolor.
-              Nullam et orci eu lorem consequat tincidunt. Vivamus et sagittis libero.
-              Mauris aliquet magna magna sed nunc rhoncus amet pharetra et feugiat tempus.
+                Add short project description here. The button below will lead to extended explanation page about the
+                project.
             </p>
             <ul className="actions">
               <li><a href="landing.html" className="button next">Get Started</a></li>

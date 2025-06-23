@@ -1,54 +1,31 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import { useUser } from "../context/UserContext.jsx";
+import "../assets/css/BrowserPage.css";
 
-const PAGE_SIZE = 10;
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 
-const CardBrowserPage = () => {
+import kittyImage from "../assets/images/kitty.png";
+
+const CardList = () => {
   const { accessToken } = useUser();
-  const [deckId, setDeckId] = useState(null);
+  const deckId = 1;
+
   const [cards, setCards] = useState([]);
-  const [search, setSearch] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [totalPages, setTotalPages] = useState(1);
-  const [previous, setPrevious] = useState(null);
-  const [next, setNext] = useState(null);
+  const cardsPerPage = 10;
 
-  // Extract deckId from URL
-  useEffect(() => {
-    const parts = window.location.pathname.split("/");
-    if (parts.length >= 3) {
-      setDeckId(parts[2]);
-    }
-  }, []);
+  const fetchCards = async (page, search, token) => {
+    let url = `http://localhost:8000/api/card_manager/decks/${deckId}/cards/?page=${page}`;
+    if (search) url += `&search=${encodeURIComponent(search)}`;
 
-  const getCSRFToken = () => {
-    const name = "csrftoken";
-    const cookies = document.cookie.split(";");
-    for (let cookie of cookies) {
-      const [key, value] = cookie.trim().split("=");
-      if (key === name) return decodeURIComponent(value);
-    }
-    return "";
-  };
-
-  const fetchCards = useCallback(async () => {
-    if (!deckId) return;
-
-    setLoading(true);
-
-    const baseUrl = `http://localhost:8000/api/decks/${deckId}/cards/`;
-    const params = new URLSearchParams();
-    params.append("page", currentPage);
-    if (search) params.append("search", search);
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
     try {
-      const response = await fetch(`${baseUrl}?${params.toString()}`, {
-        headers: {
-          Authorization: accessToken ? `Bearer ${accessToken}` : undefined,
-          "X-CSRFToken": getCSRFToken(),
-        },
+      const response = await fetch(url, {
+        headers,
         credentials: "include",
       });
 
@@ -57,39 +34,35 @@ const CardBrowserPage = () => {
       const data = await response.json();
       setCards(data.results);
       setTotalCount(data.count);
-      setTotalPages(data.total_pages || Math.ceil(data.count / PAGE_SIZE));
-      setPrevious(data.previous);
-      setNext(data.next);
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      console.error("Failed to fetch cards:", error);
       setCards([]);
       setTotalCount(0);
-      setTotalPages(1);
-    } finally {
-      setLoading(false);
     }
-  }, [deckId, currentPage, search, accessToken]);
+  };
 
   useEffect(() => {
-    fetchCards();
-  }, [fetchCards]);
+    fetchCards(currentPage, searchQuery, accessToken);
+  }, [currentPage, searchQuery, accessToken]);
 
-  const handleDelete = async (cardId) => {
-    if (!confirm("Delete this card?")) return;
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+    setCurrentPage(1);
+  };
+
+  const handleDeleteCard = async (cardId) => {
+    if (!window.confirm("Are you sure you want to delete this card?")) return;
 
     try {
-      const res = await fetch(`http://localhost:8000/api/cards/${cardId}/`, {
+      const headers = accessToken ? { Authorization: `Bearer ${accessToken}` } : {};
+      const response = await fetch(`http://localhost:8000/api/cards/${cardId}/`, {
         method: "DELETE",
-        headers: {
-          Authorization: accessToken ? `Bearer ${accessToken}` : undefined,
-          "X-CSRFToken": getCSRFToken(),
-        },
+        headers,
         credentials: "include",
       });
 
-      if (res.ok) {
+      if (response.ok) {
         setCards((prev) => prev.filter((card) => card.id !== cardId));
-        setTotalCount((count) => count - 1);
       } else {
         alert("Failed to delete card.");
       }
@@ -99,88 +72,113 @@ const CardBrowserPage = () => {
   };
 
   const renderPagination = () => {
+    const totalPages = Math.ceil(totalCount / cardsPerPage);
     if (totalPages <= 1) return null;
 
     const buttons = [];
 
-    const addPageButton = (label, page, disabled = false, current = false) => (
+    const createArrowButton = (label, page, disabled = false, id = "") => (
       <button
-        key={label}
-        disabled={disabled}
-        className={current ? "pagination-btn current" : "pagination-btn"}
+        key={label + "-" + page}
         onClick={() => setCurrentPage(page)}
+        disabled={disabled}
+        id={id}
+        className="pagination-arrow"
+        aria-label={label}
       >
         {label}
       </button>
     );
 
-    buttons.push(addPageButton("« First", 1, currentPage === 1));
-    buttons.push(addPageButton("‹ Prev", currentPage - 1, currentPage === 1));
-
-    const range = [...Array(totalPages).keys()].map((i) => i + 1);
-    const visible = range.filter(
-      (i) =>
-        i === 1 ||
-        i === totalPages ||
-        Math.abs(i - currentPage) <= 1
+    const createPageLink = (label, page, isCurrent = false, id = "") => (
+      <a
+        key={label + "-" + page}
+        href="#"
+        onClick={(e) => {
+          e.preventDefault();
+          if (!isCurrent) setCurrentPage(page);
+        }}
+        className={`pagination-page-number${isCurrent ? " current-page" : ""}`}
+        id={id}
+        aria-current={isCurrent ? "page" : undefined}
+        tabIndex={isCurrent ? -1 : 0}
+      >
+        {label}
+      </a>
     );
 
-    visible.forEach((i, idx) => {
-      if (idx > 0 && visible[idx - 1] !== i - 1) {
-        buttons.push(<span key={`ellipsis-${i}`}>...</span>);
-      }
-      buttons.push(addPageButton(i, i, false, i === currentPage));
-    });
+    buttons.push(createArrowButton("«", 1, currentPage === 1, "btn-page-first"));
+    buttons.push(createArrowButton("‹", currentPage - 1, currentPage === 1, "btn-page-prev"));
 
-    buttons.push(addPageButton("Next ›", currentPage + 1, currentPage === totalPages));
-    buttons.push(addPageButton("Last »", totalPages, currentPage === totalPages));
+    buttons.push(createPageLink("1", 1, currentPage === 1, "btn-page-1"));
+
+    if (currentPage > 4) {
+      buttons.push(<span key="dots-left" className="pagination-dots">...</span>);
+    }
+
+    const start = Math.max(2, currentPage);
+    const end = Math.min(currentPage + 3, totalPages - 1);
+
+    for (let i = start; i <= end; i++) {
+      if (i !== 1 && i !== totalPages) {
+        buttons.push(createPageLink(i.toString(), i, i === currentPage, `btn-page-${i}`));
+      }
+    }
+
+    if (currentPage + 3 < totalPages - 1) {
+      buttons.push(<span key="dots-right" className="pagination-dots">...</span>);
+    }
+
+    if (totalPages > 1) {
+      buttons.push(createPageLink(totalPages.toString(), totalPages, currentPage === totalPages, `btn-page-${totalPages}`));
+    }
+
+    buttons.push(createArrowButton("›", currentPage + 1, currentPage === totalPages, "btn-page-next"));
+    buttons.push(createArrowButton("»", totalPages, currentPage === totalPages, "btn-page-last"));
 
     return <div className="pagination">{buttons}</div>;
   };
 
   return (
-    <div>
+    <div className="deck-browser-page">
       <div className="search-container">
         <input
-          className="search-input"
           type="text"
+          className="search-input"
           placeholder="Search cards..."
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setCurrentPage(1);
-          }}
+          value={searchQuery}
+          onChange={handleSearchChange}
         />
       </div>
 
-      <ul id="card-list">
-        {loading ? (
-          <p>Loading cards...</p>
-        ) : cards.length === 0 ? (
+      <ul id="deck-list">
+        {cards.length === 0 ? (
           <div className="empty-container">
-            <img src="/static/images/kitty.png" alt="Sad Cat Illustration" />
-            <h2>No cards yet</h2>
-            <p>This deck doesn't have any cards yet. How about creating your first one?</p>
-            <a href="/create-card/">
-              <button className="create-button">➕ Add Your First Card</button>
-            </a>
+            <img src={kittyImage} alt="Sad Cat Illustration" className="kitty-image" />
+            <h2>No cards found</h2>
+            <p>We couldn't find any cards that match your search.</p>
           </div>
         ) : (
           cards.map((card) => (
-            <li key={card.id} className="card-item">
-              <span className="card-word">{card.word}</span>
+            <li key={card.id} className="deck-item">
+              <span className="deck-name">{card.word}</span>
               <div className="actions">
                 <a className="button-link" href={`/cards/${card.id}/view/`}>
-                  <button className="circle-button btn-view">👁️</button>
+                  <button id={`btn-view-${card.id}`} title="View Card">
+                    <FontAwesomeIcon icon={faEye} />
+                  </button>
                 </a>
                 <a className="button-link" href={`/cards/${card.id}/edit/`}>
-                  <button className="circle-button btn-edit">✏️</button>
+                  <button id={`btn-edit-${card.id}`} title="Edit Card">
+                    <FontAwesomeIcon icon={faEdit} />
+                  </button>
                 </a>
                 <button
-                  className="circle-button btn-delete"
-                  onClick={() => handleDelete(card.id)}
+                  id={`btn-delete-${card.id}`}
+                  title="Delete Card"
+                  onClick={() => handleDeleteCard(card.id)}
                 >
-                  🗑️
+                  <FontAwesomeIcon icon={faTrash} />
                 </button>
               </div>
             </li>
@@ -193,4 +191,4 @@ const CardBrowserPage = () => {
   );
 };
 
-export default CardBrowserPage;
+export default CardList;

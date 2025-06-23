@@ -81,6 +81,7 @@
 /* Round button base via id selector */
 .deck-browser-page [id^="btn-view"],
 .deck-browser-page [id^="btn-learn"],
+.deck-browser-page [id^="btn-edit"],
 .deck-browser-page [id^="btn-delete"] {
   all: unset;
   width: 42px;
@@ -120,6 +121,20 @@
 }
 .deck-browser-page [id^="btn-delete"]:hover {
   background-color: #d32f2f;
+}
+
+.deck-browser-page a.button-link {
+  text-decoration: none !important;
+  border: none;
+}
+
+/* Edit button */
+.deck-browser-page [id^="btn-edit"] {
+  background-color: #FFC107;
+  color: white;
+}
+.deck-browser-page [id^="btn-edit"]:hover {
+  background-color: #FF6F3C;
 }
 
 .deck-browser-page a.button-link {

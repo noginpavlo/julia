@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useUser } from "../context/UserContext.jsx";
-import "../assets/css/DecksBrowserPage.css";
+import "../assets/css/BrowserPage.css";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faBookOpen, faTrash } from "@fortawesome/free-solid-svg-icons";

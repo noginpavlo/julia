@@ -1,4 +1,10 @@
-import React, { createContext, useState, useEffect, useContext, useRef } from 'react';
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useContext,
+  useRef,
+} from "react";
 
 const UserContext = createContext();
 
@@ -7,84 +13,81 @@ export function UserProvider({ children }) {
   const [username, setUsernameState] = useState(null);
   const refreshIntervalRef = useRef(null);
 
-  // Load from localStorage on first render
+  // Helpers for localStorage
+  const saveToStorage = (key, value) =>
+    value ? localStorage.setItem(key, value) : localStorage.removeItem(key);
+
+  const loadFromStorage = (key) => localStorage.getItem(key);
+
+  // Load initial state from localStorage
   useEffect(() => {
-    const storedToken = localStorage.getItem('accessToken');
-    const storedUsername = localStorage.getItem('username');
+    const token = loadFromStorage("accessToken");
+    const name = loadFromStorage("username");
 
-    if (storedToken) {
-      setAccessTokenState(storedToken);
-    }
-
-    if (storedUsername) {
-      setUsernameState(storedUsername);
-    }
+    if (token) setAccessTokenState(token);
+    if (name) setUsernameState(name);
   }, []);
 
-  // 🔁 Refresh token logic tied to accessToken
+  // Token refresh effect
   useEffect(() => {
     if (!accessToken) return;
 
-    const refreshAccessToken = async () => {
+    const refreshToken = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/users/token/refresh/', {
-          method: 'POST',
-          credentials: 'include',
+        const response = await fetch("http://localhost:8000/api/users/token/refresh/", {
+          method: "POST",
+          credentials: "include",
         });
 
         if (response.ok) {
           const data = await response.json();
           setAccessToken(data.access);
         } else {
-          console.warn('Refresh token expired or invalid');
+          console.warn("Refresh token expired or invalid");
           logout();
         }
       } catch (err) {
-        console.error('Network error while refreshing access token', err);
+        console.error("Network error while refreshing token:", err);
         logout();
       }
     };
 
-    refreshIntervalRef.current = setInterval(refreshAccessToken, 2 * 60 * 1000);
-    console.log('Started refresh interval');
+    // Refresh every 2 minutes
+    refreshIntervalRef.current = setInterval(refreshToken, 2 * 60 * 1000);
+
+    if (import.meta.env.DEV) {
+      console.log("🔁 Token refresh interval started");
+    }
 
     return () => {
-      console.log('Clearing refresh interval');
       clearInterval(refreshIntervalRef.current);
+      if (import.meta.env.DEV) {
+        console.log("🧹 Cleared token refresh interval");
+      }
     };
   }, [accessToken]);
 
-  // Set access token and persist it
   const setAccessToken = (token) => {
-    if (token) {
-      localStorage.setItem('accessToken', token);
-      setAccessTokenState(token);
-    } else {
-      localStorage.removeItem('accessToken');
-      setAccessTokenState(null);
-    }
+    saveToStorage("accessToken", token);
+    setAccessTokenState(token);
   };
 
-  // Set username and persist it
   const setContextUsername = (name) => {
-    if (name) {
-      localStorage.setItem('username', name);
-      setUsernameState(name);
-    } else {
-      localStorage.removeItem('username');
-      setUsernameState(null);
-    }
+    saveToStorage("username", name);
+    setUsernameState(name);
   };
 
-  // Logout and cleanup
   const logout = () => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('username');
-    setAccessTokenState(null);
-    setUsernameState(null);
+    setAccessToken(null);
+    setContextUsername(null);
 
     if (refreshIntervalRef.current) {
       clearInterval(refreshIntervalRef.current);
+      refreshIntervalRef.current = null;
+    }
+
+    if (import.meta.env.DEV) {
+      console.log("🚪 Logged out and cleared user data");
     }
   };
 
