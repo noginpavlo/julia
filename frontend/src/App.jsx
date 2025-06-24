@@ -16,6 +16,7 @@ import LogoutPage from './pages/LogoutPage';
 import RegisterPage from './pages/RegisterPage';
 import DecksBrowserPage from './pages/DecksBrowserPage';
 import CardsBrowserPage from './pages/CardsBrowserPage';
+import TestPage from './pages/TestPage';
 
 import './assets/css/CreatePage.css';
 import './assets/css/LoginPrompt.css';
@@ -47,6 +48,7 @@ function App() {
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/browser/decks" element={<DecksBrowserPage />} />
               <Route path="/browser/cards" element={<CardsBrowserPage />} />
+              <Route path="/quiz" element={<TestPage />} />
             </Routes>
 
             <Footer />

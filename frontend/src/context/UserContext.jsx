@@ -53,7 +53,7 @@ export function UserProvider({ children }) {
     };
 
     // Refresh every 2 minutes
-    refreshIntervalRef.current = setInterval(refreshToken, 2 * 60 * 1000);
+    refreshIntervalRef.current = setInterval(refreshToken, 20 * 60 * 1000);
 
     if (import.meta.env.DEV) {
       console.log("🔁 Token refresh interval started");
