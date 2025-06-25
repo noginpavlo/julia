@@ -4,12 +4,17 @@ import '../assets/css/TestPage.css';
 
 const TestPage = () => {
   const { accessToken } = useUser();
+
   const [quizCards, setQuizCards] = useState([]);
   const [selectedDecks, setSelectedDecks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [distributed, setDistributed] = useState(null);
   const [selectedAnswers, setSelectedAnswers] = useState({});
+  const [matches, setMatches] = useState({});
+  const [draggedWordId, setDraggedWordId] = useState(null);
+  const [definitions, setDefinitions] = useState([]);
+  const [selectedWordId, setSelectedWordId] = useState(null); // New state for click selection
 
   useEffect(() => {
     if (selectedDecks.length === 0) return;
@@ -45,6 +50,15 @@ const TestPage = () => {
     fetchQuizData();
   }, [selectedDecks, accessToken]);
 
+  useEffect(() => {
+    if (!distributed?.matching) {
+      setDefinitions([]);
+      return;
+    }
+    const shuffled = [...distributed.matching].sort(() => 0.5 - Math.random());
+    setDefinitions(shuffled);
+  }, [distributed]);
+
   const handleDeckSelection = (deckId) => {
     setSelectedDecks(prev =>
       prev.includes(deckId) ? prev.filter(id => id !== deckId) : [...prev, deckId]
@@ -63,18 +77,86 @@ const TestPage = () => {
 
   const getMCQOptions = (currentCard, allCards) => {
     const correctDefinition = currentCard.json_data.definitions?.[0] || 'Unknown';
-
     const otherDefs = allCards
       .filter(card => card.id !== currentCard.id)
       .map(card => card.json_data.definitions?.[0] || 'Unknown')
       .slice(0, 3);
-
-    const allOptions = [...otherDefs, correctDefinition];
-    return allOptions.sort(() => 0.5 - Math.random());
+    return [...otherDefs, correctDefinition].sort(() => 0.5 - Math.random());
   };
 
   const handleSelectOption = (questionId, optionIndex) => {
     setSelectedAnswers(prev => ({ ...prev, [questionId]: optionIndex }));
+  };
+
+  const matchingCards = distributed?.matching || [];
+  const unmatchedWords = matchingCards.filter(wordCard => !Object.values(matches).includes(wordCard.id));
+
+  // Drag & Drop handlers
+  const handleDragStart = (wordId) => {
+    setDraggedWordId(wordId);
+    setSelectedWordId(null); // Clear selection when drag starts
+  };
+  const handleDragEnd = () => setDraggedWordId(null);
+
+  const handleDrop = (definitionId) => {
+    if (!definitionId || !draggedWordId) return;
+
+    setMatches(prev => {
+      const newMatches = { ...prev };
+      // Remove previous match for this dragged word
+      for (const defId in newMatches) {
+        if (newMatches[defId] === draggedWordId) {
+          delete newMatches[defId];
+        }
+      }
+      newMatches[definitionId] = draggedWordId;
+      return newMatches;
+    });
+
+    setDraggedWordId(null);
+  };
+
+  const handleWordReturn = () => {
+    if (!draggedWordId) return;
+    setMatches(prev => {
+      const newMatches = { ...prev };
+      for (const defId in newMatches) {
+        if (newMatches[defId] === draggedWordId) {
+          delete newMatches[defId];
+        }
+      }
+      return newMatches;
+    });
+    setDraggedWordId(null);
+  };
+
+  // New click-to-select handlers
+  const handleWordClick = (wordId) => {
+    // If dragging, ignore clicks
+    if (draggedWordId) return;
+
+    // Toggle selection
+    setSelectedWordId(prevSelected => (prevSelected === wordId ? null : wordId));
+  };
+
+  const handleDefinitionClick = (definitionId) => {
+    if (!selectedWordId) return;
+
+    setMatches(prev => {
+      const newMatches = { ...prev };
+
+      // Remove previous match for this selected word
+      for (const defId in newMatches) {
+        if (newMatches[defId] === selectedWordId) {
+          delete newMatches[defId];
+        }
+      }
+
+      newMatches[definitionId] = selectedWordId;
+      return newMatches;
+    });
+
+    setSelectedWordId(null); // Clear selection after placing
   };
 
   return (
@@ -82,6 +164,7 @@ const TestPage = () => {
       <div id="test-page-container">
         <h1 className="test-page-title">Vocabulary Test</h1>
 
+        {/* Deck Selection */}
         <div className="deck-selection-section">
           <h2>Select Decks:</h2>
           <div className="deck-options">
@@ -103,9 +186,9 @@ const TestPage = () => {
 
         {!loading && !error && distributed && (
           <>
-            {/* Multiple Choice */}
-          <section className="quiz-section">
-              <h2 id="msq-title-h2">Multiple Choice Questions</h2>
+            {/* MCQ */}
+            <section className="quiz-section">
+              <h2 id="msq-title-h2">Choose the correct word definition</h2>
               {distributed.mcq.map((card, index) => {
                 const options = getMCQOptions(card, quizCards);
                 const questionName = `mcq-${card.id}`;
@@ -123,6 +206,7 @@ const TestPage = () => {
                             type="radio"
                             name={questionName}
                             value={opt}
+                            onChange={() => handleSelectOption(card.id, i)}
                             className="mcq-radio-button"
                           />
                           <span className="option-label">{letters[i]}</span>
@@ -137,11 +221,12 @@ const TestPage = () => {
 
             {/* Cloze Test */}
             <section className="quiz-section">
-              <h2>Fill in the Blank</h2>
+              <h2>Fell in the blank with a word that matches a definition</h2>
               {distributed.cloze.map((card, index) => (
                 <div key={card.id} className="quiz-card">
                   <h3>{index + 6}. {card.json_data.definitions?.[0]}</h3>
-                  <input id="fb-input-field"
+                  <input
+                    id="fb-input-field"
                     type="text"
                     className="answer-input"
                     placeholder="Enter the correct word..."
@@ -152,7 +237,7 @@ const TestPage = () => {
 
             {/* Free Recall */}
             <section className="quiz-section">
-              <h2>Free Recall</h2>
+              <h2>Put a word definition in your own words</h2>
               {distributed.recall.map((card, index) => (
                 <div key={card.id} className="quiz-card">
                   <h3>{index + 11}. Define: "{card.word}"</h3>
@@ -166,24 +251,80 @@ const TestPage = () => {
 
             {/* Matching Section */}
             <section className="quiz-section">
-              <h2>Matching</h2>
-              <div className="matching-grid">
-                <div className="column">
-                  <h4>Words</h4>
-                  {distributed.matching.map(card => (
-                    <div key={card.id} className="matching-item">{card.word}</div>
+              <h2>Match words and definitions by dragging and dropping or clicking</h2>
+              <div className="matching-container">
+
+                {/* Draggable Words */}
+                <div
+                  className="words-column"
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={handleWordReturn}
+                >
+                  <h4>Drag me😊 or click me 😎</h4>
+                  {unmatchedWords.map(wordCard => (
+                    <div
+                      key={wordCard.id}
+                      className={`matching-item word
+                        ${draggedWordId === wordCard.id ? 'dragging' : ''}
+                        ${selectedWordId === wordCard.id ? 'selected' : ''}`}
+                      draggable
+                      onDragStart={() => handleDragStart(wordCard.id)}
+                      onDragEnd={handleDragEnd}
+                      onClick={() => handleWordClick(wordCard.id)}
+                      style={{ cursor: 'pointer', userSelect: 'none' }}
+                      // Prevent text selection on double click
+                    >
+                      {wordCard.word}
+                    </div>
                   ))}
                 </div>
-                <div className="column">
-                  <h4>Definitions</h4>
-                  {[...distributed.matching]
-                    .sort(() => 0.5 - Math.random())
-                    .map(card => (
-                      <div key={card.id} className="matching-item">
-                        {card.json_data.definitions?.[0]}
+
+                {/* Definitions */}
+                <div className="definitions-column">
+                  <h4>Drop me here🫣 or click me 😉</h4>
+                  {definitions.map(defCard => {
+                    const matchedWordId = matches[defCard.id];
+                    const matchedWord = matchingCards.find(w => w.id === matchedWordId);
+
+                    return (
+                      <div
+                        key={defCard.id}
+                        className={`matching-item definition ${matchedWord ? 'matched' : ''}`}
+                        onDragOver={e => {
+                          e.preventDefault();
+                          e.currentTarget.classList.add('drag-over');
+                        }}
+                        onDragLeave={e => {
+                          e.currentTarget.classList.remove('drag-over');
+                        }}
+                        onDrop={e => {
+                          e.preventDefault();
+                          e.currentTarget.classList.remove('drag-over');
+                          handleDrop(defCard.id);
+                        }}
+                        onClick={() => handleDefinitionClick(defCard.id)}
+                        style={{ cursor: selectedWordId ? 'pointer' : 'default' }}
+                      >
+                        <div className="definition-text">{defCard.json_data.definitions?.[0]}</div>
+                        <div className="word-socket">
+                          {matchedWord ? (
+                            <div
+                              className="matched-word"
+                              draggable
+                              onDragStart={() => handleDragStart(matchedWord.id)}
+                              onDragEnd={handleDragEnd}
+                            >
+                              {matchedWord.word}
+                            </div>
+                          ) : (
+                            <span className="socket-placeholder">Drop here</span>
+                          )}
+                        </div>
                       </div>
-                  ))}
+                    );
+                  })}
                 </div>
+
               </div>
             </section>
           </>

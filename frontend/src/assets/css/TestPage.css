@@ -1,3 +1,6 @@
+/* =====================================
+   PAGE LAYOUT
+===================================== */
 #test-page {
   color: #000;
   min-height: 100vh;
@@ -13,7 +16,10 @@
   }
 }
 
-/* Section containers */
+
+/* =====================================
+   SECTION CONTAINERS
+===================================== */
 .test-section,
 .quiz-section {
   max-width: 900px;
@@ -25,6 +31,10 @@
   color: #555879;
 }
 
+
+/* =====================================
+   HEADINGS
+===================================== */
 .quiz-section h2,
 .quiz-card h3 {
   color: #2e3450;
@@ -36,6 +46,73 @@
   font-size: 1.2rem;
 }
 
+
+/* =====================================
+   TEXT STYLES
+===================================== */
+.test-word {
+  font-size: 1.4rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #2e3450;
+}
+
+.test-question {
+  margin-top: 2rem;
+  font-size: 1rem;
+}
+
+.option-label {
+  font-weight: bold;
+  min-width: 1.5rem;
+  display: inline-block;
+  color: #fff;
+  user-select: none;
+  font-size: 1rem;
+}
+
+.option-text {
+  flex: 1;
+  color: #2e3450;
+  user-select: none;
+  padding: 0.1rem 0.2rem;
+  transition: color 0.3s ease;
+  text-transform: capitalize;
+  font-size: 1rem;
+}
+
+#quiz-keyword {
+  color: #FFFCFB;
+  font-weight: 700;
+  font-style: italic;
+  font-size: 1.15em;
+}
+
+@media (max-width: 768px) {
+  [id^="quiz-keyword"] {
+    font-size: 1rem;
+  }
+}
+
+
+/* =====================================
+   INPUTS & TEXTAREAS
+===================================== */
+.test-input,
+.test-textarea,
+.answer-input,
+.answer-textarea {
+  width: 100%;
+  padding: 0.85rem;
+  background-color: #b7bac7;
+  border: 2px solid #555;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 500;
+  box-sizing: border-box;
+}
+
 #fb-input-field {
   background-color: #b7bac7;
   color: #2e3450;
@@ -43,12 +120,130 @@
   font-size: 1rem;
 }
 
-/* Placeholder color */
 #fb-input-field::placeholder {
   color: #98A1BC !important;
 }
 
-/* Deck selection */
+.answer-textarea {
+  resize: vertical;
+  min-height: 100px;
+  font-weight: 600;
+  caret-color: #000000;
+  color: #2e3450;
+}
+
+.answer-textarea::placeholder {
+  color: #98A1BC !important;
+}
+
+
+/* =====================================
+   MULTIPLE CHOICE QUESTIONS
+===================================== */
+.mcq-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  color: #2e3450;
+  font-size: 1rem;
+}
+
+.mcq-option {
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+  gap: 0.5rem;
+  cursor: pointer;
+  background-color: #b7bac7;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  user-select: none;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  color: #fff;
+  position: relative;
+}
+
+.mcq-option:hover {
+  background-color: #3c3c5d;
+}
+
+.mcq-option:hover .option-text {
+  color: #ffffff;
+}
+
+.mcq-radio-button {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2.5px solid #007bff;
+  border-radius: 50%;
+  position: relative;
+  cursor: pointer;
+  margin-right: 0.6rem;
+  background-color: transparent;
+  flex-shrink: 0;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.mcq-radio-button:checked {
+  background-color: #007bff;
+  border-color: #0056b3;
+}
+
+.mcq-radio-button:checked::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 8px;
+  height: 8px;
+  background-color: white;
+  border-radius: 50%;
+  display: block;
+}
+
+.mcq-radio-button:focus {
+  outline: 2px solid #00b894;
+  outline-offset: 2px;
+}
+
+/* Checked MCQ styling */
+.mcq-option input.mcq-radio-button:checked + .option-label,
+.mcq-option input.mcq-radio-button:checked + .option-label + .option-text {
+  background-color: #DED3C4;
+  color: #2e3450;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  position: relative;
+  z-index: 3;
+}
+
+.mcq-option input.mcq-radio-button:checked::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #0056b3;
+  border-radius: 8px;
+  z-index: -1;
+  opacity: 0.4;
+  transition: opacity 0.3s ease;
+}
+
+.mcq-radio-button:checked::after {
+  position: relative;
+  z-index: 2;
+}
+
+
+/* =====================================
+   DECK SELECTOR
+===================================== */
 .deck-selector {
   list-style: none;
   padding: 0;
@@ -77,7 +272,10 @@
   cursor: pointer;
 }
 
-/* Test config */
+
+/* =====================================
+   TEST CONFIG & QUESTION COUNT
+===================================== */
 .test-config {
   margin-bottom: 1.5rem;
   display: flex;
@@ -96,7 +294,10 @@
   font-weight: 600;
 }
 
-/* Buttons */
+
+/* =====================================
+   BUTTONS
+===================================== */
 button,
 .start-test-button {
   padding: 0.75rem 1.5rem;
@@ -135,235 +336,189 @@ button:hover,
   background-color: #444;
 }
 
-/* Questions */
-.test-question {
-  margin-top: 2rem;
-  font-size: 1rem;
-}
 
-.test-word {
-  font-size: 1.4rem;
-  font-weight: bold;
-  margin-bottom: 1rem;
-  color: #2e3450;
-}
-
-/* Multiple Choice Questions container */
-.mcq-options {
+/* =====================================
+   MATCHING SECTION
+===================================== */
+.matching-container {
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-  color: #2e3450;
-  font-size: 1rem;
+  flex-direction: row;
+  gap: 2rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
 }
 
-.mcq-option:hover .option-text {
-  color: #ffffff;
-}
-
-.mcq-option {
-  display: flex;
-  align-items: center;
-  font-size: 1rem;
-  gap: 0.5rem;
-  cursor: pointer;
-  background-color: #b7bac7;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  user-select: none;
-  transition: background-color 0.3s ease, color 0.3s ease;
-  color: #fff;
-  position: relative;
-}
-
-.mcq-option:hover {
-  background-color: #3c3c5d;
-}
-
-.mcq-radio-button {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  width: 18px;
-  height: 18px;
-  border: 2.5px solid #007bff;
-  border-radius: 50%;
-  position: relative;
-  cursor: pointer;
-  margin-right: 0.6rem;
-  transition: border-color 0.3s ease, background-color 0.3s ease;
-  background-color: transparent;
-  flex-shrink: 0;
-}
-
-.mcq-radio-button:checked::after {
-  content: "";
-  position: absolute;
-  top: 4px;
-  left: 4px;
-  width: 8px;
-  height: 8px;
-  background-color: white;
-  border-radius: 50%;
-  display: block;
-}
-
-.mcq-radio-button:checked {
-  background-color: #007bff;
-  border-color: #0056b3;
-}
-
-/* A, B, C, D */
-.option-label {
-  font-weight: bold;
-  min-width: 1.5rem;
-  display: inline-block;
-  color: #fff; /* A, B, C, D color */
-  user-select: none;
-  font-size: 1rem;
-}
-
-.option-text {
-  flex: 1;
-  color: #2e3450;
-  user-select: none;
-  padding: 0.1rem 0.2rem;
-  transition: color 0.3s ease;
-  text-transform: capitalize;
-  font-size: 1rem;
-}
-
-/* word */
-#quiz-keyword {
-  color: #FFFCFB;
-  font-weight: 700;
-  font-style: italic;
-  font-size: 1.15em;
-}
-
+/* Responsive: Stack columns vertically on small screens */
 @media (max-width: 768px) {
-  [id^="quiz-keyword"] {
-    font-size: 1rem;
+  .matching-container {
+    flex-direction: column;
+    gap: 1rem;
   }
 }
 
-.mcq-option input.mcq-radio-button:checked + .option-label,
-.mcq-option input.mcq-radio-button:checked + .option-label + .option-text {
-  background-color: #DED3C4;
-  color: #2e3450;
-  border-radius: 8px;
-  padding: 0.5rem 1rem;
-}
-
-.mcq-option input.mcq-radio-button:checked {
-  position: relative;
-  z-index: 1;
-}
-
-.mcq-option input.mcq-radio-button:checked::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #0056b3;
-  border-radius: 8px;
-  z-index: -1;
-  opacity: 0.4;
-  transition: opacity 0.3s ease;
-}
-
-.mcq-radio-button:checked::after {
-  position: relative;
-  z-index: 2;
-}
-
-.mcq-option input.mcq-radio-button:checked + .option-label,
-.mcq-option input.mcq-radio-button:checked + .option-label + .option-text {
-  position: relative;
-  z-index: 3;
-}
-
-.mcq-radio-button:focus {
-  outline: 2px solid #00b894;
-  outline-offset: 2px;
-}
-
-/* Inputs */
-.test-input,
-.test-textarea,
-.answer-input,
-.answer-textarea {
-  width: 100%;
-  padding: 0.85rem;
-  background-color: #b7bac7;
-  border: 2px solid #555;
-  border-radius: 8px;
-  color: #fff;
-  font-size: 1rem;
-  font-weight: 500;
-  box-sizing: border-box;
-}
-
-.answer-textarea {
-  resize: vertical;
-  min-height: 100px;
-  font-weight: 600;        /* Thicker text */
-  caret-color: #000000;    /* Black cursor */
-  color: #2e3450;
-}
-
-/* Placeholder color */
-.answer-textarea::placeholder {
-  color: #98A1BC !important;
-}
-
-/* Matching */
-.matching-container {
+/* Words Column */
+.words-column {
+  flex: 0 0 160px;
   display: flex;
-  gap: 2rem;
-  flex-wrap: wrap;
-  margin-top: 2rem;
+  flex-direction: column;
+  gap: 0.6rem;
+  border-right: 1px solid #555;
+  padding-right: 1rem;
 }
 
-.matching-list {
-  list-style: none;
-  padding: 1rem;
-  background-color: #2f2f47;
-  border-radius: 8px;
-  flex: 1;
-  min-width: 200px;
-  color: #fff;
-  font-size: 1rem;
+@media (max-width: 768px) {
+  .words-column {
+    flex: none;
+    border-right: none;
+    padding-right: 0;
+    border-bottom: 1px solid #555;
+    padding-bottom: 1rem;
+  }
 }
 
-.matching-list li {
-  padding: 0.75rem;
-  border-bottom: 1px solid #555;
+.matching-item.word {
+  background-color: #3a3a5c;
+  color: white;
+  padding: 0.5rem 0.8rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
   cursor: grab;
   user-select: none;
-  font-size: 1rem;
-}
-
-.matching-item {
-  background-color: #3a3a5c;
-  color: #fff;
-  padding: 0.8rem;
-  border-radius: 8px;
-  margin-bottom: 0.6rem;
-  font-weight: 600;
-  cursor: grab;
+  text-align: center;
+  border: 2px solid transparent;
   transition: background-color 0.3s ease;
+  min-width: 120px;
+  max-width: 140px;
+  width: 100%;
+}
+
+.matching-item.word.dragging {
+  opacity: 0.5;
+}
+
+/* Definitions Column */
+.definitions-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
+.matching-item.definition {
+  background-color: #2f2f47;
+  color: white;
+  min-height: 4.5rem;
+  padding: 1rem 1.5rem;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  cursor: default;
+  border: 2px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  user-select: none;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+  position: relative;
+}
+
+@media (max-width: 768px) {
+  .matching-item.definition {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1rem;
+    gap: 0.5rem;
+  }
+}
+
+.matching-item.definition.drag-over {
+  border-color: #00b894;
+  background-color: #38695d;
+  cursor: pointer;
+}
+
+.matching-item.definition.matched {
+  background-color: #00b894;
+  color: white;
+  cursor: default;
+}
+
+/* Matched word inside definition container */
+.matched-word {
+  background-color: #00b894;
+  color: white;
+  padding: 0.25rem 0.8rem;
+  border-radius: 6px;
+  font-weight: 700;
+  font-style: normal;
+  user-select: none;
+  max-width: 130px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border: 2px dashed #888;
+  box-sizing: border-box;
+  transition: border 0.3s ease, background-color 0.3s ease;
+}
+
+.definition-text {
+  flex-grow: 1;
   font-size: 1rem;
 }
 
-.matching-item:hover {
-  background-color: #4e4e72;
+@media (max-width: 768px) {
+  .definition-text {
+    font-size: 0.95rem;
+  }
 }
 
-/* 🔻 RESPONSIVE FONT SIZES */
+.word-socket {
+  flex-shrink: 0;
+  width: 140px;
+  height: 38px;
+  border: 2px dashed #888;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #1f1f30;
+  color: #ccc;
+  font-style: italic;
+  font-size: 1rem;
+  user-select: none;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .word-socket {
+    width: 100%;
+  }
+}
+
+/* Remove socket border once matched */
+.word-socket:has(.matched-word) {
+  border: none;
+  background-color: transparent;
+}
+
+.matching-item.definition.drag-over .word-socket {
+  border-color: #00b894;
+  background-color: #284f42;
+  color: #d4f4e4;
+}
+
+.socket-placeholder {
+  user-select: none;
+  pointer-events: none;
+}
+
+
+/* =====================================
+   RESPONSIVE FONT SIZES
+===================================== */
 @media (max-width: 768px) {
   .quiz-section h2 {
     font-size: 1.5rem;
@@ -426,7 +581,11 @@ button:hover,
   }
 }
 
-/* removes letter spacing that comes from HTML5 UP main.css */
+
+/* =====================================
+   OVERRIDES / MISC FIXES
+===================================== */
+/* Removes letter spacing that comes from HTML5 UP main.css */
 .option-text,
 .test-question,
 .test-word {
