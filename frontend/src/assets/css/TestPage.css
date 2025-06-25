@@ -387,7 +387,7 @@ button:hover,
   user-select: none;
   text-align: center;
   border: 2px solid transparent;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, opacity 0.3s ease, filter 0.3s ease, box-shadow 0.3s ease;
   min-width: 120px;
   max-width: 140px;
   width: 100%;
@@ -395,6 +395,22 @@ button:hover,
 
 .matching-item.word.dragging {
   opacity: 0.5;
+}
+
+/* Highlight selected word */
+.matching-item.word.selected {
+  border: 2px solid #00b894;
+  background-color: #2ecc71;
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 0 8px #00b894aa;
+}
+
+/* Subtle other words when one is selected */
+.matching-item.word.subtle {
+  opacity: 0.4;
+  filter: grayscale(60%);
+  pointer-events: none;
 }
 
 /* Definitions Column */
@@ -492,6 +508,7 @@ button:hover,
   overflow: hidden;
 }
 
+/* Responsive for sockets */
 @media (max-width: 768px) {
   .word-socket {
     width: 100%;
@@ -504,17 +521,25 @@ button:hover,
   background-color: transparent;
 }
 
+/* Highlight sockets on drag-over */
 .matching-item.definition.drag-over .word-socket {
   border-color: #00b894;
   background-color: #284f42;
   color: #d4f4e4;
 }
 
+/* Highlight sockets on drag start or word selected */
+.word-socket.highlight-socket {
+  border-color: #0984e3;
+  background-color: #74b9ff33;
+  color: #0984e3;
+}
+
+/* Socket placeholder styling */
 .socket-placeholder {
   user-select: none;
   pointer-events: none;
 }
-
 
 /* =====================================
    RESPONSIVE FONT SIZES

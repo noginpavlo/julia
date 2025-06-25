@@ -14,7 +14,8 @@ const TestPage = () => {
   const [matches, setMatches] = useState({});
   const [draggedWordId, setDraggedWordId] = useState(null);
   const [definitions, setDefinitions] = useState([]);
-  const [selectedWordId, setSelectedWordId] = useState(null); // New state for click selection
+  const [selectedWordId, setSelectedWordId] = useState(null);
+  const [dragOverDefinitionId, setDragOverDefinitionId] = useState(null);
 
   useEffect(() => {
     if (selectedDecks.length === 0) return;
@@ -94,9 +95,12 @@ const TestPage = () => {
   // Drag & Drop handlers
   const handleDragStart = (wordId) => {
     setDraggedWordId(wordId);
-    setSelectedWordId(null); // Clear selection when drag starts
+    setSelectedWordId(null); // Clear selection on drag start
   };
-  const handleDragEnd = () => setDraggedWordId(null);
+  const handleDragEnd = () => {
+    setDraggedWordId(null);
+    setDragOverDefinitionId(null);
+  };
 
   const handleDrop = (definitionId) => {
     if (!definitionId || !draggedWordId) return;
@@ -114,6 +118,7 @@ const TestPage = () => {
     });
 
     setDraggedWordId(null);
+    setDragOverDefinitionId(null);
   };
 
   const handleWordReturn = () => {
@@ -130,13 +135,11 @@ const TestPage = () => {
     setDraggedWordId(null);
   };
 
-  // New click-to-select handlers
+  // Click-to-select handlers
   const handleWordClick = (wordId) => {
-    // If dragging, ignore clicks
-    if (draggedWordId) return;
+    if (draggedWordId) return; // Ignore clicks if dragging
 
-    // Toggle selection
-    setSelectedWordId(prevSelected => (prevSelected === wordId ? null : wordId));
+    setSelectedWordId(prev => (prev === wordId ? null : wordId));
   };
 
   const handleDefinitionClick = (definitionId) => {
@@ -144,19 +147,26 @@ const TestPage = () => {
 
     setMatches(prev => {
       const newMatches = { ...prev };
-
       // Remove previous match for this selected word
       for (const defId in newMatches) {
         if (newMatches[defId] === selectedWordId) {
           delete newMatches[defId];
         }
       }
-
       newMatches[definitionId] = selectedWordId;
       return newMatches;
     });
 
-    setSelectedWordId(null); // Clear selection after placing
+    setSelectedWordId(null);
+  };
+
+  // Drag over handlers for definitions
+  const handleDefinitionDragOver = (defId, e) => {
+    e.preventDefault();
+    setDragOverDefinitionId(defId);
+  };
+  const handleDefinitionDragLeave = (defId) => {
+    if (dragOverDefinitionId === defId) setDragOverDefinitionId(null);
   };
 
   return (
@@ -260,53 +270,51 @@ const TestPage = () => {
                   onDragOver={(e) => e.preventDefault()}
                   onDrop={handleWordReturn}
                 >
-                  <h4>Drag me😊 or click me 😎</h4>
-                  {unmatchedWords.map(wordCard => (
-                    <div
-                      key={wordCard.id}
-                      className={`matching-item word
-                        ${draggedWordId === wordCard.id ? 'dragging' : ''}
-                        ${selectedWordId === wordCard.id ? 'selected' : ''}`}
-                      draggable
-                      onDragStart={() => handleDragStart(wordCard.id)}
-                      onDragEnd={handleDragEnd}
-                      onClick={() => handleWordClick(wordCard.id)}
-                      style={{ cursor: 'pointer', userSelect: 'none' }}
-                      // Prevent text selection on double click
-                    >
-                      {wordCard.word}
-                    </div>
-                  ))}
+                  {unmatchedWords.map(wordCard => {
+                    const isSelected = selectedWordId === wordCard.id;
+                    return (
+                      <div
+                        key={wordCard.id}
+                        className={`matching-item word
+                          ${draggedWordId === wordCard.id ? 'dragging' : ''}
+                          ${isSelected ? 'selected' : ''}
+                          ${selectedWordId && !isSelected ? 'subtle' : ''}
+                        `}
+                        draggable
+                        onDragStart={() => handleDragStart(wordCard.id)}
+                        onDragEnd={handleDragEnd}
+                        onClick={() => handleWordClick(wordCard.id)}
+                        style={{ cursor: 'pointer', userSelect: 'none' }}
+                      >
+                        {wordCard.word}
+                      </div>
+                    );
+                  })}
                 </div>
 
                 {/* Definitions */}
                 <div className="definitions-column">
-                  <h4>Drop me here🫣 or click me 😉</h4>
                   {definitions.map(defCard => {
                     const matchedWordId = matches[defCard.id];
                     const matchedWord = matchingCards.find(w => w.id === matchedWordId);
+                    const isDragOver = dragOverDefinitionId === defCard.id;
+                    const highlightSockets = draggedWordId || selectedWordId;
 
                     return (
                       <div
                         key={defCard.id}
-                        className={`matching-item definition ${matchedWord ? 'matched' : ''}`}
-                        onDragOver={e => {
-                          e.preventDefault();
-                          e.currentTarget.classList.add('drag-over');
-                        }}
-                        onDragLeave={e => {
-                          e.currentTarget.classList.remove('drag-over');
-                        }}
+                        className={`matching-item definition ${matchedWord ? 'matched' : ''} ${isDragOver ? 'drag-over' : ''}`}
+                        onDragOver={e => handleDefinitionDragOver(defCard.id, e)}
+                        onDragLeave={() => handleDefinitionDragLeave(defCard.id)}
                         onDrop={e => {
                           e.preventDefault();
-                          e.currentTarget.classList.remove('drag-over');
                           handleDrop(defCard.id);
                         }}
                         onClick={() => handleDefinitionClick(defCard.id)}
                         style={{ cursor: selectedWordId ? 'pointer' : 'default' }}
                       >
                         <div className="definition-text">{defCard.json_data.definitions?.[0]}</div>
-                        <div className="word-socket">
+                        <div className={`word-socket ${highlightSockets ? 'highlight-socket' : ''}`}>
                           {matchedWord ? (
                             <div
                               className="matched-word"
