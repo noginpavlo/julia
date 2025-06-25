@@ -291,14 +291,6 @@ button:hover,
   outline-offset: 2px;
 }
 
-#msq-title-h2 {
-  color: #2e3450;
-}
-
-#msq-question-h3 {
-  color: #2e3450;
-}
-
 /* Inputs */
 .test-input,
 .test-textarea,
@@ -306,7 +298,7 @@ button:hover,
 .answer-textarea {
   width: 100%;
   padding: 0.85rem;
-  background-color: red;
+  background-color: #b7bac7;
   border: 2px solid #555;
   border-radius: 8px;
   color: #fff;
@@ -315,10 +307,17 @@ button:hover,
   box-sizing: border-box;
 }
 
-.test-textarea,
 .answer-textarea {
   resize: vertical;
   min-height: 100px;
+  font-weight: 600;        /* Thicker text */
+  caret-color: #000000;    /* Black cursor */
+  color: #2e3450;
+}
+
+/* Placeholder color */
+.answer-textarea::placeholder {
+  color: #98A1BC !important;
 }
 
 /* Matching */
