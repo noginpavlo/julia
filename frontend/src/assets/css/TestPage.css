@@ -27,13 +27,25 @@
 
 .quiz-section h2,
 .quiz-card h3 {
-  color: #555879;
+  color: #2e3450;
   font-size: 1.8rem;
 }
 
 .quiz-card h3 {
   margin-top: 1rem;
   font-size: 1.2rem;
+}
+
+#fb-input-field {
+  background-color: #b7bac7;
+  color: #2e3450;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+/* Placeholder color */
+#fb-input-field::placeholder {
+  color: #98A1BC !important;
 }
 
 /* Deck selection */
@@ -294,7 +306,7 @@ button:hover,
 .answer-textarea {
   width: 100%;
   padding: 0.85rem;
-  background-color: #2f2f47;
+  background-color: red;
   border: 2px solid #555;
   border-radius: 8px;
   color: #fff;
@@ -421,4 +433,3 @@ button:hover,
 .test-word {
   letter-spacing: normal;
 }
-

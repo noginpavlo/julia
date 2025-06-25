@@ -137,11 +137,11 @@ const TestPage = () => {
 
             {/* Cloze Test */}
             <section className="quiz-section">
-              <h2>Cloze Tests (Fill in the Blank)</h2>
+              <h2>Fill in the Blank</h2>
               {distributed.cloze.map((card, index) => (
                 <div key={card.id} className="quiz-card">
                   <h3>{index + 6}. {card.json_data.definitions?.[0]}</h3>
-                  <input
+                  <input id="fb-input-field"
                     type="text"
                     className="answer-input"
                     placeholder="Enter the correct word..."
