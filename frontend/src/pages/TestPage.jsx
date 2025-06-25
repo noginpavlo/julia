@@ -105,7 +105,7 @@ const TestPage = () => {
           <>
             {/* Multiple Choice */}
           <section className="quiz-section">
-              <h2>Multiple Choice Questions</h2>
+              <h2 id="msq-title-h2">Multiple Choice Questions</h2>
               {distributed.mcq.map((card, index) => {
                 const options = getMCQOptions(card, quizCards);
                 const questionName = `mcq-${card.id}`;
@@ -113,8 +113,8 @@ const TestPage = () => {
 
                 return (
                   <div key={card.id} className="quiz-card">
-                    <h3>
-                      {index + 1}. What does "<strong>{card.word}</strong>" mean?
+                    <h3 id="msq-question-h3">
+                      {index + 1}. What does "<strong id="quiz-keyword">{card.word}</strong>" mean?
                     </h3>
                     <div className="mcq-options">
                       {options.map((opt, i) => (

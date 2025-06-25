@@ -1,10 +1,10 @@
-/* Do NOT touch #test-page background color */
 #test-page {
   color: #000;
   min-height: 100vh;
   padding: 5rem 2rem 2rem;
   font-family: 'Poppins', sans-serif;
   box-sizing: border-box;
+  background-color: #2e3450;
 }
 
 @media (max-width: 768px) {
@@ -14,14 +14,26 @@
 }
 
 /* Section containers */
-.test-section, .quiz-section {
+.test-section,
+.quiz-section {
   max-width: 900px;
   margin: 0 auto 3rem;
-  background-color: #1e1e2e; /* Dark container */
+  background-color: #98A1BC;
   padding: 2rem;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  color: #fff;
+  color: #555879;
+}
+
+.quiz-section h2,
+.quiz-card h3 {
+  color: #555879;
+  font-size: 1.8rem;
+}
+
+.quiz-card h3 {
+  margin-top: 1rem;
+  font-size: 1.2rem;
 }
 
 /* Deck selection */
@@ -35,12 +47,13 @@
 }
 
 .deck-selector li {
-  background-color: #2f2f47;
+  background-color: #DED3C4;
   color: #fff;
   padding: 0.6rem 1rem;
   border-radius: 8px;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  font-size: 1rem;
 }
 
 .deck-selector li:hover {
@@ -58,6 +71,7 @@
   display: flex;
   align-items: center;
   gap: 1rem;
+  font-size: 1rem;
 }
 
 #question-count {
@@ -112,13 +126,14 @@ button:hover,
 /* Questions */
 .test-question {
   margin-top: 2rem;
+  font-size: 1rem;
 }
 
 .test-word {
   font-size: 1.4rem;
   font-weight: bold;
   margin-bottom: 1rem;
-  color: #fff;
+  color: #2e3450;
 }
 
 /* Multiple Choice Questions container */
@@ -127,16 +142,21 @@ button:hover,
   flex-direction: column;
   gap: 0.5rem;
   margin-top: 0.5rem;
+  color: #2e3450;
+  font-size: 1rem;
 }
 
-/* Each option label */
+.mcq-option:hover .option-text {
+  color: #ffffff;
+}
+
 .mcq-option {
   display: flex;
   align-items: center;
   font-size: 1rem;
   gap: 0.5rem;
   cursor: pointer;
-  background-color: #2f2f47;
+  background-color: #b7bac7;
   padding: 0.5rem 1rem;
   border-radius: 8px;
   user-select: none;
@@ -145,12 +165,10 @@ button:hover,
   position: relative;
 }
 
-/* Hover effect on label */
 .mcq-option:hover {
   background-color: #3c3c5d;
 }
 
-/* Hide the default radio button appearance */
 .mcq-radio-button {
   appearance: none;
   -webkit-appearance: none;
@@ -167,7 +185,6 @@ button:hover,
   flex-shrink: 0;
 }
 
-/* Show the inner dot for checked radio */
 .mcq-radio-button:checked::after {
   content: "";
   position: absolute;
@@ -180,48 +197,53 @@ button:hover,
   display: block;
 }
 
-/* Checked radio background & border */
 .mcq-radio-button:checked {
   background-color: #007bff;
   border-color: #0056b3;
 }
 
-/* Letters label (e.g. A., B., C.) */
+/* A, B, C, D */
 .option-label {
   font-weight: bold;
   min-width: 1.5rem;
   display: inline-block;
-  color: #fff;
+  color: #fff; /* A, B, C, D color */
   user-select: none;
+  font-size: 1rem;
 }
 
-/* Option text */
 .option-text {
   flex: 1;
-  color: #fff;
+  color: #2e3450;
   user-select: none;
   padding: 0.1rem 0.2rem;
   transition: color 0.3s ease;
+  text-transform: capitalize;
+  font-size: 1rem;
 }
 
-/* Highlight entire label (background + text + letter) when checked */
+/* word */
+#quiz-keyword {
+  color: #FFFCFB;
+  font-weight: 700;
+  font-style: italic;
+  font-size: 1.15em;
+}
 
-/* Trick: style the label based on input:checked */
-/* We cannot do parent selectors in pure CSS, but we can use this workaround: */
+@media (max-width: 768px) {
+  [id^="quiz-keyword"] {
+    font-size: 1rem;
+  }
+}
 
-/* Hide the native radio but keep it for focus and checked state */
 .mcq-option input.mcq-radio-button:checked + .option-label,
 .mcq-option input.mcq-radio-button:checked + .option-label + .option-text {
-  background-color: #0056b3;
-  color: #fff;
+  background-color: #DED3C4;
+  color: #2e3450;
   border-radius: 8px;
   padding: 0.5rem 1rem;
 }
 
-/* To highlight the entire label including the radio, add a sibling selector on label itself */
-/* Since label is the parent, we cannot select it with CSS only */
-
-/* So instead, extend the label's background with a pseudo-element when input is checked */
 .mcq-option input.mcq-radio-button:checked {
   position: relative;
   z-index: 1;
@@ -241,38 +263,28 @@ button:hover,
   transition: opacity 0.3s ease;
 }
 
-/* Prevent the pseudo background from overlapping the radio dot */
 .mcq-radio-button:checked::after {
   position: relative;
   z-index: 2;
 }
 
-/* Make sure label text and radio remain visible */
 .mcq-option input.mcq-radio-button:checked + .option-label,
 .mcq-option input.mcq-radio-button:checked + .option-label + .option-text {
   position: relative;
   z-index: 3;
 }
 
-/* Optional: focus outline for accessibility */
 .mcq-radio-button:focus {
   outline: 2px solid #00b894;
   outline-offset: 2px;
 }
 
-
-/* Letters label */
-.option-label {
-  font-weight: bold;
-  min-width: 1.5rem;
-  display: inline-block;
-  color: #fff;
+#msq-title-h2 {
+  color: #2e3450;
 }
 
-/* Option text */
-.option-text {
-  flex: 1;
-  color: #fff;
+#msq-question-h3 {
+  color: #2e3450;
 }
 
 /* Inputs */
@@ -313,6 +325,7 @@ button:hover,
   flex: 1;
   min-width: 200px;
   color: #fff;
+  font-size: 1rem;
 }
 
 .matching-list li {
@@ -320,6 +333,7 @@ button:hover,
   border-bottom: 1px solid #555;
   cursor: grab;
   user-select: none;
+  font-size: 1rem;
 }
 
 .matching-item {
@@ -331,8 +345,80 @@ button:hover,
   font-weight: 600;
   cursor: grab;
   transition: background-color 0.3s ease;
+  font-size: 1rem;
 }
 
 .matching-item:hover {
   background-color: #4e4e72;
 }
+
+/* 🔻 RESPONSIVE FONT SIZES */
+@media (max-width: 768px) {
+  .quiz-section h2 {
+    font-size: 1.5rem;
+  }
+
+  .quiz-card h3 {
+    font-size: 1rem;
+  }
+
+  .mcq-option,
+  .option-label,
+  .option-text,
+  .test-config,
+  .test-word,
+  .deck-selector li,
+  .matching-item,
+  .matching-list li,
+  .test-input,
+  .test-textarea,
+  .answer-input,
+  .answer-textarea {
+    font-size: 0.9rem;
+  }
+
+  .start-test-button,
+  .test-nav button {
+    font-size: 0.9rem;
+    padding: 0.6rem 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .quiz-section h2 {
+    font-size: 1.3rem;
+  }
+
+  .quiz-card h3 {
+    font-size: 0.95rem;
+  }
+
+  .mcq-option,
+  .option-label,
+  .option-text,
+  .test-config,
+  .test-word,
+  .deck-selector li,
+  .matching-item,
+  .matching-list li,
+  .test-input,
+  .test-textarea,
+  .answer-input,
+  .answer-textarea {
+    font-size: 0.85rem;
+  }
+
+  .start-test-button,
+  .test-nav button {
+    font-size: 0.85rem;
+    padding: 0.5rem 1rem;
+  }
+}
+
+/* removes letter spacing that comes from HTML5 UP main.css */
+.option-text,
+.test-question,
+.test-word {
+  letter-spacing: normal;
+}
+
