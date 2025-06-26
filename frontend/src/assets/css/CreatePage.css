@@ -1,7 +1,7 @@
 /* Create Page Styles - Highly Specific to #create-section */
 
 #create-section {
-  background-color: #2e3450; /* DARK BACKGROUND as requested */
+  background-color: #2e3450;
   min-height: 100vh;
   padding: 4rem 1rem;
   display: flex;

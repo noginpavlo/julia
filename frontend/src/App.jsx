@@ -16,9 +16,10 @@ import LogoutPage from './pages/LogoutPage';
 import RegisterPage from './pages/RegisterPage';
 import DecksBrowserPage from './pages/DecksBrowserPage';
 import CardsBrowserPage from './pages/CardsBrowserPage';
+import StatsPage from './pages/StatsPage';
 import TestPage from './pages/TestPage';
 
-import './assets/css/CreatePage.css';
+import './assets/css/CreatePage.css'; // why do I even need these imports when I import css inside each page separately?
 import './assets/css/LoginPrompt.css';
 import './assets/css/main.css';
 
@@ -49,6 +50,7 @@ function App() {
               <Route path="/browser/decks" element={<DecksBrowserPage />} />
               <Route path="/browser/cards" element={<CardsBrowserPage />} />
               <Route path="/quiz" element={<TestPage />} />
+              <Route path="/stats" element={<StatsPage />} />
             </Routes>
 
             <Footer />
