@@ -169,6 +169,16 @@ const TestPage = () => {
     if (dragOverDefinitionId === defId) setDragOverDefinitionId(null);
   };
 
+  // Handle removing matched word on double click
+  const handleMatchedWordDoubleClick = (definitionId) => {
+    setMatches(prev => {
+      const newMatches = { ...prev };
+      delete newMatches[definitionId];
+      return newMatches;
+    });
+    setSelectedWordId(null);
+  };
+
   return (
     <div id="test-page">
       <div id="test-page-container">
@@ -321,6 +331,9 @@ const TestPage = () => {
                               draggable
                               onDragStart={() => handleDragStart(matchedWord.id)}
                               onDragEnd={handleDragEnd}
+                              onDoubleClick={() => handleMatchedWordDoubleClick(defCard.id)}
+                              title="Double-click to remove"
+                              style={{ userSelect: 'none', cursor: 'pointer' }}
                             >
                               {matchedWord.word}
                             </div>
