@@ -1,24 +1,21 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import status
-from rest_framework.generics import (
-    CreateAPIView,
-    DestroyAPIView,
-    ListAPIView,
-    UpdateAPIView,
-)
-from rest_framework.views import APIView
+from rest_framework.generics import CreateAPIView, DestroyAPIView, ListAPIView, UpdateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from .serializers import (
-    DeckSerializer,
-    CardSerializer,
-    CardCreateSerializer,
-    ShowCardSerializer,
-    CardUpdateSerializer,
-)
+from rest_framework.views import APIView
+
+from card_manager.models import Card, Deck
+from card_manager.services.card_dealer import show_card, sm2
+
 from .pagination import CustomPageNumberPagination
-from card_manager.models import Deck, Card
-from django.shortcuts import get_object_or_404
-from card_manager.services.card_dealer import sm2, show_card
+from .serializers import (
+    CardCreateSerializer,
+    CardSerializer,
+    CardUpdateSerializer,
+    DeckSerializer,
+    ShowCardSerializer,
+)
 
 
 class DeckListView(ListAPIView):
@@ -27,9 +24,7 @@ class DeckListView(ListAPIView):
     pagination_class = CustomPageNumberPagination
 
     def get_queryset(self):
-        deck_queryset = Deck.objects.filter(user=self.request.user).order_by(
-            "-date_updated"
-        )
+        deck_queryset = Deck.objects.filter(user=self.request.user).order_by("-date_updated")
 
         search_query = self.request.GET.get("search", "")
         if search_query:
@@ -71,26 +66,20 @@ class CardCreateView(CreateAPIView):
 
         if Card.objects.filter(deck=deck, json_data__word__iexact=word).exists():
             return Response(
-                {
-                    "message": f"Word '{word}' already exists in your '{deck_name}' deck."
-                },
+                {"message": f"Word '{word}' already exists in your '{deck_name}' deck."},
                 status=400,
             )
 
         try:
-            result = (
-                serializer.save()
-            )  # calls serializer.create(serializer.validated_data)
-        except Exception:
+            result = serializer.save()  # calls serializer.create(serializer.validated_data)
+        except Exception:  # too generic exception
             return Response(
                 {"error": "Something went wrong."},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
         return Response(
-            {
-                "message": f"Card for '{result}' is being created. This may take a moment."
-            },
+            {"message": f"Card for '{result}' is being created. This may take a moment."},
             status=status.HTTP_202_ACCEPTED,  # 202 = Accepted for processing
         )
 
@@ -162,13 +151,9 @@ class ShowCardAPIView(APIView):
             user_feedback = int(user_feedback)
             sm2(card_id, user_feedback, request.user)
         except Exception as e:
-            return Response(
-                {"error": "Failed to update card."}, status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response({"error": "Failed to update card."}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(
-            {"message": "Card updated successfully."}, status=status.HTTP_200_OK
-        )
+        return Response({"message": "Card updated successfully."}, status=status.HTTP_200_OK)
 
 
 class CardUpdateView(UpdateAPIView):

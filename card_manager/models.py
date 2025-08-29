@@ -1,6 +1,6 @@
-from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.db import models
 from django.utils import timezone
 
 
@@ -13,9 +13,7 @@ class Deck(models.Model):
     date_updated = models.DateTimeField(auto_now=True)
 
     class Meta:
-        db_table = (
-            "decks_deck"  # This ensures the DB table is named exactly as you want
-        )
+        db_table = "decks_deck"  # This ensures the DB table is named exactly as you want
 
     def __str__(self):
         return f"{self.deck_name}"

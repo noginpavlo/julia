@@ -1,14 +1,10 @@
 import os
 import random
-import django
 import sys
-import requests
-from datetime import date
-from django.utils import timezone
-from datetime import timedelta
-from django.db.models import F
-from card_manager.models import Card, Deck, ShowCardDailyStat
 
+import django
+import requests
+from card_anager.models import Card, Deck, ShowCardDailyStat
 
 # Set the default settings module for Django and initialize Django
 # (needed for standalone scripts that interact with django)
@@ -30,8 +26,8 @@ def log_errors(func):
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except Exception as e:
-            print(f"Unexpected error in {func.__name__}: {e}")
+        except Exception as e:  # too generic exception
+            print(f"Unexpected error in {func.__name__}: {e}")  # logger
             raise
 
     return wrapper
@@ -39,7 +35,7 @@ def log_errors(func):
 
 @log_errors
 def get_data(input_word):
-    url = f"https://api.dictionaryapi.dev/api/v2/entries/en/{input_word}"
+    url = f"https://api.dictionaryapi.dev/api/v2/entries/en/{input_word}"  # hardcoded url
     response = requests.get(url)
 
     if response.status_code == 404:
@@ -49,7 +45,11 @@ def get_data(input_word):
 
 
 @log_errors
-def save_data(response, deck_name, user):
+def save_data(response, deck_name, user):  # this function does 2 things: process and save data
+    """
+    This function processes and saves data.
+    It can do processing and leave saving data to a view, for example.
+    """
 
     deck, created = Deck.objects.get_or_create(user=user, deck_name=deck_name)
 
@@ -61,6 +61,7 @@ def save_data(response, deck_name, user):
     definitions = []
     examples = []
 
+    #  this block is a little hard to read. Can be more pythonic
     for meaning in entry.get("meanings", []):
         for definition_obj in meaning.get("definitions", []):
             if len(definitions) < 2:
@@ -87,7 +88,7 @@ def save_data(response, deck_name, user):
         json_data=cleaned_data,
         word=word,
     )
-    return word if word else "success"
+    return word if word else "success"  # return strings?
 
 
 @log_errors
@@ -97,17 +98,20 @@ def get_and_save(input_word, deck_name, user):
         response = get_data(input_word)
         return save_data(response.json(), deck_name, user)
     except WordNotFoundError as e:
-        return str(e)
+        return str(e)  # raise error and leave it to handle at the correct lvl of abstraction
 
 
 @log_errors
 def create_deck(deck_name, user):
+    # this might be redundant
+    # why this is not handled by view? Pause on this and figure out
     Deck.objects.get_or_create(user=user, deck_name=deck_name)
     return f"Deck {deck_name} created"
 
 
 @log_errors
 def delete_card(card_id, user):
+    # this might be redundant
 
     card_to_delete = Card.objects.get(id=card_id, deck__user=user)
     card_to_delete.delete()
@@ -116,18 +120,19 @@ def delete_card(card_id, user):
 
 @log_errors
 def delete_deck(deck_id, user):
+    # this might be redundant
+    # view?
 
     deck_to_delete = Deck.objects.get(id=deck_id, user=user)
     deck_to_delete.delete()
     return f"Deck id {deck_id} deleted successfully"
 
 
-# This function shows the whole card including front and back. Handle showing a part of it on frontend
-# !!! Frontend will receive the whole card but will show only front then after click will show back
 @log_errors
 def show_card(deck_name, user):
+    # again this just retrieves the card from the database. View?
 
-    # this function counts cards learned by user every day and saves the data to db
+    # can this function be called from view? and here remove show card at all?
     increment_daily_learning(user)
 
     now = timezone.now()
@@ -168,6 +173,10 @@ def increment_daily_learning(user):
 
 @log_errors
 def sm2(card_id, user_feedback, user):
+    """
+    Does this function calculates sm2 and saves the data to the db?
+    It should just calculate the parametars and return them for the caller to db-save
+    """
 
     card = Card.objects.get(id=card_id, deck__user=user)
 
@@ -181,13 +190,9 @@ def sm2(card_id, user_feedback, user):
         )
     else:
         if card.repetitions == 0:
-            Card.objects.filter(id=card.id).update(
-                interval=1, repetitions=F("repetitions") + 1
-            )
+            Card.objects.filter(id=card.id).update(interval=1, repetitions=F("repetitions") + 1)
         elif card.repetitions == 1:
-            Card.objects.filter(id=card.id).update(
-                interval=3, repetitions=F("repetitions") + 1
-            )
+            Card.objects.filter(id=card.id).update(interval=3, repetitions=F("repetitions") + 1)
         else:
             Card.objects.filter(id=card.id).update(
                 interval=F("interval") * F("ef"), repetitions=F("repetitions") + 1
@@ -195,6 +200,7 @@ def sm2(card_id, user_feedback, user):
 
     card.refresh_from_db(fields=["interval", "repetitions", "ef"])
 
+    # parameters hardcoded? what if I want to change them later?
     new_ef = card.ef + (0.1 - (5 - user_feedback) * (0.08 + (5 - user_feedback) * 0.02))
     card.ef = max(new_ef, 1.3)
 
@@ -215,9 +221,7 @@ def update_card(request, user):
 
         word = request.POST.get("word", card_data.get("word", ""))
         card_data["word"] = request.POST.get("word", card_data.get("word", ""))
-        card_data["phonetic"] = request.POST.get(
-            "phonetic", card_data.get("phonetic", "")
-        )
+        card_data["phonetic"] = request.POST.get("phonetic", card_data.get("phonetic", ""))
         card_data["definitions"] = [
             request.POST.get("meaning1", ""),
             request.POST.get("meaning2", ""),
