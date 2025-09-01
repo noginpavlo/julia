@@ -8,10 +8,12 @@ This is a mock module dockstring, make it better as soon as you complete the mod
 ====================================================================================
 """
 
+import json
 from abc import ABC, abstractmethod
+
 import requests
 from requests import Response
-import json
+
 # from card_manager.models import Card, Deck
 
 
@@ -22,11 +24,12 @@ class WordNotFoundError(Exception):
             f"Data not available for word {word}. Are you sure you spelled '{word}' correctly?"
         )
 
+
 class BaseWordDataFetcher(ABC):
     """Interface for DataGetter class. DataGetter must have get_data method."""
 
     @abstractmethod
-    def get_data(self, word: str, api_url: str) -> Response: ...
+    def fetch_word_data(self, word: str, api_url: str) -> Response: ...
 
 
 class WordDataFetcher(BaseWordDataFetcher):
@@ -34,14 +37,14 @@ class WordDataFetcher(BaseWordDataFetcher):
     Concrete class that requests data from dictionaryapi.dev.
     Returns response that contains word definitions, examples and transcription.
 
-    Preconditions: 
+    Preconditions:
     => The word is a string.
     => api_url is a string.
     """
 
-    def get_data(self, word: str, api_url: str) -> Response:
-        endpoint_url = f"{api_url}{word}"
-        response = requests.get(endpoint_url, timeout=None)
+    def fetch_word_data(self, word: str, api_url: str) -> Response:
+        word_url = f"{api_url}{word}"
+        response = requests.get(word_url, timeout=None)
 
         # remove this 2 lines for prod
         parsed_data = json.dumps(response.json(), indent=4, sort_keys=True)
@@ -54,8 +57,8 @@ class WordDataFetcher(BaseWordDataFetcher):
 
 
 DICTIONARYAPI_URL = "https://api.dictionaryapi.dev/api/v2/entries/en/"
-data_fetcher= WordDataFetcher()
-data_fetcher.get_data("cat", DICTIONARYAPI_URL)
+data_fetcher = WordDataFetcher()
+data_fetcher.fetch_word_data("cat", DICTIONARYAPI_URL)
 
 
 # def save_data(response, deck_name, user):  # this function does 2 things: process and save data
