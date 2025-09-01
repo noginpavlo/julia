@@ -4,7 +4,7 @@ import sys
 
 import django
 import requests
-from card_anager.models import Card, Deck, ShowCardDailyStat
+from card_manager.models import Card, Deck, ShowCardDailyStat
 
 # Set the default settings module for Django and initialize Django
 # (needed for standalone scripts that interact with django)

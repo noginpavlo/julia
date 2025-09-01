@@ -8,8 +8,11 @@ This is a mock module dockstring, make it better as soon as you complete the mod
 ====================================================================================
 """
 
+from abc import ABC, abstractmethod
 import requests
-from card_anager.models import Card, Deck, ShowCardDailyStat
+from requests import Response
+import json
+# from card_manager.models import Card, Deck
 
 
 class WordNotFoundError(Exception):
@@ -19,67 +22,92 @@ class WordNotFoundError(Exception):
             f"Data not available for word {word}. Are you sure you spelled '{word}' correctly?"
         )
 
+class BaseWordDataFetcher(ABC):
+    """Interface for DataGetter class. DataGetter must have get_data method."""
 
-def get_data(input_word):
-    url = f"https://api.dictionaryapi.dev/api/v2/entries/en/{input_word}"  # hardcoded url
-    response = requests.get(url)
-
-    if response.status_code == 404:
-        raise WordNotFoundError(input_word)
-
-    return response
+    @abstractmethod
+    def get_data(self, word: str, api_url: str) -> Response: ...
 
 
-def save_data(response, deck_name, user):  # this function does 2 things: process and save data
+class WordDataFetcher(BaseWordDataFetcher):
     """
-    This function processes and saves data.
-    It can do processing and leave saving data to a view, for example.
+    Concrete class that requests data from dictionaryapi.dev.
+    Returns response that contains word definitions, examples and transcription.
+
+    Preconditions: 
+    => The word is a string.
+    => api_url is a string.
     """
 
-    deck, _ = Deck.objects.get_or_create(user=user, deck_name=deck_name)
+    def get_data(self, word: str, api_url: str) -> Response:
+        endpoint_url = f"{api_url}{word}"
+        response = requests.get(endpoint_url, timeout=None)
 
-    # Process data to remove redundant meanings and examples
-    entry = response[0]
+        # remove this 2 lines for prod
+        parsed_data = json.dumps(response.json(), indent=4, sort_keys=True)
+        print(parsed_data)
 
-    word = entry.get("word", "")
-    phonetic = entry.get("phonetic", "")
-    definitions = []
-    examples = []
+        if response.status_code == 404:
+            raise WordNotFoundError(word)
 
-    #  this block is a little hard to read. Can be more pythonic
-    for meaning in entry.get("meanings", []):
-        for definition_obj in meaning.get("definitions", []):
-            if len(definitions) < 2:
-                definitions.append(definition_obj.get("definition", ""))
-
-            example = definition_obj.get("example")
-            if example and len(examples) < 2:
-                examples.append(example)
-
-            if len(definitions) >= 2 and len(examples) >= 2:
-                break
-        if len(definitions) >= 2 and len(examples) >= 2:
-            break
-
-    cleaned_data = {
-        "word": word,
-        "phonetic": phonetic,
-        "definitions": definitions,
-        "examples": examples,
-    }
-
-    Card.objects.create(
-        deck=deck,
-        json_data=cleaned_data,
-        word=word,
-    )
-    return word if word else "success"  # return strings?
+        return response
 
 
-def get_and_save(input_word, deck_name, user):
+DICTIONARYAPI_URL = "https://api.dictionaryapi.dev/api/v2/entries/en/"
+data_fetcher= WordDataFetcher()
+data_fetcher.get_data("cat", DICTIONARYAPI_URL)
 
-    try:
-        response = get_data(input_word)
-        return save_data(response.json(), deck_name, user)
-    except WordNotFoundError as e:
-        return str(e)  # raise error and leave it to handle at the correct lvl of abstraction
+
+# def save_data(response, deck_name, user):  # this function does 2 things: process and save data
+#     """
+#     This function processes and saves data.
+#     It can do processing and leave saving data to a view, for example.
+#     """
+#
+#     deck, _ = Deck.objects.get_or_create(user=user, deck_name=deck_name)
+#
+#     # Process data to remove redundant meanings and examples
+#     entry = response[0]
+#
+#     word = entry.get("word", "")
+#     phonetic = entry.get("phonetic", "")
+#     definitions = []
+#     examples = []
+#
+#     #  this block is a little hard to read. Can be more pythonic
+#     for meaning in entry.get("meanings", []):
+#         for definition_obj in meaning.get("definitions", []):
+#             if len(definitions) < 2:
+#                 definitions.append(definition_obj.get("definition", ""))
+#
+#             example = definition_obj.get("example")
+#             if example and len(examples) < 2:
+#                 examples.append(example)
+#
+#             if len(definitions) >= 2 and len(examples) >= 2:
+#                 break
+#         if len(definitions) >= 2 and len(examples) >= 2:
+#             break
+#
+#     cleaned_data = {
+#         "word": word,
+#         "phonetic": phonetic,
+#         "definitions": definitions,
+#         "examples": examples,
+#     }
+#
+#     Card.objects.create(
+#         deck=deck,
+#         json_data=cleaned_data,
+#         word=word,
+#     )
+#     return word if word else "success"  # return strings?
+
+
+# def get_and_save(input_word, deck_name, user):
+#
+#     try:
+#         response = get_data(input_word)
+#         return save_data(response.json(), deck_name, user)
+#     except WordNotFoundError as e:
+#         return str(e)  # raise error and leave it to handle at the correct lvl of abstraction
