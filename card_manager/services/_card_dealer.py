@@ -1,15 +1,45 @@
 """
-This module handles busyness logic of the application.
+This module handles busyness logic of Julia.
 It inclutes retrieving data from 3rd party API, processing the data.
 It implements sm2 algorithm and handles the algorithmic data to highler-level of abstraction.
 
 ====================================================================================
 This is a mock module dockstring, make it better as soon as you complete the module.
 ====================================================================================
+
+Response structure of dictionaryapi.dev:
+
+[
+    {
+    "word": "string",
+    "phonetic": "string",
+    "phonetics": [
+        {
+        "text": "string",
+        "audio": "string (optional)" => usually a url
+        }
+    ],
+    "origin": "string",
+    "meanings": [
+        {
+        "partOfSpeech": "string",  => can include 2 or more parts of speech: noun, verb, etc.
+        "definitions": [
+            {
+            "definition": "string",
+            "example": "string (optional)",
+            "synonyms": ["string"],
+            "antonyms": ["string"]
+            }
+        ]
+        }
+    ]
+    }
+]
 """
 
 import json
 from abc import ABC, abstractmethod
+from collections.abc import Generator
 
 import requests
 from requests import Response
@@ -32,7 +62,7 @@ class BaseWordDataFetcher(ABC):
     def fetch_word_data(self, word: str, api_url: str) -> Response: ...
 
 
-class WordDataFetcher(BaseWordDataFetcher):
+class WordDataFetcher(BaseWordDataFetcher):  # consider renaming to sth like DictionaryApiFetcher
     """
     Concrete class that requests data from dictionaryapi.dev.
     Returns response that contains word definitions, examples and transcription.
@@ -46,67 +76,113 @@ class WordDataFetcher(BaseWordDataFetcher):
         word_url = f"{api_url}{word}"
         response = requests.get(word_url, timeout=None)
 
-        # remove this 2 lines for prod
-        parsed_data = json.dumps(response.json(), indent=4, sort_keys=True)
-        print(parsed_data)
+        # json_response = response.json()
+        # print(json.dumps(json_response, indent=4))
 
-        if response.status_code == 404:
-            raise WordNotFoundError(word)
+        if (
+            response.status_code == 404
+        ):  # this might not be correct lvl of abstraction to handle this
+            raise WordNotFoundError(word)  # rase this exception in the caller for view to handle
 
         return response
 
 
 DICTIONARYAPI_URL = "https://api.dictionaryapi.dev/api/v2/entries/en/"
 data_fetcher = WordDataFetcher()
-data_fetcher.fetch_word_data("cat", DICTIONARYAPI_URL)
+data_fetcher.fetch_word_data("branch", DICTIONARYAPI_URL)
 
 
-# def save_data(response, deck_name, user):  # this function does 2 things: process and save data
-#     """
-#     This function processes and saves data.
-#     It can do processing and leave saving data to a view, for example.
-#     """
-#
-#     deck, _ = Deck.objects.get_or_create(user=user, deck_name=deck_name)
-#
-#     # Process data to remove redundant meanings and examples
-#     entry = response[0]
-#
-#     word = entry.get("word", "")
-#     phonetic = entry.get("phonetic", "")
-#     definitions = []
-#     examples = []
-#
-#     #  this block is a little hard to read. Can be more pythonic
-#     for meaning in entry.get("meanings", []):
-#         for definition_obj in meaning.get("definitions", []):
-#             if len(definitions) < 2:
-#                 definitions.append(definition_obj.get("definition", ""))
-#
-#             example = definition_obj.get("example")
-#             if example and len(examples) < 2:
-#                 examples.append(example)
-#
-#             if len(definitions) >= 2 and len(examples) >= 2:
-#                 break
-#         if len(definitions) >= 2 and len(examples) >= 2:
-#             break
+class BaseWordDataProcessor(ABC):
+    """
+    This is an interface for WordDataProcessor.
+    """
+
+    @staticmethod
+    @abstractmethod
+    def _parse_audio(entry: dict) -> str | None: ...
+
+    @staticmethod
+    @abstractmethod
+    def _parse_definition(entry: dict) -> dict: ...
+
+    @abstractmethod
+    def parse_word_data(self) -> dict: ...
+
+
+class WordDataProcessor(BaseWordDataProcessor):
+
+    def __init__(self, response: Response) -> None:
+        self._response = response
+
+    @staticmethod
+    def _parse_audio(entry: dict) -> str | None:
+
+        phonetics = entry.get("phonetics")
+        if phonetics:
+            audio = phonetics.get("audio")
+            if isinstance(audio, str) and audio:
+                return audio
+
+        return None
+
+    @staticmethod
+    def _parse_definition(entry: dict) -> dict:
+
+        meanings = entry.get("meanings")
+        definitions: dict = {}
+        if meanings:
+            for part_of_speech in meanings:
+                part_name = part_of_speech.get("partOfSpeech")
+                definition_block = part_of_speech.get("definitions")
+                definitions[part_name] = list(definition for definition in definition_block)[0:2]
+
+        print(definitions)
+        return definitions
+
+    def parse_word_data(self) -> dict:
+        """
+        This function processes and saves data.
+        It can do processing and leave saving data to a view, for example.
+        """
+
+        entry = self._response[0]
+
+        word = entry.get("word", "")
+        phonetic = entry.get("phonetic", "")
+        audio = self._parse_audio(entry)
+        definitions: dict = self._parse_definition(entry)
+        examples: list = []
+
+        cleaned_data = {
+            "word": word,
+            "phonetic": phonetic,
+            "audio": audio,
+            "definitions": definitions,
+            "examples": examples,
+        }
+
+        return cleaned_data
+
+
+# def save_data(response, deck_name, user):  # this must accept deck object as an argument
 #
 #     cleaned_data = {
 #         "word": word,
 #         "phonetic": phonetic,
+#         "audio": audio,
 #         "definitions": definitions,
 #         "examples": examples,
 #     }
 #
+#     # ROLE 2: Creates card.
 #     Card.objects.create(
 #         deck=deck,
 #         json_data=cleaned_data,
 #         word=word,
 #     )
 #     return word if word else "success"  # return strings?
-
-
+#
+#
 # def get_and_save(input_word, deck_name, user):
 #
 #     try:

@@ -1,0 +1,9 @@
+
+
+Error executing Lua callback: ...vim/lazy/venv-selector.nvim/lua/venv-selector/search.lua:261: bad argument #1 to 'pairs' (table expected, got boolean)
+stack traceback:
+	[C]: in function 'pairs'
+	...vim/lazy/venv-selector.nvim/lua/venv-selector/search.lua:261: in function 'run_search'
+	...e/nvim/lazy/venv-selector.nvim/lua/venv-selector/gui.lua:83: in function 'open'
+	...y/venv-selector.nvim/lua/venv-selector/user_commands.lua:6: in function <...y/venv-selector.nvim/lua/venv-selector/user_commands.lua:4>
+E492: Not an editor command: massages
