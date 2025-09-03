@@ -56,6 +56,7 @@ THESE ARE PROBLEMS WITH THIS MODULE:
 
 import json
 from abc import ABC, abstractmethod
+from itertools import islice
 
 import requests
 from requests import Response
@@ -71,14 +72,14 @@ class WordNotFoundError(Exception):
         )
 
 
-class BaseWordDataFetcher(ABC):
+class BaseApiDataFetcher(ABC):
     """Interface for DataGetter class. DataGetter must have get_data method."""
 
     @abstractmethod
     def fetch_word_data(self, word: str, api_url: str) -> Response: ...
 
 
-class WordDataFetcher(BaseWordDataFetcher):  # consider renaming to sth like DictionaryApiFetcher
+class DictApiDataFetcher(BaseApiDataFetcher):
     """
     Concrete class that requests data from dictionaryapi.dev.
     Returns response that contains word definitions, examples and transcription.
@@ -108,7 +109,7 @@ data_fetcher = WordDataFetcher()
 data_fetcher.fetch_word_data("branch", DICTIONARYAPI_URL)
 
 
-class BaseWordDataProcessor(ABC):
+class BaseDictApiDataParser(ABC):
     """
     This is an interface for WordDataProcessor.
     """
@@ -127,13 +128,14 @@ class BaseWordDataProcessor(ABC):
         """Orchestrate parsing methosds to parse word datat from Response."""
 
 
-class WordDataProcessor(BaseWordDataProcessor):
+class DictApiDataParser(BaseWordDataProcessor):
 
     def __init__(self, response: Response, max_definitions: int, max_examples: int) -> None:
         self._response = response
         self._max_examples = max_examples
         self._max_definitions = max_definitions
 
+    # data validation should be a responsibility of a separate class
     def _validate_entry(self) -> bool:
         """
         Validate dictionary API response structure.
@@ -200,58 +202,45 @@ class WordDataProcessor(BaseWordDataProcessor):
 
     def _parse_definitions(self) -> dict[str, dict[str, list[str]]]:
         """
-        Parse dictionary entry to extract 2 definitions and 2 examples per part of speech.
-
-        Args:
-            entry: Dictionary entry from API response
+        Parse dictionary entry to extract definitions and examples per part of speech.
+        Uses self._max_definitions and self._max_examples.
 
         Returns:
-            Dictionary with structure:
+            Dictionary structured as:
             {
-                "noun": {
-                    "definitions": ["def1", "def2"],
-                    "examples": ["ex1", "ex2"]
-                },
-                "verb": {
-                    "definitions": ["def1", "def2"],
-                    "examples": ["ex1", "ex2"]
-                }
+                "noun": {"definitions": [...], "examples": [...]},
+                "verb": {"definitions": [...], "examples": [...]}
             }
         """
 
         entry = self._response[0]
 
-        meanings: dict | list = entry.get("meanings", [])
-        definitions: dict[str, dict[str, list[str]]] = {}
+        meanings = entry.get("meanings")
+        result: dict[str, dict[str, list[str]]] = {}
 
-        for meaning in meanings:
-            part_of_speech = meaning.get("partOfSpeech", "word")
+        for part_of_speech in meanings:
+            pos_type = part_of_speech.get("partOfSpeech", "word")
+            definitions_list = part_of_speech.get("definitions")
 
-            definitions_list = meaning.get("definitions", [])
-            definitions[part_of_speech] = {"definitions": [], "examples": []}
+            definitions_gen = (
+                definition.get("definition")
+                for definition in definitions_list
+                if definition.get("definition")
+            )
 
-            # the counters approach must be changed to something better. (generators?)
-            definitions_count = 0
-            examples_count = 0
+            examples_gen = (
+                example.get("example")
+                for example in definitions_list
+                if example.get("example") and example.get("example").strip()
+            )
 
-            for definition_obj in definitions_list:
+            defs_list = list(islice(definitions_gen, self._max_definitions))
+            exs_list = list(islice(examples_gen, self._max_examples))
 
-                if definitions_count < self._max_definitions:
-                    definition_text = definition_obj.get("definition")
-                    if definition_text:
-                        definitions[part_of_speech]["definitions"].append(definition_text)
-                        definitions_count += 1
+            # reconsider return structure of result.
+            result[pos_type] = {"definitions": defs_list, "examples": exs_list}
 
-                if examples_count < 2:
-                    example_text = definition_obj.get("example")
-                    if example_text and example_text.strip():
-                        definitions[part_of_speech]["examples"].append(example_text.strip())
-                        examples_count += 1
-
-                if definitions_count >= 2 and examples_count >= 2:
-                    break
-
-        return definitions
+        return result
 
     def parse_word_data(self) -> dict:
         """
@@ -264,37 +253,20 @@ class WordDataProcessor(BaseWordDataProcessor):
         word = entry.get("word", "")
         phonetic = entry.get("phonetic", "")
         audio = self._parse_audio()
-        definitions = self._parse_definitions()
+        # Information includes partOfSpeech, definitions and examples.
+        # Are you sure it needs to be in one place?
+        information = self._parse_definitions()
 
         cleaned_data = {
             "word": word,
             "phonetic": phonetic,
             "audio": audio,
-            "definitions": definitions,
+            "information": information,
         }
 
         return cleaned_data
 
 
-# def save_data(response, deck_name, user):  # this must accept deck object as an argument
-#
-#     cleaned_data = {
-#         "word": word,
-#         "phonetic": phonetic,
-#         "audio": audio,
-#         "definitions": definitions,
-#         "examples": examples,
-#     }
-#
-#     # ROLE 2: Creates card.
-#     Card.objects.create(
-#         deck=deck,
-#         json_data=cleaned_data,
-#         word=word,
-#     )
-#     return word if word else "success"  # return strings?
-#
-#
 # def get_and_save(input_word, deck_name, user):
 #
 #     try:
