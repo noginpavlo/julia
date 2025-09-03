@@ -32,7 +32,7 @@ Response structure of dictionaryapi.dev:
             }
         ]
         }
-    ]
+]
     }
 ]
 """
@@ -76,8 +76,8 @@ class WordDataFetcher(BaseWordDataFetcher):  # consider renaming to sth like Dic
         word_url = f"{api_url}{word}"
         response = requests.get(word_url, timeout=None)
 
-        # json_response = response.json()
-        # print(json.dumps(json_response, indent=4))
+        json_response = response.json()
+        print(json.dumps(json_response, indent=4))
 
         if (
             response.status_code == 404
@@ -103,10 +103,13 @@ class BaseWordDataProcessor(ABC):
 
     @staticmethod
     @abstractmethod
-    def _parse_definition(entry: dict) -> dict: ...
+    def _parse_definitions(
+        entry: dict[str, dict],
+    ) -> dict[str, dict[str, list[str]]]: ...
 
     @abstractmethod
-    def parse_word_data(self) -> dict: ...
+    def parse_word_data(self) -> dict:
+        """Orchestrate parsing methosds to parse word datat from Response."""
 
 
 class WordDataProcessor(BaseWordDataProcessor):
@@ -126,17 +129,76 @@ class WordDataProcessor(BaseWordDataProcessor):
         return None
 
     @staticmethod
-    def _parse_definition(entry: dict) -> dict:
+    def _parse_definitions(entry: dict[str, dict]) -> dict[str, dict[str, list[str]]]:
+        """
+        Parse dictionary entry to extract 2 definitions and 2 examples per part of speech.
 
-        meanings = entry.get("meanings")
-        definitions: dict = {}
-        if meanings:
-            for part_of_speech in meanings:
-                part_name = part_of_speech.get("partOfSpeech")
-                definition_block = part_of_speech.get("definitions")
-                definitions[part_name] = list(definition for definition in definition_block)[0:2]
+        Args:
+            entry: Dictionary entry from API response
 
-        print(definitions)
+        Returns:
+            Dictionary with structure:
+            {
+                "noun": {
+                    "definitions": ["def1", "def2"],
+                    "examples": ["ex1", "ex2"]
+                },
+                "verb": {
+                    "definitions": ["def1", "def2"],
+                    "examples": ["ex1", "ex2"]
+                }
+            }
+        """
+        if not isinstance(entry, dict):
+            return {}
+
+        meanings: dict | list = entry.get("meanings", [])
+        if not meanings:
+            return {}
+
+        definitions: dict[str, dict[str, list[str]]] = {}
+
+        for meaning in meanings:
+            if not isinstance(meaning, dict):
+                continue
+
+            part_of_speech = meaning.get("partOfSpeech")
+            if not part_of_speech:
+                continue
+
+            definitions_list = meaning.get("definitions", [])
+            if not definitions_list:
+                continue
+
+            # Initialize structure for this part of speech
+            definitions[part_of_speech] = {"definitions": [], "examples": []}
+
+            # Extract up to 2 definitions and 2 examples
+            definitions_count = 0
+            examples_count = 0
+
+            for definition_obj in definitions_list:
+                if not isinstance(definition_obj, dict):
+                    continue
+
+                # Get definition (max 2)
+                if definitions_count < 2:
+                    definition_text = definition_obj.get("definition")
+                    if definition_text and definition_text.strip():
+                        definitions[part_of_speech]["definitions"].append(definition_text.strip())
+                        definitions_count += 1
+
+                # Get example (max 2)
+                if examples_count < 2:
+                    example_text = definition_obj.get("example")
+                    if example_text and example_text.strip():
+                        definitions[part_of_speech]["examples"].append(example_text.strip())
+                        examples_count += 1
+
+                # Stop if we have 2 of each
+                if definitions_count >= 2 and examples_count >= 2:
+                    break
+
         return definitions
 
     def parse_word_data(self) -> dict:
@@ -150,15 +212,13 @@ class WordDataProcessor(BaseWordDataProcessor):
         word = entry.get("word", "")
         phonetic = entry.get("phonetic", "")
         audio = self._parse_audio(entry)
-        definitions: dict = self._parse_definition(entry)
-        examples: list = []
+        definitions: list = self._parse_definitions(entry)
 
         cleaned_data = {
             "word": word,
             "phonetic": phonetic,
             "audio": audio,
             "definitions": definitions,
-            "examples": examples,
         }
 
         return cleaned_data
