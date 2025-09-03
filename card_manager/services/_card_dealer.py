@@ -99,6 +99,10 @@ class BaseWordDataProcessor(ABC):
 
     @staticmethod
     @abstractmethod
+    def _validate_entry(response: Response) -> bool: ...
+
+    @staticmethod
+    @abstractmethod
     def _parse_audio(entry: dict) -> str | None: ...
 
     @staticmethod
@@ -116,6 +120,57 @@ class WordDataProcessor(BaseWordDataProcessor):
 
     def __init__(self, response: Response) -> None:
         self._response = response
+
+    @staticmethod
+    def validate_entry(response: Response) -> bool:
+        """
+        Validate dictionary API response structure.
+
+        Args:
+            response: API response to validate
+
+        Returns:
+            True if valid
+
+        Raises:
+            TypeError: If response structure is invalid
+            ValueError: If required fields are missing or have wrong types
+            IndexError: If response is empty when entry expected
+        """
+
+        if not isinstance(response, list):
+            raise TypeError(f"Response must be a list, got {type(response).__name__}")
+
+        if len(response) == 0:
+            raise IndexError("Response list is empty - no dictionary entries found")
+
+        entry = response[0]
+
+        if not isinstance(entry, dict):
+            raise TypeError(f"Dictionary entry must be a dict, got {type(entry).__name__}")
+
+        required_fields = ["word", "meanings"]
+
+        for field in required_fields:
+            if field not in entry:
+                raise ValueError(f"Missing required field: '{field}' in dictionary entry")
+
+        word = entry["word"]
+
+        if not isinstance(word, str) or not word.strip():
+            raise ValueError(
+                f"Field 'word' must be a non-empty string, got {type(word).__name__}: '{word}'"
+            )
+
+        meanings = entry["meanings"]
+
+        if not isinstance(meanings, list):
+            raise ValueError(f"Field 'meanings' must be a list, got {type(meanings).__name__}")
+
+        if len(meanings) == 0:
+            raise ValueError("Field 'meanings' cannot be empty - at least one meaning required")
+
+        return True
 
     @staticmethod
     def _parse_audio(entry: dict) -> str | None:
@@ -149,53 +204,34 @@ class WordDataProcessor(BaseWordDataProcessor):
                 }
             }
         """
-        if not isinstance(entry, dict):
-            return {}
 
         meanings: dict | list = entry.get("meanings", [])
-        if not meanings:
-            return {}
-
         definitions: dict[str, dict[str, list[str]]] = {}
 
         for meaning in meanings:
-            if not isinstance(meaning, dict):
-                continue
-
-            part_of_speech = meaning.get("partOfSpeech")
-            if not part_of_speech:
-                continue
+            part_of_speech = meaning.get("partOfSpeech", "word")
 
             definitions_list = meaning.get("definitions", [])
-            if not definitions_list:
-                continue
-
-            # Initialize structure for this part of speech
             definitions[part_of_speech] = {"definitions": [], "examples": []}
 
-            # Extract up to 2 definitions and 2 examples
+            # the counters approach must be changed to something better. (generators?)
             definitions_count = 0
             examples_count = 0
 
             for definition_obj in definitions_list:
-                if not isinstance(definition_obj, dict):
-                    continue
 
-                # Get definition (max 2)
                 if definitions_count < 2:
                     definition_text = definition_obj.get("definition")
-                    if definition_text and definition_text.strip():
-                        definitions[part_of_speech]["definitions"].append(definition_text.strip())
+                    if definition_text:
+                        definitions[part_of_speech]["definitions"].append(definition_text)
                         definitions_count += 1
 
-                # Get example (max 2)
                 if examples_count < 2:
                     example_text = definition_obj.get("example")
                     if example_text and example_text.strip():
                         definitions[part_of_speech]["examples"].append(example_text.strip())
                         examples_count += 1
 
-                # Stop if we have 2 of each
                 if definitions_count >= 2 and examples_count >= 2:
                     break
 
@@ -212,7 +248,7 @@ class WordDataProcessor(BaseWordDataProcessor):
         word = entry.get("word", "")
         phonetic = entry.get("phonetic", "")
         audio = self._parse_audio(entry)
-        definitions: list = self._parse_definitions(entry)
+        definitions = self._parse_definitions(entry)
 
         cleaned_data = {
             "word": word,
