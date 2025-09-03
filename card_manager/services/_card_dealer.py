@@ -1,11 +1,17 @@
 """
-This module handles busyness logic of Julia.
-It inclutes retrieving data from 3rd party API, processing the data.
-It implements sm2 algorithm and handles the algorithmic data to highler-level of abstraction.
-
 ====================================================================================
 This is a mock module dockstring, make it better as soon as you complete the module.
 ====================================================================================
+
+Module for fetching and processing English word data from dictionaryapi.dev.
+
+Responsibilities:
+- Fetch data from a 3rd-party dictionary API.
+- Validate and parse the response into a structured format.
+- Extract word definitions, examples, phonetics, and audio links.
+
+Exceptions:
+- WordNotFoundError: Raised when the API has no data for the requested word.
 
 Response structure of dictionaryapi.dev:
 
@@ -37,9 +43,19 @@ Response structure of dictionaryapi.dev:
 ]
 """
 
+"""
+====================================================================================================
+THESE ARE PROBLEMS WITH THIS MODULE:
+=> Docstrings are inconcitent and bad. Do considtant styling: Google style, NumPy style. Choose.
+=> Separate validation and parsing. How both responsibilities are handled by WordDataProcassor.
+=> Definition and example count logic is bad. Use generator and islise to take first n ex. and def.
+=> Type hinting verbose?
+=> if __name__ == "__main__": guard needed?
+====================================================================================================
+"""
+
 import json
 from abc import ABC, abstractmethod
-from collections.abc import Generator
 
 import requests
 from requests import Response
@@ -97,19 +113,14 @@ class BaseWordDataProcessor(ABC):
     This is an interface for WordDataProcessor.
     """
 
-    @staticmethod
     @abstractmethod
-    def _validate_entry(response: Response) -> bool: ...
+    def _validate_entry(self) -> bool: ...
 
-    @staticmethod
     @abstractmethod
-    def _parse_audio(entry: dict) -> str | None: ...
+    def _parse_audio(self) -> str | None: ...
 
-    @staticmethod
     @abstractmethod
-    def _parse_definitions(
-        entry: dict[str, dict],
-    ) -> dict[str, dict[str, list[str]]]: ...
+    def _parse_definitions(self) -> dict[str, dict[str, list[str]]]: ...
 
     @abstractmethod
     def parse_word_data(self) -> dict:
@@ -118,11 +129,12 @@ class BaseWordDataProcessor(ABC):
 
 class WordDataProcessor(BaseWordDataProcessor):
 
-    def __init__(self, response: Response) -> None:
+    def __init__(self, response: Response, max_definitions: int, max_examples: int) -> None:
         self._response = response
+        self._max_examples = max_examples
+        self._max_definitions = max_definitions
 
-    @staticmethod
-    def validate_entry(response: Response) -> bool:
+    def _validate_entry(self) -> bool:
         """
         Validate dictionary API response structure.
 
@@ -137,6 +149,8 @@ class WordDataProcessor(BaseWordDataProcessor):
             ValueError: If required fields are missing or have wrong types
             IndexError: If response is empty when entry expected
         """
+
+        response = self._response
 
         if not isinstance(response, list):
             raise TypeError(f"Response must be a list, got {type(response).__name__}")
@@ -172,8 +186,9 @@ class WordDataProcessor(BaseWordDataProcessor):
 
         return True
 
-    @staticmethod
-    def _parse_audio(entry: dict) -> str | None:
+    def _parse_audio(self) -> str | None:
+
+        entry = self._response[0]
 
         phonetics = entry.get("phonetics")
         if phonetics:
@@ -183,8 +198,7 @@ class WordDataProcessor(BaseWordDataProcessor):
 
         return None
 
-    @staticmethod
-    def _parse_definitions(entry: dict[str, dict]) -> dict[str, dict[str, list[str]]]:
+    def _parse_definitions(self) -> dict[str, dict[str, list[str]]]:
         """
         Parse dictionary entry to extract 2 definitions and 2 examples per part of speech.
 
@@ -205,6 +219,8 @@ class WordDataProcessor(BaseWordDataProcessor):
             }
         """
 
+        entry = self._response[0]
+
         meanings: dict | list = entry.get("meanings", [])
         definitions: dict[str, dict[str, list[str]]] = {}
 
@@ -220,7 +236,7 @@ class WordDataProcessor(BaseWordDataProcessor):
 
             for definition_obj in definitions_list:
 
-                if definitions_count < 2:
+                if definitions_count < self._max_definitions:
                     definition_text = definition_obj.get("definition")
                     if definition_text:
                         definitions[part_of_speech]["definitions"].append(definition_text)
@@ -247,8 +263,8 @@ class WordDataProcessor(BaseWordDataProcessor):
 
         word = entry.get("word", "")
         phonetic = entry.get("phonetic", "")
-        audio = self._parse_audio(entry)
-        definitions = self._parse_definitions(entry)
+        audio = self._parse_audio()
+        definitions = self._parse_definitions()
 
         cleaned_data = {
             "word": word,
