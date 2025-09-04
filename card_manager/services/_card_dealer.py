@@ -48,7 +48,6 @@ Response structure of dictionaryapi.dev:
 THESE ARE PROBLEMS WITH THIS MODULE:
 => Docstrings are inconcitent and bad. Do considtant styling: Google style, NumPy style. Choose.
 => Separate validation and parsing. How both responsibilities are handled by WordDataProcassor.
-=> Definition and example count logic is bad. Use generator and islise to take first n ex. and def.
 => Type hinting verbose?
 => if __name__ == "__main__": guard needed?
 ====================================================================================================
@@ -134,8 +133,8 @@ class ParsedWordData(TypedDict):
     """
 
     word: Required[str]
-    phonetic: NotRequired[str]
-    audio: NotRequired[str]
+    phonetic: NotRequired[str | None]
+    audio: NotRequired[str | None]
     definitions_by_pos: Required[dict[str, list[DefinitionExampleEntry]]]
 
 
@@ -154,7 +153,7 @@ class BaseDictApiParser(ABC):
     def _parse_definitions(self) -> dict[str, list[DefinitionExampleEntry]]: ...
 
     @abstractmethod
-    def parse_word_data(self) -> dict:
+    def parse_word_data(self) -> ParsedWordData:
         """Orchestrate parsing methosds to parse word datat from Response."""
 
 
@@ -274,7 +273,7 @@ class DictApiParser(BaseDictApiParser):
 
         return result
 
-    def parse_word_data(self) -> dict:
+    def parse_word_data(self) -> ParsedWordData:
         """
         This function processes and saves data.
         It can do processing and leave saving data to a view, for example.
@@ -282,19 +281,14 @@ class DictApiParser(BaseDictApiParser):
 
         entry = self._response[0]
 
-        word = entry.get("word", "")
-        phonetic = entry.get("phonetic", "")
-        audio = self._parse_audio()
-        def_by_pos = self._parse_definitions()
-
-        cleaned_data = {
-            "word": word,
-            "phonetic": phonetic,
-            "audio": audio,
-            "definitions_by_pos": def_by_pos,
+        parsed_data: ParsedWordData = {
+            "word": entry.get("word"),
+            "phonetic": entry.get("phonetic", ""),
+            "audio": self._parse_audio(),
+            "definitions_by_pos": self._parse_definitions(),
         }
 
-        return cleaned_data
+        return parsed_data
 
 
 # def get_and_save(input_word, deck_name, user):
