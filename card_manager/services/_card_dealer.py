@@ -47,7 +47,6 @@ Response structure of dictionaryapi.dev:
 ====================================================================================================
 THESE ARE PROBLEMS WITH THIS MODULE:
 => Docstrings are inconcitent and bad. Do considtant styling: Google style, NumPy style. Choose.
-=> Separate validation and parsing. How both responsibilities are handled by WordDataProcassor.
 => Type hinting verbose?
 => if __name__ == "__main__": guard needed?
 ====================================================================================================
@@ -60,8 +59,6 @@ from typing import NotRequired, Required, TypedDict
 
 import requests
 from requests import Response
-
-# from card_manager.models import Card, Deck
 
 
 class WordNotFoundError(Exception):
@@ -138,13 +135,10 @@ class ParsedWordData(TypedDict):
     definitions_by_pos: Required[dict[str, list[DefinitionExampleEntry]]]
 
 
-class BaseDictApiParser(ABC):
+class ApiResponseParser(ABC):
     """
     This is an interface for WordDataProcessor.
     """
-
-    @abstractmethod
-    def _validate_entry(self) -> bool: ...
 
     @abstractmethod
     def _parse_audio(self) -> str | None: ...
@@ -157,20 +151,20 @@ class BaseDictApiParser(ABC):
         """Orchestrate parsing methosds to parse word datat from Response."""
 
 
-class DictApiParser(BaseDictApiParser):
+class ResponseValidator(ABC):
 
-    def __init__(self, response: Response, max_definitions: int, max_examples: int) -> None:
+    @abstractmethod
+    def validate_responce(self) -> bool: ...
+
+
+class DictApiResponseValidator(ResponseValidator):
+
+    def __init__(self, response: Response) -> None:
         self._response = response
-        self._max_examples = max_examples
-        self._max_definitions = max_definitions
 
-    # data validation should be a responsibility of a separate class
-    def _validate_entry(self) -> bool:
+    def validate_responce(self) -> bool:
         """
         Validate dictionary API response structure.
-
-        Args:
-            response: API response to validate
 
         Returns:
             True if valid
@@ -216,6 +210,13 @@ class DictApiParser(BaseDictApiParser):
             raise ValueError("Field 'meanings' cannot be empty - at least one meaning required")
 
         return True
+
+
+class DictApiParser(ApiResponseParser):
+
+    def __init__(self, response: Response, max_definitions: int) -> None:
+        self._response = response
+        self._max_definitions = max_definitions
 
     def _parse_audio(self) -> str | None:
 
