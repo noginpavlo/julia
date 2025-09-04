@@ -57,6 +57,7 @@ THESE ARE PROBLEMS WITH THIS MODULE:
 import json
 from abc import ABC, abstractmethod
 from itertools import islice
+from typing import NotRequired, Required, TypedDict
 
 import requests
 from requests import Response
@@ -105,11 +106,40 @@ class DictApiDataFetcher(BaseApiDataFetcher):
 
 
 DICTIONARYAPI_URL = "https://api.dictionaryapi.dev/api/v2/entries/en/"
-data_fetcher = WordDataFetcher()
+data_fetcher = DictApiDataFetcher()
 data_fetcher.fetch_word_data("branch", DICTIONARYAPI_URL)
 
 
-class BaseDictApiDataParser(ABC):
+class DefinitionExampleEntry(TypedDict):
+    """
+    Represents a single dictionary entry for a word’s definition and optional example.
+
+    Fields:
+    - definition: The textual definition of the word (required).
+    - example: Example sentence illustrating the definition (optional).
+    """
+
+    definition: Required[str]
+    example: NotRequired[str | None]
+
+
+class ParsedWordData(TypedDict):
+    """Represents the parsed structure of a word from API response.
+
+    Fields:
+    - word: The word string (required).
+    - phonetic: Phonetic transcription (optional).
+    - audio: Optional audio URL (optional).
+    - definitions_by_pos: Mapping part-of-speech to a list of DefinitionExampleEntry (required).
+    """
+
+    word: Required[str]
+    phonetic: NotRequired[str]
+    audio: NotRequired[str]
+    definitions_by_pos: Required[dict[str, list[DefinitionExampleEntry]]]
+
+
+class BaseDictApiParser(ABC):
     """
     This is an interface for WordDataProcessor.
     """
@@ -121,14 +151,14 @@ class BaseDictApiDataParser(ABC):
     def _parse_audio(self) -> str | None: ...
 
     @abstractmethod
-    def _parse_definitions(self) -> dict[str, dict[str, list[str]]]: ...
+    def _parse_definitions(self) -> dict[str, list[DefinitionExampleEntry]]: ...
 
     @abstractmethod
     def parse_word_data(self) -> dict:
         """Orchestrate parsing methosds to parse word datat from Response."""
 
 
-class DictApiDataParser(BaseWordDataProcessor):
+class DictApiParser(BaseDictApiParser):
 
     def __init__(self, response: Response, max_definitions: int, max_examples: int) -> None:
         self._response = response
@@ -200,7 +230,7 @@ class DictApiDataParser(BaseWordDataProcessor):
 
         return None
 
-    def _parse_definitions(self) -> dict[str, dict[str, list[str]]]:
+    def _parse_definitions(self) -> dict[str, list[DefinitionExampleEntry]]:
         """
         Parse dictionary entry to extract definitions and examples per part of speech.
         Uses self._max_definitions and self._max_examples.
@@ -208,37 +238,39 @@ class DictApiDataParser(BaseWordDataProcessor):
         Returns:
             Dictionary structured as:
             {
-                "noun": {"definitions": [...], "examples": [...]},
-                "verb": {"definitions": [...], "examples": [...]}
+                "noun": [
+                    {"definition": "...", "example": "..."}, (DefinitionExampleEntry)
+                    {"definition": "..."}  # example optional (DefinitionExampleEntry)
+                ],
+                "verb": [
+                    ...
+                ]
             }
         """
 
         entry = self._response[0]
 
         meanings = entry.get("meanings")
-        result: dict[str, dict[str, list[str]]] = {}
+        result: dict[str, list[DefinitionExampleEntry]] = {}
 
-        for part_of_speech in meanings:
-            pos_type = part_of_speech.get("partOfSpeech", "word")
-            definitions_list = part_of_speech.get("definitions")
+        for meaning in meanings:
+            pos = meaning.get("partOfSpeech", "unknown_type")
+            def_list = meaning.get("definitions")
 
-            definitions_gen = (
-                definition.get("definition")
-                for definition in definitions_list
-                if definition.get("definition")
+            def_entry_gen = (
+                DefinitionExampleEntry(
+                    definition=d["definition"],
+                    example=(
+                        d.get("example") if d.get("example") and d.get("example").strip() else None
+                    ),
+                )
+                for d in def_list
+                if d.get("definition")
             )
 
-            examples_gen = (
-                example.get("example")
-                for example in definitions_list
-                if example.get("example") and example.get("example").strip()
-            )
+            entries_list = list(islice(def_entry_gen, self._max_definitions))
 
-            defs_list = list(islice(definitions_gen, self._max_definitions))
-            exs_list = list(islice(examples_gen, self._max_examples))
-
-            # reconsider return structure of result.
-            result[pos_type] = {"definitions": defs_list, "examples": exs_list}
+            result[pos] = entries_list
 
         return result
 
@@ -253,15 +285,13 @@ class DictApiDataParser(BaseWordDataProcessor):
         word = entry.get("word", "")
         phonetic = entry.get("phonetic", "")
         audio = self._parse_audio()
-        # Information includes partOfSpeech, definitions and examples.
-        # Are you sure it needs to be in one place?
-        information = self._parse_definitions()
+        def_by_pos = self._parse_definitions()
 
         cleaned_data = {
             "word": word,
             "phonetic": phonetic,
             "audio": audio,
-            "information": information,
+            "definitions_by_pos": def_by_pos,
         }
 
         return cleaned_data
