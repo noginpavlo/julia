@@ -23,9 +23,11 @@ THESE ARE PROBLEMS WITH THIS MODULE:
 import json
 from abc import ABC, abstractmethod
 from itertools import islice
-from typing import NotRequired, Required, TypedDict
+from typing import NotRequired, Required, Type, TypedDict
 
+import pinject
 import requests
+from pinject import BindingSpec
 from requests import Response
 
 
@@ -292,6 +294,12 @@ class DictApiParser(ApiResponseParser):
         return parsed_data
 
 
+# =================================================================================================
+# 🛠️ Services Section
+# High-level module that orchestrates mechanical classes.
+# =================================================================================================
+
+
 class ApiService(ABC):
 
     @abstractmethod
@@ -300,25 +308,53 @@ class ApiService(ABC):
 
 
 class DictApiServise(ApiService):
-
     def __init__(
         self,
-        fetcher: BaseApiDataFetcher | None = None,
-        validator_cls: type[ResponseValidator] | None = None,
-        parser_cls: type[ApiResponseParser] | None = None,
+        fetcher: BaseApiDataFetcher,
+        validator_cls: type[ResponseValidator],
+        parser_cls: type[ApiResponseParser],
         api_url: str = DICTIONARYAPI_URL,
-        max_definitions: int = 5,
-    ) -> None:
-
-        self._fetcher = fetcher or DictApiDataFetcher()
-        self._validator_cls = validator_cls or DictApiResponseValidator
-        self._parser_cls = parser_cls or DictApiParser
+        max_definitions: int = 2,
+    ):
+        self._fetcher = fetcher
+        self._validator_cls = validator_cls
+        self._parser_cls = parser_cls
         self._api_url = api_url
         self._max_definitions = max_definitions
 
     def get_word_data(self, word: str) -> ParsedWordData:
-
         response = self._fetcher.fetch_word_data(word, self._api_url)
-        data = response.json()  # this is done for validator, do this there later. not here
-        self._validator_cls().validate_response()
-        return self._parser_cls(data, self._max_definitions).parse_word_data()
+        validator = self._validator_cls()
+        validator.validate_response()
+        parser = self._parser_cls.(response.json(), self._max_definitions)
+        return parser.parse_word_data()
+
+
+class DictApiBindings(BindingSpec):
+    """
+    Defines how dependencies for DictApiService are provided.
+    """
+
+    def provide_fetcher(self) -> BaseApiDataFetcher:
+        return DictApiDataFetcher()
+
+    def provide_validator(self) -> type[ResponseValidator]:
+        return DictApiResponseValidator
+
+    def provide_parser(self) -> type[ApiResponseParser]:
+        return DictApiParser  # this and validator will be instantiated per call with parameters data
+
+
+class DictApiModule:
+    """
+    Factory for DictApiService with fully wired dependencies.
+    Encapsulates Pinject object graph.
+    """
+
+    _graph = None
+
+    @classmethod
+    def get_dict_service(cls) -> DictApiService:
+        if cls._graph is None:
+            cls._graph = pinject.new_object_graph(binding_specs=[DictApiBindings()])
+        return cls._graph.provide(DictApiService)
