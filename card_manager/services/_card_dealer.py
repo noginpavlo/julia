@@ -1,46 +1,14 @@
 """
-====================================================================================
-This is a mock module dockstring, make it better as soon as you complete the module.
-====================================================================================
-
 Module for fetching and processing English word data from dictionaryapi.dev.
 
 Responsibilities:
 - Fetch data from a 3rd-party dictionary API.
-- Validate and parse the response into a structured format.
+- Validate response structure before parsing.
+- Parse data removing redundant information.
 - Extract word definitions, examples, phonetics, and audio links.
 
 Exceptions:
 - WordNotFoundError: Raised when the API has no data for the requested word.
-
-Response structure of dictionaryapi.dev:
-
-[
-    {
-    "word": "string",
-    "phonetic": "string",
-    "phonetics": [
-        {
-        "text": "string",
-        "audio": "string (optional)" => usually a url
-        }
-    ],
-    "origin": "string",
-    "meanings": [
-        {
-        "partOfSpeech": "string",  => can include 2 or more parts of speech: noun, verb, etc.
-        "definitions": [
-            {
-            "definition": "string",
-            "example": "string (optional)",
-            "synonyms": ["string"],
-            "antonyms": ["string"]
-            }
-        ]
-        }
-]
-    }
-]
 """
 
 """
@@ -106,51 +74,6 @@ data_fetcher = DictApiDataFetcher()
 data_fetcher.fetch_word_data("branch", DICTIONARYAPI_URL)
 
 
-class DefinitionExampleEntry(TypedDict):
-    """
-    Represents a single dictionary entry for a word’s definition and optional example.
-
-    Fields:
-    - definition: The textual definition of the word (required).
-    - example: Example sentence illustrating the definition (optional).
-    """
-
-    definition: Required[str]
-    example: NotRequired[str | None]
-
-
-class ParsedWordData(TypedDict):
-    """Represents the parsed structure of a word from API response.
-
-    Fields:
-    - word: The word string (required).
-    - phonetic: Phonetic transcription (optional).
-    - audio: Optional audio URL (optional).
-    - definitions_by_pos: Mapping part-of-speech to a list of DefinitionExampleEntry (required).
-    """
-
-    word: Required[str]
-    phonetic: NotRequired[str | None]
-    audio: NotRequired[str | None]
-    definitions_by_pos: Required[dict[str, list[DefinitionExampleEntry]]]
-
-
-class ApiResponseParser(ABC):
-    """
-    This is an interface for WordDataProcessor.
-    """
-
-    @abstractmethod
-    def _parse_audio(self) -> str | None: ...
-
-    @abstractmethod
-    def _parse_definitions(self) -> dict[str, list[DefinitionExampleEntry]]: ...
-
-    @abstractmethod
-    def parse_word_data(self) -> ParsedWordData:
-        """Orchestrate parsing methosds to parse word datat from Response."""
-
-
 class ResponseValidator(ABC):
 
     @abstractmethod
@@ -158,6 +81,37 @@ class ResponseValidator(ABC):
 
 
 class DictApiResponseValidator(ResponseValidator):
+    """
+    Checks if response from dictionaryapi.dev matches expected structure.
+
+    Expected response structure of dictionaryapi.dev:
+    [
+        {
+        "word": "string",
+        "phonetic": "string",
+        "phonetics": [
+            {
+            "text": "string",
+            "audio": "string (optional)" => usually a url
+            }
+        ],
+        "origin": "string",
+        "meanings": [
+            {
+            "partOfSpeech": "string",  => can include 2 or more parts of speech: noun, verb, etc.
+            "definitions": [
+                {
+                "definition": "string",
+                "example": "string (optional)",
+                "synonyms": ["string"],
+                "antonyms": ["string"]
+                }
+            ]
+            }
+        ]
+        }
+    ]
+    """
 
     def __init__(self, response: Response) -> None:
         self._response = response
@@ -212,6 +166,51 @@ class DictApiResponseValidator(ResponseValidator):
         return True
 
 
+class DefinitionExampleEntry(TypedDict):
+    """
+    Represents a single dictionary entry for a word’s definition and optional example.
+
+    Fields:
+    - definition: The textual definition of the word (required).
+    - example: Example sentence illustrating the definition (optional).
+    """
+
+    definition: Required[str]
+    example: NotRequired[str | None]
+
+
+class ParsedWordData(TypedDict):
+    """Represents the parsed structure of a word from API response.
+
+    Fields:
+    - word: The word string (required).
+    - phonetic: Phonetic transcription (optional).
+    - audio: Optional audio URL (optional).
+    - definitions_by_pos: Mapping part-of-speech to a list of DefinitionExampleEntry (required).
+    """
+
+    word: Required[str]
+    phonetic: NotRequired[str | None]
+    audio: NotRequired[str | None]
+    definitions_by_pos: Required[dict[str, list[DefinitionExampleEntry]]]
+
+
+class ApiResponseParser(ABC):
+    """
+    This is an interface for DictApiParser.
+    """
+
+    @abstractmethod
+    def _parse_audio(self) -> str | None: ...
+
+    @abstractmethod
+    def _parse_definitions(self) -> dict[str, list[DefinitionExampleEntry]]: ...
+
+    @abstractmethod
+    def parse_word_data(self) -> ParsedWordData:
+        """Orchestrate parsing methosds to parse word datat from Response."""
+
+
 class DictApiParser(ApiResponseParser):
 
     def __init__(self, response: Response, max_definitions: int) -> None:
@@ -233,7 +232,7 @@ class DictApiParser(ApiResponseParser):
     def _parse_definitions(self) -> dict[str, list[DefinitionExampleEntry]]:
         """
         Parse dictionary entry to extract definitions and examples per part of speech.
-        Uses self._max_definitions and self._max_examples.
+        Uses self._max_definitions.
 
         Returns:
             Dictionary structured as:
