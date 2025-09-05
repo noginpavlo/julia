@@ -77,7 +77,7 @@ data_fetcher.fetch_word_data("branch", DICTIONARYAPI_URL)
 class ResponseValidator(ABC):
 
     @abstractmethod
-    def validate_responce(self) -> bool: ...
+    def validate_response(self) -> bool: ...
 
 
 class DictApiResponseValidator(ResponseValidator):
@@ -116,7 +116,7 @@ class DictApiResponseValidator(ResponseValidator):
     def __init__(self, response: Response) -> None:
         self._response = response
 
-    def validate_responce(self) -> bool:
+    def validate_response(self) -> bool:
         """
         Validate dictionary API response structure.
 
@@ -232,6 +232,7 @@ class DictApiParser(ApiResponseParser):
     def _parse_definitions(self) -> dict[str, list[DefinitionExampleEntry]]:
         """
         Parse dictionary entry to extract definitions and examples per part of speech.
+
         Uses self._max_definitions.
 
         Returns:
@@ -291,10 +292,33 @@ class DictApiParser(ApiResponseParser):
         return parsed_data
 
 
-# def get_and_save(input_word, deck_name, user):
-#
-#     try:
-#         response = get_data(input_word)
-#         return save_data(response.json(), deck_name, user)
-#     except WordNotFoundError as e:
-#         return str(e)  # raise error and leave it to handle at the correct lvl of abstraction
+class ApiService(ABC):
+
+    @abstractmethod
+    def get_word_data(self, word: str) -> ParsedWordData:
+        """Fetch, validate and parse word data from 3rd party api provider."""
+
+
+class DictApiServise(ApiService):
+
+    def __init__(
+        self,
+        fetcher: BaseApiDataFetcher | None = None,
+        validator_cls: type[ResponseValidator] | None = None,
+        parser_cls: type[ApiResponseParser] | None = None,
+        api_url: str = DICTIONARYAPI_URL,
+        max_definitions: int = 5,
+    ) -> None:
+
+        self._fetcher = fetcher or DictApiDataFetcher()
+        self._validator_cls = validator_cls or DictApiResponseValidator
+        self._parser_cls = parser_cls or DictApiParser
+        self._api_url = api_url
+        self._max_definitions = max_definitions
+
+    def get_word_data(self, word: str) -> ParsedWordData:
+
+        response = self._fetcher.fetch_word_data(word, self._api_url)
+        data = response.json()  # this is done for validator, do this there later. not here
+        self._validator_cls().validate_response()
+        return self._parser_cls(data, self._max_definitions).parse_word_data()
