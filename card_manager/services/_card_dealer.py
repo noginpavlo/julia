@@ -10,11 +10,11 @@ Exceptions:
 - WordNotFoundError: Raised if the word is not found in the API.
 """
 
+import time
 from abc import ABC, abstractmethod
 from itertools import islice
 from typing import Callable, NotRequired, Required, TypedDict
 
-import time
 import pinject
 import requests
 from pinject import BindingSpec
@@ -71,13 +71,8 @@ class DictApiDataFetcher(BaseApiDataFetcher):
 class ResponseValidator(ABC):
     """Abstract base class for validating API responses.
 
-    Subclasses must implement:
-        - __init__(response): Store the API response.
-        - validate_response(): Check if the response structure is valid.
-
     Methods:
-        validate_response(): Returns True if the response is valid, 
-            otherwise raises an exception.
+        validate_response(): Returns True if the response is matches expected structure.
     """
 
     @abstractmethod
@@ -89,8 +84,6 @@ class ResponseValidator(ABC):
 
 class DictApiResponseValidator(ResponseValidator):
     """Validate response structure from dictionaryapi.dev.
-
-    Checks if the API response matches the expected structure.
 
     Expected response format:
         [
@@ -127,17 +120,10 @@ class DictApiResponseValidator(ResponseValidator):
     def validate_response(self) -> bool:
         """Check if the dictionary API response has the correct structure.
 
-        Validates that the response is a non-empty list containing
-        dictionaries with required fields like "word" and "meanings".
-
         Returns:
-            bool: True if the response is valid.
-
-        Raises:
-            TypeError: If the response or entries are not the expected types.
-            ValueError: If required fields are missing or empty.
-            IndexError: If the response list is empty.
+            bool: True if the response matches expected structure.
         """
+
         response = self._response
 
         if not isinstance(response, list):
@@ -176,26 +162,14 @@ class DictApiResponseValidator(ResponseValidator):
 
 
 class DefinitionExampleEntry(TypedDict):
-    """A single dictionary entry with a definition and optional example.
-
-    Attributes:
-        definition (str): The text definition of the word (required).
-        example (str | None, optional): Example sentence for the definition.
-    """
+    """A single dictionary entry with a definition and optional example."""
 
     definition: Required[str]
     example: NotRequired[str | None]
 
 
 class ParsedWordData(TypedDict):
-    """Complete parsed word data structure from the API response.
-
-    Attributes:
-        word (str): The word itself (required).
-        phonetic (str, optional): Phonetic transcription of the word.
-        audio (str, optional): URL to audio pronunciation.
-        definitions_by_pos (dict[str, list[DefinitionExampleEntry]]): 
-    """
+    """Dictionary structure that the module must return in the end."""
 
     word: Required[str]
     phonetic: NotRequired[str | None]
@@ -203,16 +177,11 @@ class ParsedWordData(TypedDict):
     definitions_by_pos: Required[dict[str, list[DefinitionExampleEntry]]]
 
 
-class ApiResponseParser(ABC):
-    """Abstract base class for parsing API responses into structured word data.
-
-    Subclasses must implement:
-        - __init__(response, max_definitions): Store the response and
-          maximum number of definitions to parse.
-        - parse_word_data(): Extract word data into a ParsedWordData dict.
+class ApiParser(ABC):
+    """Abstract base class for parsing API responses into ParsedWordData format.
 
     Methods:
-        parse_word_data(): Returns parsed word data.
+        parse_word_data(): Returns ParsedWordData formatted data.
     """
 
     @abstractmethod
@@ -223,12 +192,11 @@ class ApiResponseParser(ABC):
         """Orchestrates parsing methosds to parse word datat from Response."""
 
 
-class DictApiParser(ApiResponseParser):
-    """Parse dictionaryapi.dev responses into structured word data.
+class DictApiParser(ApiParser):
+    """Parse dictionaryapi.dev responses into ParsedWordData format.
 
-    Extracts word, phonetic transcription, audio link, and definitions
-    grouped by part of speech. Limits definitions per part of speech
-    using `max_definitions`.
+    Extracts word, phonetics , audio link, and definitions grouped by part of speech.
+    Limits definitions per part of speech using `max_definitions`.
 
     Methods:
         parse_word_data(): Returns a ParsedWordData dictionary.
@@ -239,11 +207,7 @@ class DictApiParser(ApiResponseParser):
         self._max_definitions = max_definitions
 
     def _parse_audio(self) -> str | None:
-        """Extract the first available audio URL from the response.
-
-        Returns:
-            str | None: URL of the word's pronunciation audio if available, else None.
-        """
+        """Extracts phonetics and the first audio URL from Response."""
 
         entry = self._response[0]
 
@@ -256,13 +220,8 @@ class DictApiParser(ApiResponseParser):
         return None
 
     def _parse_definitions(self) -> dict[str, list[DefinitionExampleEntry]]:
-        """Extract definitions and examples grouped by part of speech.
-
-        Uses `max_definitions` to limit the number of definitions per part of speech.
-
-        Returns:
-            dict[str, list[DefinitionExampleEntry]]: Mapping of part-of-speech
-            to a list of definition/example entries.
+        """
+        Extracts definitions and examples grouped by part of speech, limited by `max_definitions`.
         """
 
         entry = self._response[0]
@@ -292,17 +251,13 @@ class DictApiParser(ApiResponseParser):
         return result
 
     def parse_word_data(self) -> ParsedWordData:
-        """Parse the API response into structured word data.
+        """Utilizes _parse_audio and _parse_definitions to return ParsedWordData dict.
 
         Extracts the word, phonetic transcription, audio link, and
         definitions grouped by part of speech.
-
-        Returns:
-            ParsedWordData: Dictionary containing parsed word data.
         """
 
         entry = self._response[0]
-        entry.json()
 
         parsed_data: ParsedWordData = {
             "word": entry.get("word"),
@@ -321,41 +276,31 @@ class DictApiParser(ApiResponseParser):
 
 
 class ApiService(ABC):
-    """Abstract base class for a service that fetches and parses word data.
-
-    Subclasses must implement `get_word_data` to return structured
-    word information from a third-party API.
-
-    Methods:
-        get_word_data(word): Fetch, validate, and parse data for a given word.
+    """
+    Abstract base class for a service that orchestrates low-level class methods
+    to fetch, validate and parse word data from 3rf party API provider.
     """
 
     @abstractmethod
-    def get_word_data(self, word: str) -> ParsedWordData:
-        """Fetch, validate and parse word data from 3rd party api provider."""
+    def get_word_data(self, word: str) -> ParsedWordData: ...
 
 
 class DictApiService(ApiService):
     """Service to fetch, validate, and parse word data from dictionaryapi.dev.
 
-    Combines a fetcher, validator, and parser to provide structured word data.
-
     Args:
-        fetcher (BaseApiDataFetcher): Object to fetch API responses.
-        validator_factory (Callable[[Response], ResponseValidator]): Factory to create a validator.
-        parser_factory (Callable[[Response, int], ApiResponseParser]): Factory to create a parser.
-        api_url (str, optional): Base URL of the API (default: DICTIONARYAPI_URL).
-        max_definitions (int, optional): Max definitions per part of speech (default: 2).
-
-    Methods:
-        get_word_data(word): Returns parsed word data for the given word.
+        fetcher: Object to fetch API responses.
+        validator_factory: Factory to create a validator.
+        parser_factory: Factory to create a parser.
+        api_url: Base URL of the API (default: DICTIONARYAPI_URL).
+        max_definitions: Max definitions per part of speech (default: 2).
     """
 
     def __init__(
         self,
         fetcher: BaseApiDataFetcher,
         validator_factory: Callable[[Response], ResponseValidator],
-        parser_factory: Callable[[Response, int], ApiResponseParser],
+        parser_factory: Callable[[Response, int], ApiParser],
         api_url: str = DICTIONARYAPI_URL,
         max_definitions: int = 2,
     ):
@@ -366,19 +311,7 @@ class DictApiService(ApiService):
         self._max_definitions = max_definitions
 
     def get_word_data(self, word: str) -> ParsedWordData:
-        """Fetch, validate, and parse data for a given word.
-
-        Args:
-            word (str): The word to retrieve data for.
-
-        Returns:
-            ParsedWordData: Structured word data including definitions,
-            phonetic transcription, and audio link.
-
-        Raises:
-            WordNotFoundError: If the word is not found by the API.
-            ValueError/TypeError/IndexError: If the API response is invalid.
-        """
+        """Fetch, validate, and parse data for a given word."""
 
         response = self._fetcher.fetch_word_data(word, self._api_url)
 
@@ -390,7 +323,7 @@ class DictApiService(ApiService):
 
 
 class DictApiBindings(BindingSpec):
-    """Provides dependencies for DictApiService using dependency injection.
+    """Provides dependencies for DictApiService using DI library Pinject.
 
     Decouples DictApiService from concrete fetcher, validator, and parser
     implementations by supplying them via factories.
@@ -398,7 +331,7 @@ class DictApiBindings(BindingSpec):
     Methods:
         provide_fetcher(): Returns a concrete BaseApiDataFetcher instance.
         provide_validator_factory(): Returns a factory for ResponseValidator.
-        provide_parser_factory(): Returns a factory for ApiResponseParser.
+        provide_parser_factory(): Returns a factory for ApiParser.
     """
 
     def provide_fetcher(self) -> BaseApiDataFetcher:
@@ -407,12 +340,12 @@ class DictApiBindings(BindingSpec):
     def provide_validator_factory(self) -> Callable[[Response], ResponseValidator]:
         return DictApiResponseValidator
 
-    def provide_parser_factory(self) -> Callable[[Response, int], ApiResponseParser]:
+    def provide_parser_factory(self) -> Callable[[Response, int], ApiParser]:
         return DictApiParser
 
 
 class DictApiModule:
-    """Factory for DictApiService with dependencies injected via Pinject.
+    """Factory for DictApiService with Pinject.
 
     Provides a single access point to DictApiService, wiring fetcher,
     validator, and parser according to DictApiBindings.
