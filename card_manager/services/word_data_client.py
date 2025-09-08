@@ -37,6 +37,12 @@ class WordNotFoundError(Exception):
         )
 
 
+# =================================================================================================
+# 🛠️ Fetcher section
+# Low-level module that fetches data from 3rd party api.
+# =================================================================================================
+
+
 class BaseApiDataFetcher(ABC):
     """Abstract base class for fetching word data from an API.
 
@@ -66,6 +72,12 @@ class DictApiDataFetcher(BaseApiDataFetcher):
             raise WordNotFoundError(word)
 
         return response
+
+
+# =================================================================================================
+# 🛠️ Validation section
+# Low-level module that validates data retrieved from API provider.
+# =================================================================================================
 
 
 class ResponseValidator(ABC):
@@ -159,6 +171,14 @@ class DictApiResponseValidator(ResponseValidator):
             raise ValueError("Field 'meanings' cannot be empty - at least one meaning required")
 
         return True
+
+
+# =================================================================================================
+# 🛠️ Parser section
+# Low-level module that parses validated data:
+#   - removes empty and excessive entries from Response.
+#   - defines structure of the data returned to the caller
+# =================================================================================================
 
 
 class DefinitionExampleEntry(TypedDict):
