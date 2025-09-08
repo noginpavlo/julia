@@ -23,7 +23,7 @@ THESE ARE PROBLEMS WITH THIS MODULE:
 import json
 from abc import ABC, abstractmethod
 from itertools import islice
-from typing import NotRequired, Required, Type, TypedDict
+from typing import Callable, NotRequired, Required, Type, TypedDict
 
 import pinject
 import requests
@@ -79,6 +79,9 @@ data_fetcher.fetch_word_data("branch", DICTIONARYAPI_URL)
 class ResponseValidator(ABC):
 
     @abstractmethod
+    def __init__(self, response: Response) -> None: ...
+
+    @abstractmethod
     def validate_response(self) -> bool: ...
 
 
@@ -132,6 +135,7 @@ class DictApiResponseValidator(ResponseValidator):
         """
 
         response = self._response
+        response.json()
 
         if not isinstance(response, list):
             raise TypeError(f"Response must be a list, got {type(response).__name__}")
@@ -203,6 +207,9 @@ class ApiResponseParser(ABC):
     """
 
     @abstractmethod
+    def __init__(self, response: Response, max_definitions: int) -> None: ...
+
+    @abstractmethod
     def _parse_audio(self) -> str | None: ...
 
     @abstractmethod
@@ -222,6 +229,7 @@ class DictApiParser(ApiResponseParser):
     def _parse_audio(self) -> str | None:
 
         entry = self._response[0]
+        entry.json()  # maybe you should do in ones in one place later!!
 
         phonetics = entry.get("phonetics")
         if phonetics:
@@ -251,6 +259,7 @@ class DictApiParser(ApiResponseParser):
         """
 
         entry = self._response[0]
+        entry.json()
 
         meanings = entry.get("meanings")
         result: dict[str, list[DefinitionExampleEntry]] = {}
@@ -283,6 +292,7 @@ class DictApiParser(ApiResponseParser):
         """
 
         entry = self._response[0]
+        entry.json()
 
         parsed_data: ParsedWordData = {
             "word": entry.get("word"),
@@ -307,26 +317,29 @@ class ApiService(ABC):
         """Fetch, validate and parse word data from 3rd party api provider."""
 
 
-class DictApiServise(ApiService):
+class DictApiService(ApiService):
+
     def __init__(
         self,
         fetcher: BaseApiDataFetcher,
-        validator_cls: type[ResponseValidator],
-        parser_cls: type[ApiResponseParser],
+        validator_factory: Callable[[Response], ResponseValidator],
+        parser_factory: Callable[[Response, int], ApiResponseParser],
         api_url: str = DICTIONARYAPI_URL,
         max_definitions: int = 2,
     ):
         self._fetcher = fetcher
-        self._validator_cls = validator_cls
-        self._parser_cls = parser_cls
+        self._validator_factory = validator_factory
+        self._parser_factory = parser_factory
         self._api_url = api_url
         self._max_definitions = max_definitions
 
     def get_word_data(self, word: str) -> ParsedWordData:
         response = self._fetcher.fetch_word_data(word, self._api_url)
-        validator = self._validator_cls()
+
+        validator = self._validator_factory(response)
         validator.validate_response()
-        parser = self._parser_cls.(response.json(), self._max_definitions)
+
+        parser = self._parser_factory(response, self._max_definitions)
         return parser.parse_word_data()
 
 
@@ -338,11 +351,11 @@ class DictApiBindings(BindingSpec):
     def provide_fetcher(self) -> BaseApiDataFetcher:
         return DictApiDataFetcher()
 
-    def provide_validator(self) -> type[ResponseValidator]:
+    def provide_validator_factory(self) -> Callable[[Response], ResponseValidator]:
         return DictApiResponseValidator
 
-    def provide_parser(self) -> type[ApiResponseParser]:
-        return DictApiParser  # this and validator will be instantiated per call with parameters data
+    def provide_parser_factory(self) -> Callable[[Response, int], ApiResponseParser]:
+        return DictApiParser
 
 
 class DictApiModule:
