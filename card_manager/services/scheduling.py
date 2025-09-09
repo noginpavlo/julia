@@ -1,27 +1,5 @@
-import os
-import sys
-from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
 from typing import TypedDict
-
-import django
-
-from card_manager.models import Card
-
-# Set the default settings module for Django and initialize Django
-# (needed for standalone scripts that interact with django)
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "julia.settings")
-django.setup()
-
-
-# sm2 constants
-BASE_EF_INCREMENT = 0.1
-QUALITY_PENALTY_BASE = 0.08
-QUALITY_PENALTY_FACTOR = 0.02
-MAX_QUALITY = 5
-MIN_EF = 1.3
 
 
 class SchedulingData(TypedDict):
@@ -33,20 +11,32 @@ class SchedulingData(TypedDict):
     due_date: datetime
 
 
-class BaseScheduler(ABC):
+class SM2Config:
 
-    @staticmethod
-    @abstractmethod
+    def __init__(
+        self,
+        base_ef_increment: float = 0.1,
+        quality_penalty_base: float = 0.08,
+        quality_penalty_factor: float = 0.02,
+        max_quality: int = 5,
+        min_ef: float = 1.3,
+    ) -> None:
+
+        self._base_ef_increment = base_ef_increment
+        self._quality_penalty_base = quality_penalty_base
+        self._quality_penalty_factor = quality_penalty_factor
+        self._max_quality = max_quality
+        self._min_ef = min_ef
+
+
+class SM2Scheduler:
+
+    def __init__(self, config: SM2Config = None) -> None:
+
+        self.config = config or SM2Config()
+
     def calculate_scheduling_data(
-        repetitions: int, interval: float, ef: float, quality: int
-    ) -> SchedulingData: ...
-
-
-class SM2Scheduler(BaseScheduler):
-
-    @staticmethod
-    def calculate_scheduling_data(
-        repetitions: int, interval: float, ef: float, quality: int
+        self, repetitions: int, interval: float, ef: float, quality: int
     ) -> SchedulingData:
         """
         Pure SM2 calculation: returns updated spaced repetition data
@@ -76,13 +66,12 @@ class SM2Scheduler(BaseScheduler):
                 interval = interval * ef
                 repetitions += 1
 
-        new_ef = ef + (
-            BASE_EF_INCREMENT
-            - (MAX_QUALITY - quality)
-            * (QUALITY_PENALTY_BASE + (MAX_QUALITY - quality) * QUALITY_PENALTY_FACTOR)
+        penalty = (self.config.max_quality - quality) * (
+            self.config.quality_penalty_base
+            + (self.config.max_quality - quality) * self.config.quality_penalty_factor
         )
-        ef = max(new_ef, MIN_EF)
-
+        new_ef = ef + self.config.base_ef_increment - penalty
+        ef = max(new_ef, self.config.min_ef)
         interval_days = round(interval)
         due_date = datetime.now() + timedelta(days=interval_days)
 
@@ -95,42 +84,3 @@ class SM2Scheduler(BaseScheduler):
         }
 
         return result
-
-
-def sm2(card_id, user_feedback, user):
-    """
-    Does this function calculates sm2 and saves the data to the db?
-    It should just calculate the parametars and return them for the caller to db-save
-    """
-
-    card = Card.objects.get(id=card_id, deck__user=user)
-
-    card.quality = user_feedback  # quality corresponds to digit values easy medium hard 1,2,3
-    # make a dict of relateions between quality and the number for robustness
-    card.save(update_fields=["quality"])  # do it in view that updates something like this
-
-    if user_feedback < 3:
-        Card.objects.filter(id=card.id).update(
-            interval=1,
-            repetitions=0,
-        )
-    else:
-        if card.repetitions == 0:
-            Card.objects.filter(id=card.id).update(interval=1, repetitions=F("repetitions") + 1)
-        elif card.repetitions == 1:
-            Card.objects.filter(id=card.id).update(interval=3, repetitions=F("repetitions") + 1)
-        else:
-            Card.objects.filter(id=card.id).update(
-                interval=F("interval") * F("ef"), repetitions=F("repetitions") + 1
-            )
-
-    card.refresh_from_db(fields=["interval", "repetitions", "ef"])
-
-    # parameters hardcoded? what if I want to change them later?
-    new_ef = card.ef + (0.1 - (5 - user_feedback) * (0.08 + (5 - user_feedback) * 0.02))
-    card.ef = max(new_ef, 1.3)
-
-    interval_days = round(float(card.interval))
-    card.due_date = timezone.now() + timedelta(days=interval_days)
-
-    card.save(update_fields=["ef", "due_date"])
