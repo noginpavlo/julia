@@ -209,6 +209,8 @@ def sm2(card_id, user_feedback, user):
 
     card.save(update_fields=["ef", "due_date"])
 
+# ===========================================================================================
+# THIS IS THE END
 
 @log_errors
 def update_card(request, user):

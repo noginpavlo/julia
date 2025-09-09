@@ -22,6 +22,13 @@ from requests import Response
 
 DICTIONARYAPI_URL = "https://api.dictionaryapi.dev/api/v2/entries/en/"
 
+# Set the default settings module for Django and initialize Django
+# (needed for standalone scripts that interact with django)
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "julia.settings")
+django.setup()
+
 
 class WordNotFoundError(Exception):
     """Exception raised when a word is not found in API used.
