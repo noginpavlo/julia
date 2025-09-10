@@ -8,9 +8,9 @@ class OutOfRangeError(ValueError):
 
     def __init__(self, param: str, value: float, min_val: float, max_val: float) -> None:
         message = (
-        f"Invalid value for {param}: {value}. "
-        f"Expected value should be in {min_val} - {max_val} range."
-    )
+            f"Invalid value for {param}: {value}."
+            f"Expected value should be in {min_val} - {max_val} range."
+        )
 
         super().__init__(message)
         self.param = param
@@ -20,6 +20,10 @@ class OutOfRangeError(ValueError):
 
 
 class SchedulingData(TypedDict):
+    """TypedDict for SM2 result ensuring correct return structure.
+
+    Defines the structure returned by `SM2Scheduler.calculate_scheduling_data()`.
+    """
 
     quality: int
     ef: float
@@ -68,6 +72,11 @@ class SM2Config:
 
 
 class SM2Scheduler:
+    """SM2 spaced repetition scheduler.
+
+    Uses an `SM2Config` to calculate review intervals and easiness
+    factors. Core logic is in `calculate_scheduling_data()`.
+    """
 
     def __init__(self, config: SM2Config | None = None) -> None:
 
@@ -77,8 +86,7 @@ class SM2Scheduler:
         self, repetitions: int, interval: float, ef: float, quality: int
     ) -> SchedulingData:
         """
-        Pure SM2 calculation: returns updated spaced repetition data
-        without touching the database.
+        Pure SM2 calculation: returns updated spaced repetition data.
 
         Args:
             repetitions: Number of successful repetitions so far
@@ -87,11 +95,11 @@ class SM2Scheduler:
             quality: User feedback (1=hard, 2=medium, 3=easy)
 
         Returns:
-            SchedulingData dict containing updated values
+            SchedulingData dict containing updated values.
         """
 
         if quality < 3:
-            repetitions = 0
+            repetitions = 0  # hardcodes values !!! make them part of config later
             interval = 1
         else:
             if repetitions == 0:
@@ -111,7 +119,9 @@ class SM2Scheduler:
         new_ef = ef + self.config.base_ef_increment - penalty
         ef = max(new_ef, self.config.min_ef)
         interval_days = round(interval)
-        due_date = datetime.now() + timedelta(days=interval_days)
+        due_date = datetime.now() + timedelta(
+            days=interval_days
+        )  # datetime.utcnow() or allow injection of “current time” for testing
 
         result: SchedulingData = {
             "quality": quality,
