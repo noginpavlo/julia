@@ -1,5 +1,22 @@
+from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import TypedDict
+
+
+class OutOfRangeError(ValueError):
+    """Raises an error when SM2Config values are out of reasonable range."""
+
+    def __init__(self, param: str, value: float, min_val: float, max_val: float) -> None:
+        message = (
+        f"Invalid value for {param}: {value}. "
+        f"Expected value should be in {min_val} - {max_val} range."
+    )
+
+        super().__init__(message)
+        self.param = param
+        self.value = value
+        self.min_val = min_val
+        self.max_val = max_val
 
 
 class SchedulingData(TypedDict):
@@ -11,27 +28,48 @@ class SchedulingData(TypedDict):
     due_date: datetime
 
 
+@dataclass
 class SM2Config:
+    """Config for the SM2 spaced repetition algorithm.
 
-    def __init__(
-        self,
-        base_ef_increment: float = 0.1,
-        quality_penalty_base: float = 0.08,
-        quality_penalty_factor: float = 0.02,
-        max_quality: int = 5,
-        min_ef: float = 1.3,
-    ) -> None:
+    Parameters are validated (if customized) to keep values within reasonable ranges
+    derived from the original SM2 algorithm. This prevents unstable scheduling
+    (e.g., negative or exploding intervals).
 
-        self._base_ef_increment = base_ef_increment
-        self._quality_penalty_base = quality_penalty_base
-        self._quality_penalty_factor = quality_penalty_factor
-        self._max_quality = max_quality
-        self._min_ef = min_ef
+    Attributes:
+        base_ef_increment (float): EF gain on success (range 0–1.0, default 0.1).
+        quality_penalty_base (float): Base EF penalty (range 0–0.5, default 0.08).
+        quality_penalty_factor (float): Scales penalty with low quality
+            (range 0–0.1, default 0.02).
+        max_quality (int): Maximum quality grade (range 1–10, default 5).
+        min_ef (float): Minimum EF allowed (range 1.0–2.0, default 1.3).
+
+    Raises:
+        OutOfRangeError: If any parameter is outside its range.
+    """
+
+    base_ef_increment: float = 0.1
+    quality_penalty_base: float = 0.08
+    quality_penalty_factor: float = 0.02
+    max_quality: int = 5
+    min_ef: float = 1.3
+
+    def __post_init__(self) -> None:
+        if not 0 < self.base_ef_increment <= 1.0:
+            raise OutOfRangeError("base_ef_increment", self.base_ef_increment, 0, 1.0)
+        if not 0 <= self.quality_penalty_base <= 0.5:
+            raise OutOfRangeError("quality_penalty_base", self.quality_penalty_base, 0, 0.5)
+        if not 0 <= self.quality_penalty_factor <= 0.1:
+            raise OutOfRangeError("quality_penalty_factor", self.quality_penalty_factor, 0, 0.1)
+        if not 1 <= self.max_quality <= 10:
+            raise OutOfRangeError("max_quality", self.max_quality, 1, 10)
+        if not 1.0 <= self.min_ef <= 2.0:
+            raise OutOfRangeError("min_ef", self.min_ef, 1.0, 2.0)
 
 
 class SM2Scheduler:
 
-    def __init__(self, config: SM2Config = None) -> None:
+    def __init__(self, config: SM2Config | None = None) -> None:
 
         self.config = config or SM2Config()
 

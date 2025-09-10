@@ -155,7 +155,7 @@ def show_card(deck_name, user):
 
 
 @log_errors
-def increment_daily_learning(user):
+def increment_daily_learning(user):  # this is related to data collected from the user not to sm2
     today = date.today()
 
     stat, created = ShowCardDailyStat.objects.get_or_create(user=user, date=today)
