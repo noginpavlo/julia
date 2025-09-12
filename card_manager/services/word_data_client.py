@@ -143,15 +143,18 @@ class DictApiResponseValidator(ResponseValidator):
             bool: True if the response matches expected structure.
         """
 
-        response = self._response
+        try:
+            data = self._response.json()
+        except Exception as e:
+            raise ValueError(f"Invalid JSON in response: {e}") from e
 
-        if not isinstance(response, list):
-            raise TypeError(f"Response must be a list, got {type(response).__name__}")
+        if not isinstance(data, list):
+            raise TypeError(f"Response must be a list, got {type(data).__name__}")
 
-        if len(response) == 0:
+        if len(data) == 0:
             raise IndexError("Response list is empty - no dictionary entries found")
 
-        entry = response[0]
+        entry = data[0]
 
         if not isinstance(entry, dict):
             raise TypeError(f"Dictionary entry must be a dict, got {type(entry).__name__}")
