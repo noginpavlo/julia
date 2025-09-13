@@ -27,7 +27,7 @@ The goal is to create a lightweight and intuitive system for spaced repetition, 
 ## Tech Stack
 
 - **Backend:** Django (Python)
-- **Database:** PostgreSQL, Reddis
+- **Database:** PostgreSQL, Redis
 - **Frontend:** React, JS, HTML5 UP template (customized)
 - **Templating:** Django Templates
 - **Other:** Celery
