@@ -1,4 +1,4 @@
-# Julia 🧠📚 (Work in Progress)
+# Julia 🧠📚 Use spaced repetition to learn English words (and never forget them)
 
 **Disclaimer:** This project is currently under development but not far from completion. The projects is evolving though. Stay tuned for updates as things evolve! 🚧
 
