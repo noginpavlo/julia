@@ -1,6 +1,6 @@
 # Julia 🧠📚 (Work in Progress)
 
-**Disclaimer:** This project is currently under active development and far from completion. Features may be incomplete, buggy, or entirely missing. Stay tuned for updates as things evolve! 🚧
+**Disclaimer:** This project is currently under development but not far from completion. The projects is evolving though. Stay tuned for updates as things evolve! 🚧
 
 ---
 
