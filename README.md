@@ -17,8 +17,8 @@ The goal is to create a lightweight and intuitive system for spaced repetition, 
 - [x] Basic Django setup and project structure
 - [x] User authentication
 - [x] CRUD operations for cards and decks
-- [ ] Deck-based learning sessions
-- [ ] Card review system with progress tracking
+- [x] Deck-based learning sessions
+- [x] Card review system with progress tracking
 - [ ] Responsive frontend with a clean UI
 - [x] Spaced repetition logic
 
@@ -27,9 +27,10 @@ The goal is to create a lightweight and intuitive system for spaced repetition, 
 ## Tech Stack
 
 - **Backend:** Django (Python)
-- **Database:** PostgreSQL
+- **Database:** PostgreSQL, Reddis
 - **Frontend:** React, JS, HTML5 UP template (customized)
 - **Templating:** Django Templates
+- **Other:** Celery
 
 ---
 
