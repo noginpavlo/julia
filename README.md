@@ -6,7 +6,7 @@
 
 ## What is Julia?
 
-**Julia** is a Django-based web app designed to help users learn and memorize new words efficiently — inspired by tools like Anki. Users can create, update, review, and delete **CRUD** flashcards organized into decks, making vocabulary learning interactive and personalized.
+**Julia** is a Django-based web app designed to help users learn and memorize new words efficiently — inspired by tools like Anki. Users can create, update, review, and delete (**CRUD**) flashcards organized into decks, making vocabulary learning interactive and personalized.
 
 The goal is to create a lightweight and intuitive system for spaced repetition, using modern web technologies and simple UI.
 
