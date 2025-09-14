@@ -1,3 +1,4 @@
+# this module might be redundant. This just queries a db for random cards. veiw + model?
 from card_manager.models import Card
 
 
