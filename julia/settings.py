@@ -10,9 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import os
 from datetime import timedelta
 from pathlib import Path
-import os
+
 import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -36,15 +37,13 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
 ]
 
 SOCIALACCOUNT_PROVIDERS = {
-    "google": {
-        "APP": {"client_id": GOOGLE_CLIENT_ID, "secret": GOOGLE_SECRET_KEY, "key": ""}
-    }
+    "google": {"APP": {"client_id": GOOGLE_CLIENT_ID, "secret": GOOGLE_SECRET_KEY, "key": ""}}
 }
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS: list[str] = []
 
 # Application definition
 INSTALLED_APPS = [

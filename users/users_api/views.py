@@ -17,6 +17,7 @@ User = get_user_model()
 
 
 class RegisterView(generics.CreateAPIView):
+    # add docstring
     serializer_class = RegisterSerializer
     permission_classes = [AllowAny]
 
@@ -25,15 +26,17 @@ class RegisterView(generics.CreateAPIView):
 
 
 class GoogleAuthView(APIView):
+    # add docstring
     permission_classes = [AllowAny]  # is it final?
 
-    def post(self, request):
+    def post(self, request):  # type hints
         token_id = request.data.get("token")
         if not token_id:
             return Response({"error": "No token provided"}, status=400)
 
         google_response = requests.get(
-            f"https://oauth2.googleapis.com/tokeninfo?id_token={token_id}"
+            f"https://oauth2.googleapis.com/tokeninfo?id_token={token_id}",
+            timeout=None,  # think if want to change timeout + retry request
         )
 
         if not google_response.ok:
@@ -46,7 +49,7 @@ class GoogleAuthView(APIView):
         if not email:
             return Response({"error": "Email not provided by Google"}, status=400)
 
-        user, created = User.objects.get_or_create(
+        user, _ = User.objects.get_or_create(
             email=email, defaults={"username": email.split("@")[0], "first_name": name}
         )
 
@@ -56,14 +59,13 @@ class GoogleAuthView(APIView):
             status=status.HTTP_200_OK,
         )
         set_refresh_cookie(response, tokens["refresh"])
-        print("THIS IS REFRESH TOKEN FROM GoogleAuthView")
-        # print(tokens["refresh"])
-        print(response.cookies.get("refresh_token"))
+        print("THIS IS REFRESH TOKEN FROM GoogleAuthView")  # logger
+        print(response.cookies.get("refresh_token"))  # logger
 
         return response
 
 
-def set_refresh_cookie(response, refresh_token: str):
+def set_refresh_cookie(response, refresh_token: str):  # type hints
     response.set_cookie(
         key="refresh_token",
         value=refresh_token,
@@ -90,13 +92,14 @@ def generate_tokens(user):
 
 
 class SocialLoginJWTView(APIView):
+    # add docstring
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
+    def get(self, request):  # type hints
         user = request.user
         access_token = str(AccessToken.for_user(user))
 
-        print(f"Access token: {access_token}")
+        print(f"Access token: {access_token}")  # logger
 
         return Response(
             data={"access": access_token, "username": user.username},
@@ -108,6 +111,7 @@ class SocialLoginJWTView(APIView):
 
 
 class CookieTokenObtainPairView(TokenObtainPairView):
+    # add docstrings
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         try:
@@ -129,7 +133,8 @@ class CookieTokenObtainPairView(TokenObtainPairView):
 
 
 class CookieTokenRefreshView(TokenRefreshView):
-    def post(self, request, *args, **kwargs):
+    # add docstring
+    def post(self, request, *args, **kwargs):  # really need args and kwargs?
         refresh_token = request.COOKIES.get("refresh_token")
         if not refresh_token:
             return Response(
@@ -140,23 +145,24 @@ class CookieTokenRefreshView(TokenRefreshView):
         serializer = TokenRefreshSerializer(data={"refresh": refresh_token})
         try:
             serializer.is_valid(raise_exception=True)
-        except Exception:
+        except Exception:  # too general excepton + controlling logic flow with try/except
             return Response(
                 {"detail": "Invalid or expired refresh token."},
                 status=status.HTTP_401_UNAUTHORIZED,
             )
-        print("This is tokens from CookieTokenRefreshView. WHEN PASSWORD AUTH")
-        print(serializer.validated_data)
+        print("This is tokens from CookieTokenRefreshView. WHEN PASSWORD AUTH")  # logger
+        print(serializer.validated_data)  # logger
         tester = Response(serializer.validated_data)
-        print(dir(tester))
+        print(dir(tester))  # logger
 
         return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
 
 class LogoutView(APIView):
+    # add docstring
     permission_classes = [IsAuthenticated]
 
-    def post(self, request):
+    def post(self, request):  # unused request
         response = Response({"detail": "Logged out"}, status=200)
         response.set_cookie(
             key="refresh_token",

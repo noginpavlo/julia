@@ -1,5 +1,5 @@
 """
-This module is convoluted and hard to grasp. Redesign it. Use OOP and adhere to SOLID
+This module is convoluted and hard to read. Redesign it. Use OOP and adhere to SRP. 
 """
 import logging
 import socket

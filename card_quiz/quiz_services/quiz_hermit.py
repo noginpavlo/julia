@@ -1,16 +1,18 @@
-# this module might be redundant. This just queries a db for random cards. veiw + model?
+"""Rewrite the module. Use OOP. Use SRP and SOLID in general."""
 from card_manager.models import Card
 
 
-def get_quiz_cards(user, deck_ids):
+def get_quiz_cards(user, deck_ids):  # type hinting
+    # add docstring
     def fetch_cards(queryset, count):
         return list(
             queryset.order_by("?")[
                 :count
-            ]  # django docs from DOU suggest that you need to avoid order_by(?). Study why!
+            ]
         )  # returns rows in random order (SQL =>ORDER BY RANDOM())
 
     base_qs = Card.objects.filter(deck__user=user, deck_id__in=deck_ids)
+    # + .select_related("deck")?
 
     hard_qs = base_qs.filter(ef__gte=1.3, ef__lt=2.0)
     medium_qs = base_qs.filter(ef__gte=2.0, ef__lt=3.5)
@@ -42,5 +44,5 @@ def get_quiz_cards(user, deck_ids):
 
         combined += fallback_cards
 
-    print(combined)
+    print(combined)  # logger
     return combined
