@@ -2,7 +2,7 @@
 
 **Use spaced repetition to learn English words — and never forget them!**  
 
-🚧 **Status:** Master branch under construction/MVP is complete.
+🚧 **Status:** Master branch under construction / MVP is complete.
 - MVP branch: Functional but not ideal, contains working backend and simple frontend for testing.  
 - Master branch: Currently being refactored to adhere to **SOLID principles, OOP best practices**, and clean architecture.  
 
@@ -21,7 +21,7 @@ The goal is to provide a **lightweight, intuitive spaced repetition system** usi
 ## **Features**
 
 - Basic Django setup and project structure  
-- User authentication (Google/GitHub + email/password)  
+- User authentication (Google/GitHub Oauth + email/password)  
 - CRUD operations for **cards** and **decks**  
 - Deck-based learning sessions  
 - Card review system with progress tracking  
@@ -35,40 +35,61 @@ The goal is to provide a **lightweight, intuitive spaced repetition system** usi
 
 ## **Tech Stack**
 
-| Layer | Technology | Icon |
-|-------|------------|------|
-| Backend | Django | 🐍 |
-| API | Django REST Framework | 🔗 |
-| Database | PostgreSQL | 🗄️ |
-| Caching/Queue | Redis & Celery | ⚡ |
-| Frontend | React | ⚛️ |
-| Templates | Django Templates / HTML5 UP | 🎨 |
-| Authentication | Google / GitHub OAuth + local | 🔑 |
-| Testing | pytest | 🧪 |
+| Layer | Technologies |
+|-------|--------------|
+| **Backend** | ![Python](https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white) ![Django](https://img.shields.io/badge/Django-092E20?style=flat&logo=django&logoColor=white) ![DRF](https://img.shields.io/badge/DRF-ff1709?style=flat&logo=django&logoColor=white) ![Celery](https://img.shields.io/badge/Celery-37814A?style=flat&logo=celery&logoColor=white) ![Asyncio](https://img.shields.io/badge/Asyncio-008080?style=flat&logo=python&logoColor=white) |
+| **Database** | ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=flat&logo=postgresql&logoColor=white) ![Redis](https://img.shields.io/badge/Redis-DC382D?style=flat&logo=redis&logoColor=white) |
+| **Frontend** | ![React](https://img.shields.io/badge/React-20232A?style=flat&logo=react&logoColor=61DAFB) ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black) |
+| **Real-Time / Communication** | ![WebSockets](https://img.shields.io/badge/WebSockets-008000?style=flat) ![TCP](https://img.shields.io/badge/TCP-6A5ACD?style=flat) |
+| **Authentication & Security** | ![JWT](https://img.shields.io/badge/JWT-000000?style=flat) ![OAuth](https://img.shields.io/badge/OAuth-FF6F00?style=flat)
+| **Tools / DevOps** | ![Git](https://img.shields.io/badge/Git-F05032?style=flat&logo=git&logoColor=white) ![Linux](https://img.shields.io/badge/Linux-FCC624?style=flat&logo=linux&logoColor=black) |
 
 ---
 
-## **Installation (Development Only)**
 
-> Currently, only the code is available. Deployment instructions are not provided yet.  
+## **Installation & Usage (Development)**
 
-1. Ensure Python, pip, and PostgreSQL are installed.  
-2. Clone the repository:
+### Prerequisites
+Make sure you have **Python, pip, and PostgreSQL** installed.  
+Also, Node.js and npm are required for the React frontend.  
 
+### Clone the repository
 ```bash
 git clone https://github.com/noginpavlo/julia.git
 cd julia
 ```
+### Setup Python environment and dependencies
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -r requirements.txt
+```
+### Run Backend (ASGI / Uvicorn)
+```bash
+uvicorn julia.asgi:application --reload
+```
+> ⚠️ Do not use python manage.py runserver — Julia requires an ASGI server.
 
-## **Usage**
+### Run Celery Worker
+```bash
+celery -A julia worker -l info
+```
+
+### Run Frontend (React + Vite)
+```bash
+cd frontend
+npm install
+npm run dev
+```
+> The frontend communicates with the backend via DRF API.
+
+### Using the App
 
 - Use Django admin or React mock frontend to **create decks and cards**.  
 - Review cards using **spaced repetition (SM2)** — cards appear just before you forget.  
 - Track your **progress and statistics** in the app.  
-- Automatically generate new word cards via **[dictionaryapi.dev](https://dictionaryapi.dev/)**.  
-
-> Frontend is primarily for testing backend compatibility and basic CRUD workflow.
-
+- Automatically generate new word cards via **[dictionaryapi.dev](https://dictionaryapi.dev/)**.
+  
 ---
 
 ## **Screenshots**  
