@@ -1,10 +1,6 @@
-from rest_framework.serializers import (
-    Serializer,
-    ModelSerializer,
-    CharField,
-    BooleanField,
-)
-from card_manager.models import Deck, Card
+from rest_framework.serializers import BooleanField, CharField, ModelSerializer, Serializer
+
+from card_manager.models import Card, Deck
 
 
 class DeckSerializer(ModelSerializer):
@@ -24,17 +20,16 @@ class CardSerializer(ModelSerializer):
 
 
 class CardCreateSerializer(Serializer):
+    # add docstring
     word = CharField()
     deck_name = CharField()
 
-    def create(self, validated_data):
+    def create(self, validated_data):  # type hinting
         user = self.context["request"].user
         word = validated_data["word"]
         deck_name = validated_data["deck_name"]
 
-        """ 
-        Curated card creation in Celery.
-        """
+        # Curated card creation in Celery.
         from card_manager.tasks import create_card_task
 
         create_card_task.delay(
@@ -50,7 +45,7 @@ class ShowCardSerializer(ModelSerializer):
 
 
 class CardUpdateSerializer(ModelSerializer):
-    word = CharField(write_only=True, required=False, allow_blank=True)
+    word = CharField(write_only=True, required=False, allow_blank=True)  # cannot be blank. Required
     phonetic = CharField(write_only=True, required=False, allow_blank=True)
     meaning1 = CharField(write_only=True, required=False, allow_blank=True)
     meaning2 = CharField(write_only=True, required=False, allow_blank=True)
@@ -72,15 +67,15 @@ class CardUpdateSerializer(ModelSerializer):
         ]
         extra_kwargs = {"id": {"read_only": True}}
 
-    def update(self, instance, validated_data):
+    def update(self, instance, validated_data):  # type hinting
         from card_manager.services.card_dealer import update_data
 
         if validated_data.get("changed"):
-            try:
+            try:  # handling logic with try/except block
                 result = update_data(instance, validated_data)
                 if result != "success":
                     print(f"update_data failed: {result}")
-            except Exception as e:
-                print(f"Exception in update_data: {e}")
+            except Exception as e:  # too generic exception
+                print(f"Exception in update_data: {e}")  # logger here
 
         return instance

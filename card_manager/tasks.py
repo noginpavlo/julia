@@ -1,26 +1,32 @@
-from card_manager.services.card_dealer import get_and_save
-import traceback
-import socket
+"""
+This module is convoluted and hard to grasp. Redesign it. Use OOP and adhere to SOLID
+"""
 import logging
+import socket
+import traceback
+
 from asgiref.sync import async_to_sync
 from celery import shared_task
-from django.contrib.auth import get_user_model
 from channels.layers import get_channel_layer
+from django.contrib.auth import get_user_model
+
+from card_manager.services.card_dealer import get_and_save
 
 logger = logging.getLogger(__name__)
 
 
+# consider using OOP here
 @shared_task(bind=True)
 def create_card_task(
     self, word, deck_name, user_id
-):  # do not forget to remove debugging redundant logging lines
+):  # redesign this function completely.
 
     user_model = get_user_model()
     channel_layer = get_channel_layer()
 
     try:
         socket.create_connection(("localhost", 6379), timeout=2)
-    except Exception as e:
+    except Exception as e:  # too generic exception
         logger.warning(
             "❌ Redis is NOT reachable from Celery: %s(message from #card_manager/tasks.py, create_card_task)",
             e,
@@ -70,7 +76,7 @@ def create_card_task(
 
         return message
 
-    except Exception as e:
+    except Exception as e:  # too general exception
         logger.error("❌ Exception in create_card_task:")
         traceback.print_exc()
 
@@ -92,7 +98,7 @@ def create_card_task(
                 logger.info(
                     "✅ Error message sent to channel layer.(message from #card_manager/tasks.py, create_card_task)"
                 )
-            except Exception:
+            except Exception:  # too general exception
                 logger.error(
                     "❌ Failed to send error message via WebSocket:(message from #card_manager/tasks.py, create_card_task)"
                 )

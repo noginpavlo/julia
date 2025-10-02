@@ -3,9 +3,10 @@ from rest_framework.response import Response
 
 
 class CustomPageNumberPagination(PageNumberPagination):
+    # add docstring
     page_size = 10
 
-    def get_paginated_response(self, data):
+    def get_paginated_response(self, data):  # type hinting
         return Response(
             {
                 "count": self.page.paginator.count,

@@ -1,14 +1,14 @@
 from django.urls import path
+
 from .views import (
-    DeckListView,
-    CardListByDeckView,
     CardCreateView,
     CardDeleteView,
-    DeckDeleteView,
-    ShowCardAPIView,
+    CardListByDeckView,
     CardUpdateView,
+    DeckDeleteView,
+    DeckListView,
+    ShowCardAPIView,
 )
-
 
 urlpatterns = [
     path("decks/", DeckListView.as_view(), name="deck-list"),

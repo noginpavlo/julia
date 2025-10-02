@@ -1,3 +1,6 @@
+"""
+This module handles algoryttmic calculations needed for SM2 cards scheduling.
+"""
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import TypedDict

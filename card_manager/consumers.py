@@ -1,22 +1,20 @@
 import json
+
+from asgiref.sync import sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
-from asgiref.sync import sync_to_async
-from rest_framework_simplejwt.tokens import AccessToken
-from rest_framework_simplejwt.exceptions import (
-    InvalidToken,
-    TokenError,
-    AuthenticationFailed,
-)
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework_simplejwt.exceptions import AuthenticationFailed, InvalidToken, TokenError
+from rest_framework_simplejwt.tokens import AccessToken
 
 User = get_user_model()
 
 
-class CardProgressConsumer(AsyncWebsocketConsumer):
+class CardProgressConsumer(AsyncWebsocketConsumer):  # this class does too much. SRP
+    # add docstring
     async def connect(self):
-        # Extract token from subprotocols list
+        """Extracts token from subprotocols list"""
         token_str = None
         for proto in self.scope.get("subprotocols", []):
             if proto.startswith("access-token."):
@@ -36,14 +34,14 @@ class CardProgressConsumer(AsyncWebsocketConsumer):
                 self.channel_name,
             )
             await self.accept(subprotocol=f"access-token.{token_str}")
-            print(f"✅ WebSocket connected: user {user.username}")
+            print(f"✅ WebSocket connected: user {user.username}")  # logger
         else:
-            print("❌ WebSocket rejected: invalid or missing token")
+            print("❌ WebSocket rejected: invalid or missing token")  # logger
             await self.close()
 
     @staticmethod
     async def authenticate_user_from_token(token_str):
-        try:
+        try:  # try/except block for controlling logic flow
             AccessToken(token_str)
 
             jwt_authenticator = JWTAuthentication()
@@ -54,17 +52,17 @@ class CardProgressConsumer(AsyncWebsocketConsumer):
             return user
 
         except (User.DoesNotExist, InvalidToken, TokenError) as e:
-            print(f"❌ JWT auth failed: {e}")
+            print(f"❌ JWT auth failed: {e}")  # logger
             return AnonymousUser()
 
     async def disconnect(self, close_code):
-        print(f"🔌 Disconnected with code: {close_code}")
+        print(f"🔌 Disconnected with code: {close_code}")  # logger
         group = getattr(self, "group_name", None)
         if group:
             await self.channel_layer.group_discard(group, self.channel_name)
-            print(f"👋 Removed channel from group: {group}")
+            print(f"👋 Removed channel from group: {group}")  # logger
         else:
-            print("⚠️ No group_name found — skipping group discard.")
+            print("⚠️ No group_name found — skipping group discard.")  # logger
 
     async def card_status(self, event):
         await self.send(text_data=json.dumps(event["content"]))

@@ -19,6 +19,7 @@ from .serializers import (
 
 
 class DeckListView(ListAPIView):
+    # add docstring
     serializer_class = DeckSerializer
     permission_classes = [IsAuthenticated]
     pagination_class = CustomPageNumberPagination
@@ -34,6 +35,7 @@ class DeckListView(ListAPIView):
 
 
 class CardListByDeckView(ListAPIView):
+    # add docstring
     serializer_class = CardSerializer
     permission_classes = [IsAuthenticated]
     pagination_class = CustomPageNumberPagination
@@ -42,7 +44,7 @@ class CardListByDeckView(ListAPIView):
         deck_id = self.kwargs["deck_id"]
         card_queryset = Card.objects.filter(
             deck__id=deck_id, deck__user=self.request.user
-        ).order_by("due_date")
+        ).order_by("due_date")  # ).select_related("deck").order_by("due_date")?
 
         search_query = self.request.GET.get("search", "")
         if search_query:
@@ -52,6 +54,7 @@ class CardListByDeckView(ListAPIView):
 
 
 class CardCreateView(CreateAPIView):
+    # add docstring
     serializer_class = CardCreateSerializer
     permission_classes = [IsAuthenticated]
 
@@ -74,7 +77,7 @@ class CardCreateView(CreateAPIView):
             result = serializer.save()  # calls serializer.create(serializer.validated_data)
         except Exception:  # too generic exception
             return Response(
-                {"error": "Something went wrong."},
+                {"error": "Something went wrong."},  # not informative. Consider spivifying
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
@@ -85,10 +88,11 @@ class CardCreateView(CreateAPIView):
 
 
 class CardDeleteView(DestroyAPIView):
+    # add docstring
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Card.objects.filter(deck__user=self.request.user)
+        return Card.objects.filter(deck__user=self.request.user)  # + ).select_related("deck")?
 
     def delete(self, request, *args, **kwargs):
         card_id = kwargs.get("pk")
@@ -106,10 +110,10 @@ class DeckDeleteView(DestroyAPIView):
     def get_queryset(self):
         return Deck.objects.filter(user=self.request.user)
 
-    def delete(self, request, *args, **kwargs):
+    def delete(self, request, *args, **kwargs):  # do you really need args and kwargs?
         deck_id = kwargs.get("pk")
         deck = get_object_or_404(Deck, id=deck_id, user=request.user)
-        deck.delete()  # deletes the deck and all cards in deck (CASCADE)
+        deck.delete()
 
         return Response(
             {"message": "Deck and all its cards deleted successfully."},
@@ -118,15 +122,16 @@ class DeckDeleteView(DestroyAPIView):
 
 
 class ShowCardAPIView(APIView):
+    # add docstring
     permission_classes = [IsAuthenticated]
     # deck_name is hardcoded because 'Learn' redirects to the ShowCardAPIView instead of DeckListView (intended)
     # so when the correct redirect will be implemented the ShowCardAPIView will accept a deck selected by user
     deck_name = "animals"
 
     def get(self, request):
-        result = show_card(self.deck_name, request.user)
+        result = show_card(self.deck_name, request.user)  # calls redundant module -- card_manager.py
 
-        if result == "No cards left for today":
+        if result == "No cards left for today":  # fragile string condition check
             return Response(
                 {
                     "message": f"Congratulations☺️ You've learned all cards in '{self.deck_name}' deck for today."
@@ -147,27 +152,28 @@ class ShowCardAPIView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        try:
+        try:  # try/except block for controlling logic flow
             user_feedback = int(user_feedback)
             sm2(card_id, user_feedback, request.user)
-        except Exception as e:
+        except Exception as e:  # too generic, unused e variable
             return Response({"error": "Failed to update card."}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response({"message": "Card updated successfully."}, status=status.HTTP_200_OK)
 
 
 class CardUpdateView(UpdateAPIView):
+    # add docstring
     serializer_class = CardUpdateSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Card.objects.filter(deck__user=self.request.user)
+        return Card.objects.filter(deck__user=self.request.user)  # + ).select_related("deck")?
 
-    def patch(self, request, *args, **kwargs):
+    def patch(self, request, *args, **kwargs):  # need args and kwargs?
         card = self.get_object()
         serializer = CardUpdateSerializer(card, data=request.data, partial=True)
         if not serializer.is_valid():
-            print("Validation errors:", serializer.errors)
+            print("Validation errors:", serializer.errors)  # logger
             return Response(serializer.errors, status=400)
         serializer.save()
         return Response({"status": "updated"}, status=200)

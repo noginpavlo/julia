@@ -11,11 +11,13 @@ Exceptions:
 """
 
 import time
+import os
+import sys
 from abc import ABC, abstractmethod
 from itertools import islice
 from typing import Callable, NotRequired, Required, TypedDict
 
-import pinject
+import pinject  # this liberary might be unneccessery
 import requests
 from pinject import BindingSpec
 from requests import Response
@@ -37,7 +39,7 @@ class WordNotFoundError(Exception):
         word (str): The word that could not be found.
     """
 
-    def __init__(self, word):
+    def __init__(self, word: str) -> None:
         self.word = word
         super().__init__(
             f"Data not available for word {word}. Are you sure you spelled '{word}' correctly?"
@@ -73,7 +75,7 @@ class DictApiDataFetcher(BaseApiDataFetcher):
     def fetch_word_data(self, word: str, api_url: str) -> Response:
         word_url = f"{api_url}{word}"
 
-        response = requests.get(word_url, timeout=None)
+        response = requests.get(word_url, timeout=None)  # consider changing timeout + request retry
 
         if response.status_code == 404:
             raise WordNotFoundError(word)
@@ -352,6 +354,7 @@ class DictApiService(ApiService):
         return parser.parse_word_data()
 
 
+# do you really need to use DI libefary to satisfy DIP ones?
 class DictApiBindings(BindingSpec):
     """Provides dependencies for DictApiService using DI library Pinject.
 
