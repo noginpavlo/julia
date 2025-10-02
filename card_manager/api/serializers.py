@@ -39,7 +39,7 @@ class CardCreateSerializer(Serializer):
 
         create_card_task.delay(
             word, deck_name, user.id
-        )  # curates card creation in Redis for Celery to pick up later
+        )
         return word
 
 

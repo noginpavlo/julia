@@ -122,12 +122,9 @@ def delete_deck(deck_id, user):
     return f"Deck id {deck_id} deleted successfully"
 
 
-# This function shows the whole card including front and back. Handle showing a part of it on frontend
-# !!! Frontend will receive the whole card but will show only front then after click will show back
 @log_errors
 def show_card(deck_name, user):
 
-    # this function counts cards learned by user every day and saves the data to db
     increment_daily_learning(user)
 
     now = timezone.now()
@@ -158,7 +155,7 @@ def increment_daily_learning(user):
     if not created:
         stat.count = F("count") + 1
     else:
-        stat.count = 1  # First time today, set count to 1
+        stat.count = 1
 
     stat.save(update_fields=["count"])
     stat.refresh_from_db()
