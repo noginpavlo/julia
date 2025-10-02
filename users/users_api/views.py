@@ -21,7 +21,7 @@ class RegisterView(generics.CreateAPIView):
     permission_classes = [AllowAny]
 
 
-"""Google Oauth and tokens granting. No refresh token needed."""
+"""Google Oauth and tokens granting. No refresh token needed."""  # this should be explained in doctrings
 
 
 class GoogleAuthView(APIView):
@@ -112,7 +112,7 @@ class CookieTokenObtainPairView(TokenObtainPairView):
         serializer = self.get_serializer(data=request.data)
         try:
             serializer.is_valid(raise_exception=True)
-        except Exception:
+        except Exception:  # too generic exception + controlling logic flow with try/except block
             return Response({"detail": "Invalid credentials"}, status=401)
 
         user = serializer.user

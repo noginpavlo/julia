@@ -109,7 +109,7 @@ DATABASES = {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "julia",
         "USER": "highlander",
-        "PASSWORD": "qazwsxedc12",
+        "PASSWORD": "qazwsxedc12",  # use environ to hide it in public repo later
         "HOST": "localhost",
         "PORT": "5432",
     }
@@ -201,7 +201,7 @@ CHANNEL_LAYERS = {
     },
 }
 
-# Allow React frontend
+# Allow React to interact with backend. Corsheaders app.
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
 ]
