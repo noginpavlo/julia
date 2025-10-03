@@ -88,11 +88,12 @@ npm run dev
 - Use Django admin or React mock frontend to **create decks and cards**.
 - Register with username and password or Google OAuth
   ![Login GIF](assets/login.gif)
-- Create your first cards using automated interface
+-- Automatically generate new word cards via **[dictionaryapi.dev](https://dictionaryapi.dev/)**.
   ![Login GIF](assets/create.gif)
-- Review cards using **spaced repetition (SM2)** — cards appear just before you forget.  
-- Track your **progress and statistics** in the app.  
-- Automatically generate new word cards via **[dictionaryapi.dev](https://dictionaryapi.dev/)**.
+- Review cards using **spaced repetition (SM2)** — cards appear just before you forget. (🚧Frontend under cunstruction🚧)
+  ![Login GIF](assets/create.gif)
+- Test your understanding
+  ![Login GIF](assets/create.gif)
   
 ---
 
