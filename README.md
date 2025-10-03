@@ -1,6 +1,6 @@
 # Julia 🧠📚
 
-**Use spaced repetition to learn English words — and never forget them!**  
+**_Use spaced repetition to learn English words — and never forget them!_**  
 
 ## **What is Julia?**
 
