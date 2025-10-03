@@ -93,7 +93,7 @@ npm run dev
 - Review cards using **spaced repetition (SM2)** — cards appear just before you forget. (🚧Frontend under cunstruction🚧)
   ![Login GIF](assets/study.gif)
 - Test your understanding
-  ![Login GIF](assets/tasting.gif)
+  ![Login GIF](assets/testing.gif)
   
 ---
 
