@@ -2,14 +2,6 @@
 
 **Use spaced repetition to learn English words — and never forget them!**  
 
-**Status:** MVP backend is complete / Master branch under construction 🚧.
-- MVP branch: Functional but not ideal, contains working backend and simple frontend for testing.  
-- Master branch: Currently being refactored to adhere to **SOLID principles, OOP best practices**, and clean architecture.  
-
-> **Disclaimer:** The project is evolving. Stay tuned for updates!  
-
----
-
 ## **What is Julia?**
 
 Julia is a Django-based web app designed to help users **learn and memorize English words efficiently**, inspired by tools like Anki. Users can **create, update, review, and delete flashcards** organized into decks, making vocabulary learning interactive and personalized.  
@@ -40,6 +32,13 @@ The goal is to provide a **lightweight, intuitive spaced repetition system** usi
 | **Real-Time / Communication** | ![WebSockets](https://img.shields.io/badge/WebSockets-008000?style=flat) ![TCP](https://img.shields.io/badge/TCP-6A5ACD?style=flat) |
 | **Authentication & Security** | ![JWT](https://img.shields.io/badge/JWT-000000?style=flat) ![OAuth](https://img.shields.io/badge/OAuth-FF6F00?style=flat)
 | **Tools / DevOps** | ![Git](https://img.shields.io/badge/Git-F05032?style=flat&logo=git&logoColor=white) ![Linux](https://img.shields.io/badge/Linux-FCC624?style=flat&logo=linux&logoColor=black) |
+
+---
+**Status:** MVP backend is complete / Master branch under construction 🚧.
+- MVP branch: Functional but not ideal, contains working backend and simple frontend for testing.  
+- Master branch: Currently being refactored to adhere to **SOLID principles, OOP best practices**, and clean architecture.  
+
+> **Disclaimer:** The project is evolving. Stay tuned for updates!  
 
 ---
 
