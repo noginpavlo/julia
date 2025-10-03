@@ -91,9 +91,9 @@ npm run dev
 -- Automatically generate new word cards via **[dictionaryapi.dev](https://dictionaryapi.dev/)**.
   ![Login GIF](assets/create.gif)
 - Review cards using **spaced repetition (SM2)** — cards appear just before you forget. (🚧Frontend under cunstruction🚧)
-  ![Login GIF](assets/create.gif)
+  ![Login GIF](assets/study.gif)
 - Test your understanding
-  ![Login GIF](assets/create.gif)
+  ![Login GIF](assets/tasting.gif)
   
 ---
 
