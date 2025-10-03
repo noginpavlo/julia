@@ -97,16 +97,6 @@ npm run dev
   
 ---
 
-## **Screenshots**  
-
-*(Add your screenshots below)*  
-
-- **Card & Deck Browser:** Search, update, delete cards/decks  
-- **Learning Interface:** Review cards one by one  
-- **Progress / Test Interface:** Track learning progress  
-
----
-
 ## License
 
 This project is released under the [MIT License](https://opensource.org/license/MIT), allowing users to freely use, modify, and distribute Julia's code while retaining the original copyright notice. However, Julia's frontend is built using an [HTML5 UP](https://html5up.net/) template, which falls under the [Creative Commons Attribution 3.0 License](https://html5up.net/license)—proper credit must be given to HTML5 UP if frontend components are used or modified.
