@@ -2,7 +2,7 @@
 
 **Use spaced repetition to learn English words — and never forget them!**  
 
-🚧 **Status:** Master branch under construction / MVP is complete.
+**Status:** MVP backend is complete / Master branch under construction 🚧.
 - MVP branch: Functional but not ideal, contains working backend and simple frontend for testing.  
 - Master branch: Currently being refactored to adhere to **SOLID principles, OOP best practices**, and clean architecture.  
 
