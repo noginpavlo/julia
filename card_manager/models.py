@@ -38,7 +38,7 @@ class Card(models.Model):
         db_table = "cards_card"
 
     def __str__(self):
-        return f"{self.json_data}"
+        return f"{self.json_data["word"]}"
 
 
 class ShowCardDailyStat(models.Model):
