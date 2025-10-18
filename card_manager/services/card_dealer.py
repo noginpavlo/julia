@@ -1,5 +1,5 @@
 """
-THIS MODULE IS REDUNDATN
+THIS MODULE IS REDUNDANT
 """
 import random
 import os

@@ -147,7 +147,7 @@ class DictApiResponseValidator(ResponseValidator):
 
         try:
             data = self._response.json()
-        except Exception as e:
+        except Exception as e:  # general exception at the top will override all down below?
             raise ValueError(f"Invalid JSON in response: {e}") from e
 
         if not isinstance(data, list):
