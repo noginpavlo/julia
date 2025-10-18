@@ -4,12 +4,14 @@ from card_manager.models import Card, Deck
 
 
 class DeckSerializer(ModelSerializer):
+
     class Meta:
         model = Deck
         fields = ["id", "deck_name", "date_updated"]
 
 
 class CardSerializer(ModelSerializer):
+
     class Meta:
         model = Card
         fields = [
@@ -39,13 +41,15 @@ class CardCreateSerializer(Serializer):
 
 
 class ShowCardSerializer(ModelSerializer):
+
     class Meta:
         model = Card
         fields = ["id", "word", "json_data"]
 
 
 class CardUpdateSerializer(ModelSerializer):
-    word = CharField(write_only=True, required=False, allow_blank=True)  # cannot be blank. Required
+
+    word = CharField(write_only=True, required=True)
     phonetic = CharField(write_only=True, required=False, allow_blank=True)
     meaning1 = CharField(write_only=True, required=False, allow_blank=True)
     meaning2 = CharField(write_only=True, required=False, allow_blank=True)
@@ -54,6 +58,7 @@ class CardUpdateSerializer(ModelSerializer):
     changed = BooleanField(write_only=True, required=False)
 
     class Meta:
+
         model = Card
         fields = [
             "id",
