@@ -24,8 +24,8 @@ class Deck(models.Model):
 class Card(models.Model):
     deck = models.ForeignKey(Deck, on_delete=models.CASCADE, related_name="cards")
     json_data = models.JSONField()  # think if you really need to store json data as backup
-    word = models.CharField(max_length=45, db_index=True)
     # The longest word in English is 'pneumonoultramicroscopicsilicovolcanoconiosis' - 45 char.
+    word = models.CharField(max_length=45, db_index=True)
     quality = models.FloatField(default=1)
     ef = models.FloatField(default=1.3)
     repetitions = models.FloatField(default=0.0)
