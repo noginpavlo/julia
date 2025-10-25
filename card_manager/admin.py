@@ -81,4 +81,22 @@ class CardAdmin(ModelAdmin):
         return obj.deck.user
 
 
-admin.site.register(ShowCardDailyStat)  # this shows how many times user learned a card on the date
+@admin.register(ShowCardDailyStat)
+class ShowCardDailyStatAdmin(ModelAdmin):
+    """Representation for daily card learning statistics.
+
+    Displays per-user daily counts, with filtering by user and date,
+    and search by username.
+    """
+
+    list_display = (
+        "user",
+        "date",
+        "count",
+    )
+    list_filter = (
+        "user",
+        "date",
+    )
+    search_fields = ("user__username",)
+    date_hierarchy = "date"

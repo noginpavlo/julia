@@ -41,6 +41,8 @@ class Card(models.Model):
 
 
 class ShowCardDailyStat(models.Model):
+    # when you will work on these models, go back to the admin.py and define ModelAdmin for this field
+    # because now it is not clear what it does and fro what reason
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     date = models.DateField(auto_now_add=True)
     count = models.PositiveIntegerField(default=0)
