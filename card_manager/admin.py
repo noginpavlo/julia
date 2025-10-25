@@ -11,8 +11,8 @@ from .models import Card, Deck, ShowCardDailyStat
 class DeckAdmin(ModelAdmin):
     """Representation for the Deck model in django-admin.
 
-    Provides deck listing, search, and a link to view all cards
-    belonging to each deck.
+    Lists all decks, searches and filters by deck_name and user,
+    links all cards that the deck contains.
     """
 
     date_hierarchy = "date_created"
@@ -20,6 +20,10 @@ class DeckAdmin(ModelAdmin):
         "deck_name",
         "user",
         "view_cards_link",
+    )
+    list_filter = (
+        "deck_name",
+        "user",
     )
     search_fields = (
         "deck_name",
