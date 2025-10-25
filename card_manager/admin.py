@@ -31,10 +31,10 @@ class DeckAdmin(ModelAdmin):
         """Generate a clickable link to view all cards for this deck.
 
         Args:
-            obj (Deck): The deck instance being displayed in the admin list.
+            obj (Deck): The deck instance.
 
         Returns:
-            str: HTML anchor element linking to the Card changelist filtered by this deck.
+            str: HTML anchor tag linking to the list of Cards filtered by the Deck.
         """
         url = reverse("admin:card_manager_card_changelist") + f"?deck__id__exact={obj.id}"
         return format_html("<a class='button' href='{}'>View Cards</a>", url)
@@ -44,8 +44,8 @@ class DeckAdmin(ModelAdmin):
 class CardAdmin(ModelAdmin):
     """Representation for the Card model in django-admin.
 
-    Displays card fields, filters by deck and user, and provides
-    the user column derived from the related Deck model.
+    Displays card, deck and user fields. Filters by deck and user.
+    Provides search by word, deck and user.
     """
 
     date_hierarchy = "due_date"
@@ -66,13 +66,13 @@ class CardAdmin(ModelAdmin):
 
     @admin.display(description="user", ordering="deck__user")
     def get_user(self, obj: Card) -> AbstractBaseUser:
-        """Retrieve the user associated with this card via its deck.
+        """Retrieve the user who owns the Deck where the Card is.
 
         Args:
-            obj (Card): The card instance being displayed in the admin list.
+            obj (Card): The card instance from admin list.
 
         Returns:
-            AbstractBaseUser: The user owning the deck that contains this card.
+            AbstractBaseUser: The user owning the deck where the card is.
         """
         return obj.deck.user
 
