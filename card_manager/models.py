@@ -24,7 +24,6 @@ class Deck(models.Model):
 class Card(models.Model):
     deck = models.ForeignKey(Deck, on_delete=models.CASCADE, related_name="cards")
     json_data = models.JSONField()  # think if you really need to store json data as backup
-    # The longest word in English is 'pneumonoultramicroscopicsilicovolcanoconiosis' - 45 char.
     word = models.CharField(max_length=45, db_index=True)
     quality = models.FloatField(default=1)
     ef = models.FloatField(default=1.3)
@@ -53,4 +52,4 @@ class ShowCardDailyStat(models.Model):
         unique_together = ("user", "date")
 
     def __str__(self):
-        return f"{self.user.username} - {self.date}: {self.count} times"
+        return f"{self.user.username} - {self.date}: {self.count} times"  # this is show in admin. Change.
