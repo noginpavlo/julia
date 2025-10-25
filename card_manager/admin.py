@@ -9,7 +9,11 @@ from .models import Card, Deck, ShowCardDailyStat
 
 @admin.register(Deck)
 class DeckAdmin(ModelAdmin):
-    """Admin class that defines Deck model representation in admin."""
+    """Representation for the Deck model in django-admin.
+
+    Provides deck listing, search, and a link to view all cards
+    belonging to each deck.
+    """
 
     date_hierarchy = "date_created"
     list_display = (
@@ -23,14 +27,26 @@ class DeckAdmin(ModelAdmin):
     )
 
     @admin.display(description="cards")
-    def view_cards_link(self, obj):
+    def view_cards_link(self, obj: Deck) -> str:
+        """Generate a clickable link to view all cards for this deck.
+
+        Args:
+            obj (Deck): The deck instance being displayed in the admin list.
+
+        Returns:
+            str: HTML anchor element linking to the Card changelist filtered by this deck.
+        """
         url = reverse("admin:card_manager_card_changelist") + f"?deck__id__exact={obj.id}"
         return format_html("<a class='button' href='{}'>View Cards</a>", url)
 
 
 @admin.register(Card)
 class CardAdmin(ModelAdmin):
-    """Admin class that defines Card model representation in admin."""
+    """Representation for the Card model in django-admin.
+
+    Displays card fields, filters by deck and user, and provides
+    the user column derived from the related Deck model.
+    """
 
     date_hierarchy = "due_date"
     list_display = (
@@ -50,7 +66,14 @@ class CardAdmin(ModelAdmin):
 
     @admin.display(description="user", ordering="deck__user")
     def get_user(self, obj: Card) -> AbstractBaseUser:
-        """Gets user from Deck model (which is fk)."""
+        """Retrieve the user associated with this card via its deck.
+
+        Args:
+            obj (Card): The card instance being displayed in the admin list.
+
+        Returns:
+            AbstractBaseUser: The user owning the deck that contains this card.
+        """
         return obj.deck.user
 
 
