@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin
 from django.contrib.auth.models import AbstractBaseUser
+from django.urls import reverse
+from django.utils.html import format_html
 
 from .models import Card, Deck, ShowCardDailyStat
 
@@ -13,11 +15,17 @@ class DeckAdmin(ModelAdmin):
     list_display = (
         "deck_name",
         "user",
+        "view_cards_link",
     )
     search_fields = (
         "deck_name",
         "user__username",
     )
+
+    @admin.display(description="cards")
+    def view_cards_link(self, obj):
+        url = reverse("admin:card_manager_card_changelist") + f"?deck__id__exact={obj.id}"
+        return format_html("<a class='button' href='{}'>View Cards</a>", url)
 
 
 @admin.register(Card)
