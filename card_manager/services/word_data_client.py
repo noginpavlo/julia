@@ -17,7 +17,7 @@ from abc import ABC, abstractmethod
 from itertools import islice
 from typing import Callable, NotRequired, Required, TypedDict
 
-import pinject  # this liberary might be unneccessery
+import pinject  # this library might be unneccessery
 import requests
 from pinject import BindingSpec
 from requests import Response
@@ -32,6 +32,11 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "julia.settings")
 django.setup()
 
 
+# =================================================================================================
+# 🛠️ Fetcher section
+# Low-level module that fetches data from 3rd party api.
+# =================================================================================================
+
 class WordNotFoundError(Exception):
     """Exception raised when a word is not found in API used.
 
@@ -44,12 +49,6 @@ class WordNotFoundError(Exception):
         super().__init__(
             f"Data not available for word {word}. Are you sure you spelled '{word}' correctly?"
         )
-
-
-# =================================================================================================
-# 🛠️ Fetcher section
-# Low-level module that fetches data from 3rd party api.
-# =================================================================================================
 
 
 class BaseApiDataFetcher(ABC):
