@@ -10,7 +10,6 @@ Exceptions:
 - WordNotFoundError: Raised if the word is not found in the API.
 """
 
-import time
 import os
 import sys
 from abc import ABC, abstractmethod

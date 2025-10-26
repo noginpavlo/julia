@@ -4,8 +4,11 @@
 # =================================================================================================
 
 from abc import ABC, abstractmethod
+
 import requests
 from requests import Response
+
+DICTIONARYAPI_URL = "https://api.dictionaryapi.dev/api/v2/entries/en/"
 
 
 class WordNotFoundError(Exception):
@@ -45,7 +48,7 @@ class DictApiDataFetcher(BaseApiDataFetcher):
     def fetch_word_data(self, word: str, api_url: str) -> Response:
         word_url = f"{api_url}{word}"
 
-        response = requests.get(word_url, timeout=None)  # consider changing timeout + request retry
+        response = requests.get(word_url, timeout=None)  # make sure you retry in Celery
 
         if response.status_code == 404:
             raise WordNotFoundError(word)
