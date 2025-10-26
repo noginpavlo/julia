@@ -12,10 +12,6 @@ Classes:
         Abstract base class defining the interface for response validators.
     DictApiResponseValidator(ResponseValidator)
         Concrete implementation that validates responses from dictionaryapi.dev.
-
-Exceptions:
-    Raises ValueError, TypeError, or IndexError if the API response is malformed
-    or missing required data.
 """
 
 from abc import ABC, abstractmethod
@@ -64,8 +60,6 @@ class ResponseValidator(ABC):
             the expected structure.
 
     Raises:
-        InvalidJSONError:
-            Raised when the API response cannot be parsed as valid JSON.
         EmptyResponseError:
             Raised when the API response is an empty list or missing required entries.
         MissingFieldError:
