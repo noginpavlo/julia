@@ -1,24 +1,88 @@
-# =================================================================================================
-# 🛠️ Validation section
-# Low-level module that validates data retrieved from API provider.
-# =================================================================================================
+"""
+Validator module for external API responses.
+
+This module's classes validate the structure of data retrieved from:
+1. dictionaryapi.dev
+
+It ensures that responses contain the required fields and are formatted correctly
+before being processed by the parser.
+
+Classes:
+    ResponseValidator (ABC)
+        Abstract base class defining the interface for response validators.
+    DictApiResponseValidator(ResponseValidator)
+        Concrete implementation that validates responses from dictionaryapi.dev.
+
+Exceptions:
+    Raises ValueError, TypeError, or IndexError if the API response is malformed
+    or missing required data.
+"""
+
 from abc import ABC, abstractmethod
 
 from requests import Response
 
 
+# ==================================================================================================
+# 📌 Custom Exceptions
+# ==================================================================================================
+class ValidationError(Exception):
+    """Base exception for API response validation errors."""
+
+
+class EmptyResponseError(ValidationError):
+    """Raised when the response list is empty."""
+
+
+class MissingFieldError(ValidationError):
+    """Raised when a required field is missing in the response."""
+
+    def __init__(self, field_name: str):
+        super().__init__(f"Missing required field: '{field_name}'")
+
+
+class InvalidFieldTypeError(ValidationError):
+    """Raised when a field has an unexpected type."""
+
+    def __init__(self, field_name: str, expected_type: str, actual_type: str):
+        super().__init__(f"Field '{field_name}' must be of type {expected_type}, got {actual_type}")
+
+
+# ==================================================================================================
+# 🛠 Validator Classes
+# ==================================================================================================
 class ResponseValidator(ABC):
     """Abstract base class for validating API responses.
 
+    This class defines the interface for validators that check the structure
+    and content of API responses. Subclasses should implement `validate_response`
+    to enforce specific validation rules.
+
     Methods:
-        validate_response(): Returns True if the response is matches expected structure.
+        validate_response() -> bool:
+            Validates the API response. Returns True if the response matches
+            the expected structure.
+
+    Raises:
+        InvalidJSONError:
+            Raised when the API response cannot be parsed as valid JSON.
+        EmptyResponseError:
+            Raised when the API response is an empty list or missing required entries.
+        MissingFieldError:
+            Raised when a required field is missing in the response data.
+        InvalidFieldTypeError:
+            Raised when a field has a type different from the expected type.
+        ValidationError:
+            Base class for all validation-related exceptions. Can be raised
+            for other generic validation failures.
     """
 
     @abstractmethod
     def __init__(self, response: Response) -> None: ...
 
     @abstractmethod
-    def validate_response(self) -> bool: ...
+    def validate_response(self) -> bool:
+        """Abstract method for response validation."""
 
 
 class DictApiResponseValidator(ResponseValidator):
@@ -63,41 +127,29 @@ class DictApiResponseValidator(ResponseValidator):
             bool: True if the response matches expected structure.
         """
 
-        try:
-            data = self._response.json()
-        except Exception as e:  # general exception at the top will override all down below?
-            raise ValueError(f"Invalid JSON in response: {e}") from e
+        data = self._response.json()  # propagtes JSONDecodeError => Catch in in orchestrator
 
         if not isinstance(data, list):
-            raise TypeError(f"Response must be a list, got {type(data).__name__}")
-
+            raise InvalidFieldTypeError("response", "list", type(data).__name__)
         if len(data) == 0:
-            raise IndexError("Response list is empty - no dictionary entries found")
+            raise EmptyResponseError("Response list is empty - no entries found")
 
         entry = data[0]
 
         if not isinstance(entry, dict):
-            raise TypeError(f"Dictionary entry must be a dict, got {type(entry).__name__}")
+            raise InvalidFieldTypeError("entry", "dict", type(entry).__name__)
 
         required_fields = ["word", "meanings"]
-
         for field in required_fields:
             if field not in entry:
-                raise ValueError(f"Missing required field: '{field}' in dictionary entry")
+                raise MissingFieldError(field)
 
         word = entry["word"]
-
         if not isinstance(word, str) or not word.strip():
-            raise ValueError(
-                f"Field 'word' must be a non-empty string, got {type(word).__name__}: '{word}'"
-            )
+            raise InvalidFieldTypeError("word", "non-empty string", type(word).__name__)
 
         meanings = entry["meanings"]
-
-        if not isinstance(meanings, list):
-            raise ValueError(f"Field 'meanings' must be a list, got {type(meanings).__name__}")
-
-        if len(meanings) == 0:
-            raise ValueError("Field 'meanings' cannot be empty - at least one meaning required")
+        if not isinstance(meanings, list) or len(meanings) == 0:
+            raise InvalidFieldTypeError("meanings", "non-empty list", type(meanings).__name__)
 
         return True
