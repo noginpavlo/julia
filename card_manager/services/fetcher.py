@@ -25,7 +25,7 @@ class WordNotFoundError(Exception):
         )
 
 
-class BaseApiDataFetcher(ABC):
+class BaseApiDataFetcher(ABC):  # BaseFetcher/Fetcher/AbstractFetcher... this name is too similar to DictApiDataFetcher
     """Abstract base class for fetching word data from an API.
 
     Subclasses must implement `fetch_word_data` to return the API response
@@ -36,7 +36,7 @@ class BaseApiDataFetcher(ABC):
     def fetch_word_data(self, word: str, api_url: str) -> Response: ...
 
 
-class DictApiDataFetcher(BaseApiDataFetcher):
+class DictApiDataFetcher(BaseApiDataFetcher):   # this name is too similar to BaseApiDataFetcher
     """Fetches word data from dictionaryapi.dev.
 
     Methods:

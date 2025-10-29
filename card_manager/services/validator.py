@@ -47,7 +47,7 @@ class InvalidFieldTypeError(ValidationError):
 # ==================================================================================================
 # 🛠 Validator Classes
 # ==================================================================================================
-class ResponseValidator(ABC):
+class ResponseValidator(ABC):  # Validator/AbstractValidator => name is too similart to DictApiResponseValidator
     """Abstract base class for validating API responses.
 
     This class defines the interface for validators that check the structure
@@ -79,7 +79,7 @@ class ResponseValidator(ABC):
         """Abstract method for response validation."""
 
 
-class DictApiResponseValidator(ResponseValidator):
+class DictApiResponseValidator(ResponseValidator):  # => name is too similart to ResponseValidator
     """Validate response structure from dictionaryapi.dev.
 
     Expected response format:
@@ -121,14 +121,14 @@ class DictApiResponseValidator(ResponseValidator):
             bool: True if the response matches expected structure.
         """
 
-        data = self._response.json()  # propagtes JSONDecodeError => Catch in in orchestrator
+        json_data = self._response.json()  # propagtes JSONDecodeError => Catch in in orchestrator
 
-        if not isinstance(data, list):
-            raise InvalidFieldTypeError("response", "list", type(data).__name__)
-        if len(data) == 0:
+        if not isinstance(json_data, list):
+            raise InvalidFieldTypeError("response", "list", type(json_data).__name__)
+        if len(json_data) == 0:
             raise EmptyResponseError("Response list is empty - no entries found")
 
-        entry = data[0]
+        entry = json_data[0]
 
         if not isinstance(entry, dict):
             raise InvalidFieldTypeError("entry", "dict", type(entry).__name__)
@@ -139,11 +139,11 @@ class DictApiResponseValidator(ResponseValidator):
                 raise MissingFieldError(field)
 
         word = entry["word"]
-        if not isinstance(word, str) or not word.strip():
-            raise InvalidFieldTypeError("word", "non-empty string", type(word).__name__)
+        if not isinstance(word, str) or not word.strip():  # explain why .strip() here is important
+            raise InvalidFieldTypeError("word", "non-empty string", type(word).__name__) # this should be missing required field error
 
         meanings = entry["meanings"]
         if not isinstance(meanings, list) or len(meanings) == 0:
-            raise InvalidFieldTypeError("meanings", "non-empty list", type(meanings).__name__)
+            raise InvalidFieldTypeError("meanings", "non-empty list", type(meanings).__name__)  # this should be missing required field error
 
         return True

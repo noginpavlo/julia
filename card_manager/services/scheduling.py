@@ -74,6 +74,7 @@ class SM2Config:
             raise OutOfRangeError("min_ef", self.min_ef, 1.0, 2.0)
 
 
+# you sure you can avoid interface here?
 class SM2Scheduler:
     """SM2 spaced repetition scheduler.
 

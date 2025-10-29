@@ -15,7 +15,7 @@ from .validator import DictApiResponseValidator, ResponseValidator
 
 
 
-class ApiService(ABC):
+class ApiService(ABC):  # Service/AbstractService => this name is too similart to DictApiService
     """
     Abstract base class for a service that orchestrates low-level class methods
     to fetch, validate and parse word data from 3rf party API provider.
@@ -25,7 +25,7 @@ class ApiService(ABC):
     def get_word_data(self, word: str) -> ParsedWordData: ...
 
 
-class DictApiService(ApiService):
+class DictApiService(ApiService):  # => this name is too similart to ApiService
     """Service to fetch, validate, and parse word data from dictionaryapi.dev.
 
     Args:
