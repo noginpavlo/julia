@@ -15,7 +15,8 @@ Classes:
 """
 
 from abc import ABC, abstractmethod
-from typing import TypedDict, Optional, List, Tuple
+from typing import Any, List, Optional, Tuple, TypedDict
+
 from requests import Response
 
 # ==================================================================================================
@@ -31,7 +32,7 @@ REQUIRED_FIELDS = (
 # TypeDicts
 # ==================================================================================================
 class Definition(TypedDict):
-    """Definition field type strucute. Needed for Meaning."""
+    """Definition field type structure. Needed for Meaning."""
 
     definition: str
     example: Optional[str]
@@ -40,14 +41,14 @@ class Definition(TypedDict):
 
 
 class Meaning(TypedDict):
-    """Meaning field type strucute. Needed for Entry."""
+    """Meaning field type structure. Needed for Entry."""
 
     partOfSpeech: str
     definitions: List[Definition]
 
 
 class Phonetic(TypedDict):
-    """Meaning field type strucute. Needed for Entry."""
+    """Phonetic field type structure. Needed for Entry."""
 
     text: str
     audio: Optional[str]
@@ -106,16 +107,6 @@ class Validator(ABC):
             Validates the API response. Returns True if the response matches
             the expected structure. Otherwise raises custom exception.
 
-    Raises:
-        EmptyResponseError:
-            Raised when the API response is an empty list or missing required entries.
-        MissingFieldError:
-            Raised when a required field is missing in the response data.
-        InvalidFieldTypeError:
-            Raised when a field has a type different from the expected type.
-        ValidationError:
-            Base class for all validation-related exceptions. Can be raised
-            for other generic validation failures.
     """
 
     @abstractmethod
@@ -241,7 +232,20 @@ class DictApiValidator(Validator):
 
         return True
 
-    # ------------------- Predicate Private Methods -------------------
+    # ------------------- Helper Functions -------------------
+    @staticmethod
+    def _is_dict(obj: Any) -> bool:
+        return isinstance(obj, dict)
+
+    @staticmethod
+    def _is_non_empty_list(obj: Any) -> bool:
+        return isinstance(obj, list) and bool(obj)
+
+    @staticmethod
+    def _is_non_empty_str(obj: Any) -> bool:
+        return isinstance(obj, str) and bool(obj.strip())
+
+    # ------------------- Predicates -------------------
     def _has_ok_status_code(self) -> bool:
         return 200 <= self._response.status_code < 300
 
@@ -251,24 +255,23 @@ class DictApiValidator(Validator):
     def _is_not_empty(self) -> bool:
         return bool(self._json_data)
 
-    def _is_dict(self, entry: Entry) -> bool:
-        return isinstance(entry, dict)
+    def _is_dict_entry(self, entry: Entry) -> bool:
+        return self._is_dict(entry)
 
-    def _has_required_fields(self, entry: Entry, fields: Tuple[str, str]) -> bool:
+    def _has_required_fields(self, entry: Entry, fields: Tuple[str, ...]) -> bool:
         return all(field in entry for field in fields)
 
     def _has_word(self, entry: Entry) -> bool:
-        word = entry.get("word")
-        return isinstance(word, str) and bool(word.strip())  # .strip() checks for " "
+        return self._is_non_empty_str(entry.get("word"))
 
     def _has_meanings(self, entry: Entry) -> bool:
         meanings = entry.get("meanings")
-        return isinstance(meanings, list) and len(meanings) > 0
+        return self._is_non_empty_list(meanings)
 
     def _has_definitions(self, entry: Entry) -> bool:
         meanings = entry.get("meanings", [])
         for meaning in meanings:
-            if not isinstance(meaning, dict):
+            if not self._is_dict(meaning):
                 return False
             if "definitions" not in meaning:
                 return False
@@ -279,9 +282,9 @@ class DictApiValidator(Validator):
         for meaning in meanings:
             definitions = meaning.get("definitions", [])
             for definition in definitions:
-                if not isinstance(definition, dict):
+                if not self._is_dict(definition):
                     return False
-                if "definition" not in definition or not definition["definition"].strip():
+                if not self._is_non_empty_str(definition.get("definition")):
                     return False
 
         return True
