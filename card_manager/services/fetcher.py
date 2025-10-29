@@ -33,7 +33,7 @@ class Fetcher(ABC):
     """
 
     @abstractmethod
-    def fetch_word_data(self, word: str, api_url: str) -> Response: ...
+    def fetch_word(self, word: str, api_url: str) -> Response: ...
 
 
 class DictApiFetcher(Fetcher):
@@ -45,7 +45,7 @@ class DictApiFetcher(Fetcher):
             is not found.
     """
 
-    def fetch_word_data(self, word: str, api_url: str) -> Response:
+    def fetch_word(self, word: str, api_url: str) -> Response:
         word_url = f"{api_url}{word}"
 
         response = requests.get(word_url, timeout=None)  # make sure you retry in Celery

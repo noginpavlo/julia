@@ -55,7 +55,7 @@ class Validator(ABC):
     to enforce specific validation rules.
 
     Methods:
-        validate_response() -> bool:
+        is_valid() -> bool:
             Validates the API response. Returns True if the response matches
             the expected structure.
 

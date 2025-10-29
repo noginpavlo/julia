@@ -38,7 +38,7 @@ class Parser(ABC):
     def __init__(self, response: Response, max_definitions: int) -> None: ...
 
     @abstractmethod
-    def parse_word_data(self) -> ParsedWordData:
+    def parse_word(self) -> ParsedWordData:
         """Orchestrates parsing methosds to parse word datat from Response."""
 
 
@@ -100,7 +100,7 @@ class DictApiParser(Parser):
 
         return result
 
-    def parse_word_data(self) -> ParsedWordData:
+    def parse_word(self) -> ParsedWordData:
         """Utilizes _parse_audio and _parse_definitions to return ParsedWordData dict.
 
         Extracts the word, phonetic transcription, audio link, and

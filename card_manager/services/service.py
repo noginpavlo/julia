@@ -21,7 +21,7 @@ class Service(ABC):
     """
 
     @abstractmethod
-    def get_word_data(self, word: str) -> ParsedWordData: ...
+    def get_clean_word(self, word: str) -> ParsedWordData: ...
 
 
 class DictApiService(Service):
@@ -49,16 +49,19 @@ class DictApiService(Service):
         self._api_url = api_url
         self._max_definitions = max_definitions
 
-    def get_word_data(self, word: str) -> ParsedWordData:
-        """Fetch, validate, and parse data for a given word."""
+    def get_clean_word(self, word: str) -> ParsedWordData:
+        """
+        Fetch, validate, and parse data for a given word.
+        Returns clean word data ready for db recording.
+        """
 
-        response = self._fetcher.fetch_word_data(word, self._api_url)
+        response = self._fetcher.fetch_word(word, self._api_url)
 
         validator = self._validator_factory(response)
         validator.validate_response()
 
         parser = self._parser_factory(response, self._max_definitions)
-        return parser.parse_word_data()
+        return parser.parse_word()
 
 
 # do you really need to use DI libefary to satisfy DIP ones?
