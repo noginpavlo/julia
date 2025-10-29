@@ -9,12 +9,12 @@ import pinject  # this library might be unneccessery
 from pinject import BindingSpec
 from requests import Response
 
-from .fetcher import DICTIONARYAPI_URL, AbstractFetcher, DictApiFetcher
-from .parser import AbstractParser, DictApiParser, ParsedWordData
-from .validator import AbstractValidator, DictApiValidator
+from .fetcher import DICTIONARYAPI_URL, DictApiFetcher, Fetcher
+from .parser import DictApiParser, ParsedWordData, Parser
+from .validator import DictApiValidator, Validator
 
 
-class AbstractService(ABC):
+class Service(ABC):
     """
     Abstract base class for a service that orchestrates low-level class methods
     to fetch, validate and parse word data from 3rf party API provider.
@@ -24,7 +24,7 @@ class AbstractService(ABC):
     def get_word_data(self, word: str) -> ParsedWordData: ...
 
 
-class DictApiService(AbstractService):
+class DictApiService(Service):
     """Service to fetch, validate, and parse word data from dictionaryapi.dev.
 
     Args:
@@ -37,9 +37,9 @@ class DictApiService(AbstractService):
 
     def __init__(
         self,
-        fetcher: AbstractFetcher,
-        validator_factory: Callable[[Response], AbstractValidator],
-        parser_factory: Callable[[Response, int], AbstractParser],
+        fetcher: Fetcher,
+        validator_factory: Callable[[Response], Validator],
+        parser_factory: Callable[[Response, int], Parser],
         api_url: str = DICTIONARYAPI_URL,
         max_definitions: int = 2,
     ):
@@ -74,13 +74,13 @@ class DictApiBindings(BindingSpec):
         provide_parser_factory(): Returns a factory for ApiParser.
     """
 
-    def provide_fetcher(self) -> AbstractFetcher:
+    def provide_fetcher(self) -> Fetcher:
         return DictApiFetcher()
 
-    def provide_validator_factory(self) -> Callable[[Response], AbstractValidator]:
+    def provide_validator_factory(self) -> Callable[[Response], Validator]:
         return DictApiValidator
 
-    def provide_parser_factory(self) -> Callable[[Response, int], AbstractParser]:
+    def provide_parser_factory(self) -> Callable[[Response, int], Parser]:
         return DictApiParser
 
 

@@ -27,7 +27,7 @@ class ParsedWordData(TypedDict):
     definitions_by_pos: Required[dict[str, list[DefinitionExampleEntry]]]
 
 
-class AbstractParser(ABC):
+class Parser(ABC):
     """Abstract base class for parsing API responses into ParsedWordData format.
 
     Methods:
@@ -42,7 +42,7 @@ class AbstractParser(ABC):
         """Orchestrates parsing methosds to parse word datat from Response."""
 
 
-class DictApiParser(AbstractParser):
+class DictApiParser(Parser):
     """Parse dictionaryapi.dev responses into ParsedWordData format.
 
     Extracts word, phonetics , audio link, and definitions grouped by part of speech.

@@ -47,7 +47,7 @@ class InvalidFieldTypeError(ValidationError):
 # ==================================================================================================
 # 🛠 Validator Classes
 # ==================================================================================================
-class AbstractValidator(ABC):
+class Validator(ABC):
     """Abstract base class for validating API responses.
 
     This class defines the interface for validators that check the structure
@@ -79,7 +79,7 @@ class AbstractValidator(ABC):
         """Abstract method for response validation."""
 
 
-class DictApiValidator(AbstractValidator):
+class DictApiValidator(Validator):
     """Validate response structure from dictionaryapi.dev.
 
     Expected response format:
