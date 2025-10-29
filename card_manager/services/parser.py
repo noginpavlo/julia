@@ -22,9 +22,9 @@ class ParsedWordData(TypedDict):
     """Dictionary structure that the module must return in the end."""
 
     word: Required[str]
-    phonetic: NotRequired[str | None]
-    audio: NotRequired[str | None]
-    definitions_by_pos: Required[dict[str, list[DefinitionExampleEntry]]]
+    phonetic: NotRequired[str]
+    audio: NotRequired[str]
+    definition_by_part_of_speach: Required[dict[str, list[DefinitionExampleEntry]]]
 
 
 class Parser(ABC):
@@ -56,7 +56,7 @@ class DictApiParser(Parser):
         self._response = response
         self._max_definitions = max_definitions
 
-    def _parse_audio(self) -> str | None:
+    def _parse_audio(self) -> str:
         """Extracts phonetics and the first audio URL from Response."""
 
         entry = self._response[0]
@@ -67,7 +67,7 @@ class DictApiParser(Parser):
             if isinstance(audio, str) and audio:
                 return audio
 
-        return None
+        return ""
 
     def _parse_definitions(self) -> dict[str, list[DefinitionExampleEntry]]:
         """
@@ -80,7 +80,7 @@ class DictApiParser(Parser):
         result: dict[str, list[DefinitionExampleEntry]] = {}
 
         for meaning in meanings:
-            pos = meaning.get("partOfSpeech", "unknown_type")
+            part_of_speach = meaning.get("partOfSpeech", "unknown_type")
             def_list = meaning.get("definitions")
 
             def_entry_gen = (
@@ -96,7 +96,7 @@ class DictApiParser(Parser):
 
             entries_list = list(islice(def_entry_gen, self._max_definitions))
 
-            result[pos] = entries_list
+            result[part_of_speach] = entries_list
 
         return result
 
@@ -113,7 +113,7 @@ class DictApiParser(Parser):
             "word": entry.get("word"),
             "phonetic": entry.get("phonetic", ""),
             "audio": self._parse_audio(),
-            "definitions_by_pos": self._parse_definitions(),
+            "definition_by_part_of_speach": self._parse_definitions(),
         }
 
         return parsed_data

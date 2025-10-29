@@ -15,37 +15,84 @@ Classes:
 """
 
 from abc import ABC, abstractmethod
-
+from typing import TypedDict, Optional, List, Tuple
 from requests import Response
 
-
 # ==================================================================================================
-# 📌 Custom Exceptions
+# Constants
 # ==================================================================================================
-class ValidationError(Exception):
-    """Base exception for API response validation errors."""
-
-
-class EmptyResponseError(ValidationError):
-    """Raised when the response list is empty."""
-
-
-class MissingFieldError(ValidationError):
-    """Raised when a required field is missing in the response."""
-
-    def __init__(self, field_name: str):
-        super().__init__(f"Missing required field: '{field_name}'")
-
-
-class InvalidFieldTypeError(ValidationError):
-    """Raised when a field has an unexpected type."""
-
-    def __init__(self, field_name: str, expected_type: str, actual_type: str):
-        super().__init__(f"Field '{field_name}' must be of type {expected_type}, got {actual_type}")
+REQUIRED_FIELDS = (
+    "word",
+    "meanings",
+)
 
 
 # ==================================================================================================
-# 🛠 Validator Classes
+# TypeDicts
+# ==================================================================================================
+class Definition(TypedDict):
+    """Definition field type strucute. Needed for Meaning."""
+
+    definition: str
+    example: Optional[str]
+    synonyms: List[str]
+    antonyms: List[str]
+
+
+class Meaning(TypedDict):
+    """Meaning field type strucute. Needed for Entry."""
+
+    partOfSpeech: str
+    definitions: List[Definition]
+
+
+class Phonetic(TypedDict):
+    """Meaning field type strucute. Needed for Entry."""
+
+    text: str
+    audio: Optional[str]
+
+
+class Entry(TypedDict):
+    """
+    Entry field type structure.
+
+    Entry is the top-level response list returned by the dictionaryapi.dev.
+    (i.e., response[0] for the word).
+    """
+
+    word: str
+    phonetic: str
+    phonetics: List[Phonetic]
+    origin: str
+    meanings: List[Meaning]
+
+
+# ==================================================================================================
+# Exceptions
+# ==================================================================================================
+class ResponseValidationError(Exception):
+    """Raised when the API response is invalid or unusable, with contextual details."""
+
+    def __init__(self, message: str, details: dict | None = None) -> None:
+        """
+        Args:
+            message (str): Description of the validation failure.
+            details (dict, optional): Structured context about the failure.
+        """
+
+        super().__init__(message)
+        self.details = details or {}
+
+    def __str__(self):
+        base = super().__str__()
+        if self.details:
+            return f"{base} | Details: {self.details}"
+        return base
+
+
+# ==================================================================================================
+# Validator Classes
 # ==================================================================================================
 class Validator(ABC):
     """Abstract base class for validating API responses.
@@ -55,9 +102,9 @@ class Validator(ABC):
     to enforce specific validation rules.
 
     Methods:
-        is_valid() -> bool:
+        validate_response() -> True:
             Validates the API response. Returns True if the response matches
-            the expected structure.
+            the expected structure. Otherwise raises custom exception.
 
     Raises:
         EmptyResponseError:
@@ -113,41 +160,128 @@ class DictApiValidator(Validator):
 
     def __init__(self, response: Response) -> None:
         self._response = response
+        self._json_data = self._response.json() or {}
 
     def validate_response(self) -> bool:
-        """Check if the dictionary API response has the correct structure.
+        """
+        Orchestrates predicate private methods to validate the response structure.
+
+        Calls the following checks in order:
+            - _has_ok_status_code: verifies that the HTTP status code indicates success.
+            - _is_list: checks that the response JSON is a list.
+            - _is_not_empty: ensures the response list is not empty.
+            - _is_dict: checks that the first entry in the list is a dictionary.
+            - _has_required_fields: ensures required fields ("word", "meanings") are present.
+            - _has_word: validates that the "word" field is a non-empty string.
+            - _has_meanings: validates that the "meanings" field is a non-empty list.
+            - _has_definitions: ensures each meaning contains a "definitions" list.
+            - _has_at_least_one_definition: ensures each "definitions" list contains at least
+              one non-empty "definition".
+
+        Raises:
+            ResponseValidationError: If any validation step fails.
 
         Returns:
-            bool: True if the response matches expected structure.
+            bool: True if all checks pass.
         """
 
-        json_data = self._response.json()  # propagtes JSONDecodeError => Catch in in orchestrator
+        if not self._has_ok_status_code():
+            raise ResponseValidationError(
+                "Invalid HTTP status code.",
+                details={"status_code": self._response.status_code},
+            )
 
-        if not isinstance(json_data, list):
-            raise InvalidFieldTypeError("response", "list", type(json_data).__name__)
-        if len(json_data) == 0:
-            raise EmptyResponseError("Response list is empty - no entries found")
+        if not self._is_list():
+            raise ResponseValidationError(
+                "Response root must be a list.",
+                details={"actual_type": type(self._json_data).__name__},
+            )
 
-        entry = json_data[0]
+        if not self._is_not_empty():
+            raise ResponseValidationError("Response list is empty.")
 
-        if not isinstance(entry, dict):
-            raise InvalidFieldTypeError("entry", "dict", type(entry).__name__)
+        entry = self._json_data[0]
 
-        required_fields = ["word", "meanings"]
-        for field in required_fields:
-            if field not in entry:
-                raise MissingFieldError(field)
+        if not self._is_dict(entry):
+            raise ResponseValidationError(
+                "First entry must be a dictionary.",
+                details={"actual_type": type(entry).__name__},
+            )
 
-        word = entry["word"]
-        if not isinstance(word, str) or not word.strip():  # explain why .strip() here is important
-            raise InvalidFieldTypeError(
-                "word", "non-empty string", type(word).__name__
-            )  # this should be missing required field error
+        if not self._has_required_fields(entry, REQUIRED_FIELDS):
+            missing_fields = [field for field in REQUIRED_FIELDS if field not in entry]
+            raise ResponseValidationError(
+                "Missing required fields.",
+                details={"missing_fields": missing_fields},
+            )
 
-        meanings = entry["meanings"]
-        if not isinstance(meanings, list) or len(meanings) == 0:
-            raise InvalidFieldTypeError(
-                "meanings", "non-empty list", type(meanings).__name__
-            )  # this should be missing required field error
+        if not self._has_word(entry):
+            raise ResponseValidationError(
+                "Invalid or empty 'word' field.",
+                details={"word": entry.get("word")},
+            )
+
+        if not self._has_meanings(entry):
+            raise ResponseValidationError(
+                "Invalid or empty 'meanings' field.",
+                details={"meanings": entry.get("meanings")},
+            )
+
+        if not self._has_definitions(entry):
+            raise ResponseValidationError(
+                "Missing 'definitions' in meanings.",
+                details={"meanings": entry.get("meanings")},
+            )
+
+        if not self._has_at_least_one_definition(entry):
+            raise ResponseValidationError(
+                "Meaning must contain at least one valid definition.",
+                details={"meanings": entry.get("meanings")},
+            )
+
+        return True
+
+    # ------------------- Predicate Private Methods -------------------
+    def _has_ok_status_code(self) -> bool:
+        return 200 <= self._response.status_code < 300
+
+    def _is_list(self) -> bool:
+        return isinstance(self._json_data, list)
+
+    def _is_not_empty(self) -> bool:
+        return bool(self._json_data)
+
+    def _is_dict(self, entry: Entry) -> bool:
+        return isinstance(entry, dict)
+
+    def _has_required_fields(self, entry: Entry, fields: Tuple[str, str]) -> bool:
+        return all(field in entry for field in fields)
+
+    def _has_word(self, entry: Entry) -> bool:
+        word = entry.get("word")
+        return isinstance(word, str) and bool(word.strip())  # .strip() checks for " "
+
+    def _has_meanings(self, entry: Entry) -> bool:
+        meanings = entry.get("meanings")
+        return isinstance(meanings, list) and len(meanings) > 0
+
+    def _has_definitions(self, entry: Entry) -> bool:
+        meanings = entry.get("meanings", [])
+        for meaning in meanings:
+            if not isinstance(meaning, dict):
+                return False
+            if "definitions" not in meaning:
+                return False
+        return True
+
+    def _has_at_least_one_definition(self, entry: Entry) -> bool:
+        meanings = entry.get("meanings", [])
+        for meaning in meanings:
+            definitions = meaning.get("definitions", [])
+            for definition in definitions:
+                if not isinstance(definition, dict):
+                    return False
+                if "definition" not in definition or not definition["definition"].strip():
+                    return False
 
         return True

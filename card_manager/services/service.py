@@ -40,6 +40,8 @@ class DictApiService(Service):
         fetcher: Fetcher,
         validator_factory: Callable[[Response], Validator],
         parser_factory: Callable[[Response, int], Parser],
+        # you can really use config dataclass for the api_url and max_definitions for pylint
+        # but I would have to think about instantiating the config class
         api_url: str = DICTIONARYAPI_URL,
         max_definitions: int = 2,
     ):
