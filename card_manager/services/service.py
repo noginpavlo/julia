@@ -9,13 +9,12 @@ import pinject  # this library might be unneccessery
 from pinject import BindingSpec
 from requests import Response
 
-from .fetcher import BaseApiDataFetcher, DictApiDataFetcher, DICTIONARYAPI_URL
-from .parser import ApiParser, DictApiParser, ParsedWordData
-from .validator import DictApiResponseValidator, ResponseValidator
+from .fetcher import DICTIONARYAPI_URL, AbstractFetcher, DictApiFetcher
+from .parser import AbstractParser, DictApiParser, ParsedWordData
+from .validator import AbstractValidator, DictApiValidator
 
 
-
-class ApiService(ABC):  # Service/AbstractService => this name is too similart to DictApiService
+class AbstractService(ABC):
     """
     Abstract base class for a service that orchestrates low-level class methods
     to fetch, validate and parse word data from 3rf party API provider.
@@ -25,7 +24,7 @@ class ApiService(ABC):  # Service/AbstractService => this name is too similart t
     def get_word_data(self, word: str) -> ParsedWordData: ...
 
 
-class DictApiService(ApiService):  # => this name is too similart to ApiService
+class DictApiService(AbstractService):
     """Service to fetch, validate, and parse word data from dictionaryapi.dev.
 
     Args:
@@ -38,9 +37,9 @@ class DictApiService(ApiService):  # => this name is too similart to ApiService
 
     def __init__(
         self,
-        fetcher: BaseApiDataFetcher,
-        validator_factory: Callable[[Response], ResponseValidator],
-        parser_factory: Callable[[Response, int], ApiParser],
+        fetcher: AbstractFetcher,
+        validator_factory: Callable[[Response], AbstractValidator],
+        parser_factory: Callable[[Response, int], AbstractParser],
         api_url: str = DICTIONARYAPI_URL,
         max_definitions: int = 2,
     ):
@@ -75,13 +74,13 @@ class DictApiBindings(BindingSpec):
         provide_parser_factory(): Returns a factory for ApiParser.
     """
 
-    def provide_fetcher(self) -> BaseApiDataFetcher:
-        return DictApiDataFetcher()
+    def provide_fetcher(self) -> AbstractFetcher:
+        return DictApiFetcher()
 
-    def provide_validator_factory(self) -> Callable[[Response], ResponseValidator]:
-        return DictApiResponseValidator
+    def provide_validator_factory(self) -> Callable[[Response], AbstractValidator]:
+        return DictApiValidator
 
-    def provide_parser_factory(self) -> Callable[[Response, int], ApiParser]:
+    def provide_parser_factory(self) -> Callable[[Response, int], AbstractParser]:
         return DictApiParser
 
 

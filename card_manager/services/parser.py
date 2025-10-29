@@ -5,9 +5,11 @@
 #   - defines structure of the data returned to the caller
 # =================================================================================================
 from abc import ABC, abstractmethod
-from typing import TypedDict, Required, NotRequired
 from itertools import islice
+from typing import NotRequired, Required, TypedDict
+
 from requests import Response
+
 
 class DefinitionExampleEntry(TypedDict):
     """A single dictionary entry with a definition and optional example."""
@@ -25,7 +27,7 @@ class ParsedWordData(TypedDict):
     definitions_by_pos: Required[dict[str, list[DefinitionExampleEntry]]]
 
 
-class ApiParser(ABC):  # Parser/AbstractParser => this name is too similar to DictApiParser
+class AbstractParser(ABC):
     """Abstract base class for parsing API responses into ParsedWordData format.
 
     Methods:
@@ -40,7 +42,7 @@ class ApiParser(ABC):  # Parser/AbstractParser => this name is too similar to Di
         """Orchestrates parsing methosds to parse word datat from Response."""
 
 
-class DictApiParser(ApiParser):  # => this name is too similar to ApiParesr
+class DictApiParser(AbstractParser):
     """Parse dictionaryapi.dev responses into ParsedWordData format.
 
     Extracts word, phonetics , audio link, and definitions grouped by part of speech.
@@ -115,5 +117,3 @@ class DictApiParser(ApiParser):  # => this name is too similar to ApiParesr
         }
 
         return parsed_data
-
-

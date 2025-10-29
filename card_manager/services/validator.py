@@ -47,7 +47,7 @@ class InvalidFieldTypeError(ValidationError):
 # ==================================================================================================
 # 🛠 Validator Classes
 # ==================================================================================================
-class ResponseValidator(ABC):  # Validator/AbstractValidator => name is too similart to DictApiResponseValidator
+class AbstractValidator(ABC):
     """Abstract base class for validating API responses.
 
     This class defines the interface for validators that check the structure
@@ -79,7 +79,7 @@ class ResponseValidator(ABC):  # Validator/AbstractValidator => name is too simi
         """Abstract method for response validation."""
 
 
-class DictApiResponseValidator(ResponseValidator):  # => name is too similart to ResponseValidator
+class DictApiValidator(AbstractValidator):
     """Validate response structure from dictionaryapi.dev.
 
     Expected response format:
@@ -140,10 +140,14 @@ class DictApiResponseValidator(ResponseValidator):  # => name is too similart to
 
         word = entry["word"]
         if not isinstance(word, str) or not word.strip():  # explain why .strip() here is important
-            raise InvalidFieldTypeError("word", "non-empty string", type(word).__name__) # this should be missing required field error
+            raise InvalidFieldTypeError(
+                "word", "non-empty string", type(word).__name__
+            )  # this should be missing required field error
 
         meanings = entry["meanings"]
         if not isinstance(meanings, list) or len(meanings) == 0:
-            raise InvalidFieldTypeError("meanings", "non-empty list", type(meanings).__name__)  # this should be missing required field error
+            raise InvalidFieldTypeError(
+                "meanings", "non-empty list", type(meanings).__name__
+            )  # this should be missing required field error
 
         return True
