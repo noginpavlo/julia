@@ -60,7 +60,7 @@ class DictApiValidator(Validator):
     Expected dictionaryapi.dev response format:
         [
             {
-                "word": "string",  REQUIRED
+                "word": "string", required
                 "phonetic": "string",
                 "phonetics": [
                     {
@@ -74,7 +74,7 @@ class DictApiValidator(Validator):
                         "partOfSpeech": "string",  # can be noun, verb, etc.
                         "definitions": [
                             {
-                                "definition": "string",  REQUIRED AT LEAST ONE
+                                "definition": "string", must contain at least one definition
                                 "example": "string (optional)",
                                 "synonyms": ["string"],
                                 "antonyms": ["string"]
@@ -88,7 +88,7 @@ class DictApiValidator(Validator):
 
     def __init__(self, response: Response) -> None:
         self._response = response
-        self._json_data = self._response.json() or {}
+        self._json_data = self._response.json()
 
     def validate_response(self) -> bool:
         """
@@ -192,27 +192,20 @@ class DictApiValidator(Validator):
     def _has_definitions(self, entry: Entry) -> bool:
         meanings = entry.get("meanings", [])
         for meaning in meanings:
-            if not self._is_dict(meaning):
-                return False
             if "definitions" not in meaning:
                 return False
+
         return True
 
     def _has_at_least_one_definition(self, entry: Entry) -> bool:
-
         meanings = entry.get("meanings", [])
-
         for meaning in meanings:
             definitions = meaning.get("definitions", [])
             for definition in definitions:
-                if not self._is_dict(definition) and self._is_non_empty_str(
-                    definition.get("definition")
-                ):
+                if self._is_non_empty_str(definition.get("definition")):
                     return True
 
-            return False
-
-        return True
+        return False
 
     # ------------------- Helper Functions -------------------
     @staticmethod
