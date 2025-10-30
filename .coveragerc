@@ -17,4 +17,3 @@ exclude_lines =
     def __str__
 
 show_missing = True
-skip_covered = True

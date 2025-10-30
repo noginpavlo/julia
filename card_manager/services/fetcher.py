@@ -19,16 +19,24 @@ Usage example:
     >>> result = service.get_word("example")
 """
 
+from __future__ import annotations
 import logging
 from abc import ABC, abstractmethod
 from typing import Type
-
 import requests
 from requests import Response
 
 logger = logging.getLogger(__name__)
 
+# ==================================================================================================
+# Constants
+# ==================================================================================================
+DICTIONARYAPI_URL = "https://api.dictionaryapi.dev/api/v2/entries/en/"
 
+
+# ==================================================================================================
+# Fetcher Classes
+# ==================================================================================================
 class Fetcher(ABC):
     """Abstract base class for fetching word data from an API."""
 
@@ -130,7 +138,7 @@ class DictApiErrorMapper(ErrorMapper):
 class WordService:
     """Orchestrates fetching words and handling errors via fetcher + error handler."""
 
-    def __init__(self, fetcher: Fetcher, error_handler: ErrorHandler):
+    def __init__(self, fetcher: Fetcher, error_handler: ErrorMapper):
         self.fetcher = fetcher
         self.error_handler = error_handler
 
@@ -155,12 +163,6 @@ class WordService:
             WordNotFoundError,
         ) as e:
             return self.error_handler.map_exception(word, e)
-
-
-# ==================================================================================================
-# Constants
-# ==================================================================================================
-DICTIONARYAPI_URL = "https://api.dictionaryapi.dev/api/v2/entries/en/"
 
 
 # ==================================================================================================
