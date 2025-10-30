@@ -63,7 +63,7 @@ class DictApiParser(Parser):
 
         phonetics = entry.get("phonetics")
         if phonetics:
-            audio = phonetics.get("audio")
+            audio = phonetics.get("audio")  # you can return dafalut "" in .get method. Shorter.
             if isinstance(audio, str) and audio:
                 return audio
 
