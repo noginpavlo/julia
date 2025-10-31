@@ -20,16 +20,16 @@ from abc import ABC, abstractmethod
 from itertools import islice
 from typing import NotRequired, Required, TypedDict
 
-from requests import Response
 
 from card_manager.services.validator import Definition, Entry, Meaning
+from card_manager.services.fetcher import ProviderResponse
 
 
 class Parser(ABC):
     """Abstract base class for parsing API responses into ParsedWordData format."""
 
     @abstractmethod
-    def __init__(self, response: Response, max_definitions: int) -> None: ...
+    def __init__(self, response: ProviderResponse, max_definitions: int) -> None: ...
 
     @abstractmethod
     def parse_word_data(self) -> ParsedWordData:
@@ -44,15 +44,15 @@ class DictApiParser(Parser):
     Limits definitions per part of speech using `max_definitions` variable.
     """
 
-    def __init__(self, response: Response, max_definitions: int) -> None:
+    def __init__(self, response: ProviderResponse, max_definitions: int) -> None:
         self._response = response
         self._max_definitions = max_definitions
 
     def parse_word_data(self) -> ParsedWordData:
 
-        entry = self._response[0]
+        entry = self._response["data"]
         parsed_data: ParsedWordData = {
-            "word": entry.get("word"),
+            "word": entry.get("word", ""),
             "phonetic": entry.get("phonetic", ""),
             "audio": self._parse_audio(entry),
             "definition_by_part_of_speech": self._group_definitions_by_part_of_speech(entry),

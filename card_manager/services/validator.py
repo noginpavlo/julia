@@ -18,8 +18,8 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from typing import Any, List, Optional, Tuple, TypedDict
-from card_manager.services.fetcher import ProviderResponse
 
+from card_manager.services.fetcher import ProviderResponse
 
 REQUIRED_FIELDS = (
     "word",
