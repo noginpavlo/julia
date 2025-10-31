@@ -1,7 +1,3 @@
-# =================================================================================================
-# 🛠️ Services Section
-# High-level module that orchestrates mechanical classes.
-# =================================================================================================
 from abc import ABC, abstractmethod
 from typing import Callable
 

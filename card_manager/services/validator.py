@@ -21,18 +21,13 @@ from typing import Any, List, Optional, Tuple, TypedDict
 
 from requests import Response
 
-# ==================================================================================================
-# Constants
-# ==================================================================================================
+
 REQUIRED_FIELDS = (
     "word",
     "meanings",
 )
 
 
-# ==================================================================================================
-# Validator Classes
-# ==================================================================================================
 class Validator(ABC):
     """Abstract base class for validating API responses.
 
@@ -169,7 +164,6 @@ class DictApiValidator(Validator):
 
         return True
 
-    # ------------------- Predicates -------------------
     def _has_ok_status_code(self) -> bool:
         return 200 <= self._response.status_code < 300
 
@@ -207,7 +201,6 @@ class DictApiValidator(Validator):
 
         return False
 
-    # ------------------- Helper Functions -------------------
     @staticmethod
     def _is_dict(obj: Any) -> bool:
         return isinstance(obj, dict)
@@ -221,9 +214,6 @@ class DictApiValidator(Validator):
         return isinstance(obj, str) and bool(obj.strip())
 
 
-# ==================================================================================================
-# Exceptions
-# ==================================================================================================
 class ResponseValidationError(Exception):
     """Raised when the API response is invalid or unusable, with contextual details."""
 
@@ -244,9 +234,6 @@ class ResponseValidationError(Exception):
         return base
 
 
-# ==================================================================================================
-# TypeDicts
-# ==================================================================================================
 class Definition(TypedDict):
     """Definition field type structure. Needed for Meaning."""
 

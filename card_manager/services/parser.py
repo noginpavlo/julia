@@ -1,9 +1,3 @@
-# =================================================================================================
-# 🛠️ Parser section
-# Low-level module that parses validated data:
-#   - removes empty and excessive entries from Response.
-#   - defines structure of the data returned to the caller
-# =================================================================================================
 from abc import ABC, abstractmethod
 from itertools import islice
 from typing import NotRequired, Required, TypedDict

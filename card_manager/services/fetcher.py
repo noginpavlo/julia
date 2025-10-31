@@ -28,15 +28,9 @@ from requests import Response
 
 logger = logging.getLogger(__name__)
 
-# ==================================================================================================
-# Constants
-# ==================================================================================================
 DICTIONARYAPI_URL = "https://api.dictionaryapi.dev/api/v2/entries/en/"
 
 
-# ==================================================================================================
-# Fetcher Classes
-# ==================================================================================================
 class Fetcher(ABC):
     """Abstract base class for fetching word data from an API."""
 
@@ -165,9 +159,6 @@ class WordService:
             return self.error_handler.map_exception(word, e)
 
 
-# ==================================================================================================
-# Exceptions and Exceptions Factory
-# ==================================================================================================
 class ExternalAPIError(Exception):
     """Base exception for all fetcher-related API errors."""
 
