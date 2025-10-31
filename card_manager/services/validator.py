@@ -18,8 +18,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from typing import Any, List, Optional, Tuple, TypedDict
-
-from requests import Response
+from card_manager.services.fetcher import ProviderResponse
 
 
 REQUIRED_FIELDS = (
@@ -43,7 +42,7 @@ class Validator(ABC):
     """
 
     @abstractmethod
-    def __init__(self, response: Response) -> None: ...
+    def __init__(self, response: ProviderResponse) -> None: ...
 
     @abstractmethod
     def validate_response(self) -> bool: ...
@@ -81,9 +80,8 @@ class DictApiValidator(Validator):
         ]
     """
 
-    def __init__(self, response: Response) -> None:
+    def __init__(self, response: ProviderResponse) -> None:
         self._response = response
-        self._json_data = self._response.json()
 
     def validate_response(self) -> bool:
         """
@@ -111,19 +109,19 @@ class DictApiValidator(Validator):
         if not self._has_ok_status_code():
             raise ResponseValidationError(
                 "Invalid HTTP status code.",
-                details={"status_code": self._response.status_code},
+                details={"status_code": self._response["status_code"]},
             )
 
         if not self._is_list():
             raise ResponseValidationError(
                 "Response root must be a list.",
-                details={"actual_type": type(self._json_data).__name__},
+                details={"actual_type": type(self._response).__name__},
             )
 
         if not self._is_not_empty():
             raise ResponseValidationError("Response list is empty.")
 
-        entry = self._json_data[0]
+        entry = self._response["data"]
 
         if not self._is_dict(entry):
             raise ResponseValidationError(
@@ -165,13 +163,13 @@ class DictApiValidator(Validator):
         return True
 
     def _has_ok_status_code(self) -> bool:
-        return 200 <= self._response.status_code < 300
+        return 200 <= self._response["status_code"] < 300
 
     def _is_list(self) -> bool:
-        return isinstance(self._json_data, list)
+        return isinstance(self._response, list)
 
     def _is_not_empty(self) -> bool:
-        return bool(self._json_data)
+        return bool(self._response)
 
     def _has_required_fields(self, entry: Entry, fields: Tuple[str, ...]) -> bool:
         return all(field in entry for field in fields)
@@ -238,7 +236,7 @@ class Definition(TypedDict):
     """Definition field type structure. Needed for Meaning."""
 
     definition: str
-    example: Optional[str]
+    example: str
     synonyms: List[str]
     antonyms: List[str]
 

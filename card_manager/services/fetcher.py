@@ -20,11 +20,15 @@ Usage example:
 """
 
 from __future__ import annotations
+
 import logging
 from abc import ABC, abstractmethod
-from typing import Type
+from typing import Type, TypedDict
+
 import requests
-from requests import Response
+
+from card_manager.services.providers import Provider
+from card_manager.services.validator import Entry
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +39,10 @@ class Fetcher(ABC):
     """Abstract base class for fetching word data from an API."""
 
     @abstractmethod
-    def fetch_word(self, word: str) -> Response:
+    def __init__(self, provider: Provider, api_url: str) -> None: ...
+
+    @abstractmethod
+    def fetch_word(self, word: str) -> ProviderResponse:
         """Fetch a word from an API."""
 
 
@@ -43,14 +50,17 @@ class ErrorMapper(ABC):
     """Interface for mapping API responses and exceptions to domain errors."""
 
     @abstractmethod
-    def map_status(self, response: Response, word: str) -> Response | ExternalAPIError: ...
+    def map_status(
+        self, response: ProviderResponse, word: str
+    ) -> ProviderResponse | ExternalAPIError: ...
 
     @abstractmethod
     def map_exception(self, word: str, exception: Exception) -> ExternalAPIError: ...
 
 
 class DictApiFetcher(Fetcher):
-    """Fetcher for dictionaryapi.dev API.
+    """
+    Fetcher for dictionaryapi.dev API.
 
     Performs HTTP GET requests to retrieve word data from dictionaryapi.dev.
 
@@ -61,42 +71,47 @@ class DictApiFetcher(Fetcher):
         fetch_word(word): Fetches the specified word and returns the HTTP response.
     """
 
-    def __init__(self, api_url: str = DICTIONARYAPI_URL):
+    def __init__(self, provider: Provider, api_url: str = DICTIONARYAPI_URL):
         self._api_url = api_url
+        self._provider = provider
 
-    def fetch_word(self, word: str) -> Response:
-        """Fetch the word data from the API.
+    def fetch_word(self, word: str) -> ProviderResponse:
+        """
+        Fetch the word data from the API.
 
         Args:
             word (str): The word to fetch data from the dictionaryapi.def for.
         """
         endpoint = f"{self._api_url}{word}"
-        response = requests.get(endpoint, timeout=10)
+        response = self._provider.get_word_data(endpoint)
         return response
 
 
 class DictApiErrorMapper(ErrorMapper):
     """Handles API exceptions and status codes for dictionaryapi.dev"""
 
-    def map_status(self, response: Response, word: str) -> Response | ExternalAPIError:
-        """Maps an HTTP response's status code to a domain-specific error.
+    def map_status(
+        self, response: ProviderResponse, word: str
+    ) -> ProviderResponse | ExternalAPIError:
+        """
+        Maps an HTTP response's status code to a domain-specific error.
 
         Logs a warning if the status indicates an error.
 
         Args:
-            response (Response): The HTTP response to check.
+            response (ProviderResponse): The HTTP response to check.
             word (str): The word requested.
 
         Returns:
-            Response: The original response if status is OK.
+            ProviderResponse: The original response if status is OK.
             ExternalAPIError: Mapped domain error if status indicates a problem.
         """
-        status_error = StatusErrorFactory.create(response.status_code, word)
+        status_error = StatusErrorFactory.create(response["status_code"], word)
         if status_error:
 
             logger.warning(
                 "Status code %d indicates error for word '%s': %s",
-                response.status_code,
+                response["status_code"],
                 word,
                 status_error,
             )
@@ -136,14 +151,14 @@ class WordService:
         self.fetcher = fetcher
         self.error_handler = error_handler
 
-    def get_word(self, word: str) -> Response | ExternalAPIError:
+    def get_word(self, word: str) -> ProviderResponse | ExternalAPIError:
         """Fetch a word and return the response or a mapped domain error.
 
         Args:
             word (str): The word to fetch.
 
         Returns:
-            Response: The API response if successful.
+            ProviderResponse: The API response if successful.
             ExternalAPIError: Mapped error if fetching or status check fails.
         """
         try:
@@ -165,6 +180,7 @@ class ExternalAPIError(Exception):
 
 class WordNotFoundError(ExternalAPIError):
     """Raised when a word is not found in the API."""
+
 
 class BadRequestError(ExternalAPIError):
     """Raised when request is invalid (HTTP 400–403)."""
@@ -198,6 +214,13 @@ class StatusErrorFactory:
         """
         for code_range, exception_class in cls.STATUS_MAP:
             if status_code in code_range:
-               return exception_class(f"Error {status_code} for word '{word}'")
+                return exception_class(f"Error {status_code} for word '{word}'")
 
         return None
+
+
+class ProviderResponse(TypedDict):
+    """Standardized response from a provider."""
+
+    data: Entry
+    status_code: int
