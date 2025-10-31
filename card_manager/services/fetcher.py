@@ -175,11 +175,6 @@ class ExternalAPIError(Exception):
 class WordNotFoundError(ExternalAPIError):
     """Raised when a word is not found in the API."""
 
-    def __init__(self, word: str) -> None:
-        self.word = word
-        super().__init__(f"Word '{word}' not found in dictionary API.")
-
-
 class BadRequestError(ExternalAPIError):
     """Raised when request is invalid (HTTP 400–403)."""
 
@@ -212,10 +207,6 @@ class StatusErrorFactory:
         """
         for code_range, exception_class in cls.STATUS_MAP:
             if status_code in code_range:
-                if (
-                    exception_class is WordNotFoundError
-                ):  # WordNotFoundError requires word as an argument. Other exceptions don't.
-                    return exception_class(word)
-                return exception_class(f"Error {status_code} for word '{word}'")
+               return exception_class(f"Error {status_code} for word '{word}'")
 
         return None
