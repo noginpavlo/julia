@@ -105,7 +105,8 @@ def test_get_word_success(monkeypatch, service):
             return {"word": "example"}
 
     monkeypatch.setattr(
-        "card_manager.services.fetcher.DictApiFetcher.fetch_word", lambda self, word: MockResponse()
+        "card_manager.services.fetcher.DictApiFetcher.fetch_word",
+        lambda self, word: MockResponse(),
     )
 
     result = service.get_word("example")
@@ -120,7 +121,8 @@ def test_get_word_status_error(monkeypatch, service):
         status_code = 404
 
     monkeypatch.setattr(
-        "card_manager.services.fetcher.DictApiFetcher.fetch_word", lambda self, word: MockResponse()
+        "card_manager.services.fetcher.DictApiFetcher.fetch_word",
+        lambda self, word: MockResponse(),
     )
 
     result = service.get_word("missing")
