@@ -11,7 +11,7 @@ from card_manager.services.fetcher import (
     ProviderResponse,
     ServiceUnavailableError,
     WordNotFoundError,
-    WordService,
+    WordFetcherService,
 )
 
 # ---------------------------
@@ -46,12 +46,12 @@ def not_found_response():
 
 @pytest.fixture
 def service_factory(provider_mock):
-    """Helper to create WordService with given provider."""
+    """Helper to create WordFetcherService with given provider."""
 
     def _create():
         fetcher = DictApiFetcher(provider=provider_mock)
         mapper = DictApiErrorMapper()
-        return WordService(fetcher, mapper)
+        return WordFetcherService(fetcher, mapper)
 
     return _create
 
@@ -120,7 +120,7 @@ def test_map_exception_generic_error(word):
 
 
 # ---------------------------
-# WordService Tests
+# WordFetcherService Tests
 # ---------------------------
 
 
@@ -145,7 +145,7 @@ def test_get_word_exception_handling(word):
         def fetch_word(self, word):
             raise requests.ConnectionError("Network down")
 
-    service = WordService(FailingFetcher(), DictApiErrorMapper())
+    service = WordFetcherService(FailingFetcher(), DictApiErrorMapper())
     result = service.get_word(word)
 
     assert isinstance(result, ExternalAPIError)

@@ -57,6 +57,11 @@ class ErrorMapper(ABC):
     @abstractmethod
     def map_exception(self, word: str, exception: Exception) -> ExternalAPIError: ...
 
+class FetcherService(ABC):
+
+    @abstractmethod
+    def get_fetched_word(self, word: str) -> ProviderResponse | ExternalAPIError: ...
+
 
 class DictApiFetcher(Fetcher):
     """
@@ -144,14 +149,14 @@ class DictApiErrorMapper(ErrorMapper):
         return ExternalAPIError(f"Unexpected error when fetching '{word}': {exception}")
 
 
-class WordService:
+class WordFetcherService(FetcherService):
     """Orchestrates fetching words and handling errors via fetcher + error handler."""
 
     def __init__(self, fetcher: Fetcher, error_handler: ErrorMapper):
         self.fetcher = fetcher
         self.error_handler = error_handler
 
-    def get_word(self, word: str) -> ProviderResponse | ExternalAPIError:
+    def get_fetched_word(self, word: str) -> ProviderResponse | ExternalAPIError:
         """Fetch a word and return the response or a mapped domain error.
 
         Args:
