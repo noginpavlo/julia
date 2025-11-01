@@ -17,9 +17,9 @@ Classes:
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, List, Optional, Tuple, TypedDict
+from typing import Any, Tuple
 
-from card_manager.services.fetcher import ProviderResponse
+from card_manager.services.services_types import ProviderResponse, Entry
 
 REQUIRED_FIELDS = (
     "word",
@@ -230,41 +230,3 @@ class ResponseValidationError(Exception):
         if self.details:
             return f"{base} | Details: {self.details}"
         return base
-
-
-class Definition(TypedDict):
-    """Definition field type structure. Needed for Meaning."""
-
-    definition: str
-    example: str
-    synonyms: List[str]
-    antonyms: List[str]
-
-
-class Meaning(TypedDict):
-    """Meaning field type structure. Needed for Entry."""
-
-    partOfSpeech: str
-    definitions: List[Definition]
-
-
-class Phonetic(TypedDict):
-    """Phonetic field type structure. Needed for Entry."""
-
-    text: str
-    audio: Optional[str]
-
-
-class Entry(TypedDict):
-    """
-    Entry field type structure.
-
-    Entry is the top-level response list returned by the dictionaryapi.dev.
-    (i.e., response[0] for the word).
-    """
-
-    word: str
-    phonetic: str
-    phonetics: List[Phonetic]
-    origin: str
-    meanings: List[Meaning]

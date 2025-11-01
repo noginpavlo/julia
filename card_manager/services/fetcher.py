@@ -23,12 +23,12 @@ from __future__ import annotations
 
 import logging
 from abc import ABC, abstractmethod
-from typing import Type, TypedDict
 
 import requests
 
 from card_manager.services.providers import Provider
-from card_manager.services.validator import Entry
+from card_manager.services.services_types import ProviderResponse
+
 
 logger = logging.getLogger(__name__)
 
@@ -217,10 +217,3 @@ class StatusErrorFactory:
                 return exception_class(f"Error {status_code} for word '{word}'")
 
         return None
-
-
-class ProviderResponse(TypedDict):
-    """Standardized response from a provider."""
-
-    data: Entry
-    status_code: int

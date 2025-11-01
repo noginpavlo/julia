@@ -18,11 +18,15 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from itertools import islice
-from typing import NotRequired, Required, TypedDict
 
-
-from card_manager.services.validator import Definition, Entry, Meaning
-from card_manager.services.fetcher import ProviderResponse
+from card_manager.services.services_types import (
+    Definition,
+    DefinitionExampleEntry,
+    Entry,
+    Meaning,
+    ParsedWordData,
+    ProviderResponse,
+)
 
 
 class Parser(ABC):
@@ -108,19 +112,3 @@ class DictApiParser(Parser):
                 if audio:
                     return audio
         return ""
-
-
-class DefinitionExampleEntry(TypedDict):
-    """A single dictionary entry with a definition and optional example."""
-
-    definition: Required[str]
-    example: NotRequired[str | None]
-
-
-class ParsedWordData(TypedDict):
-    """Dictionary structure that the module must return in the end."""
-
-    word: Required[str]
-    phonetic: NotRequired[str]
-    audio: NotRequired[str]
-    definition_by_part_of_speech: Required[dict[str, list[DefinitionExampleEntry]]]

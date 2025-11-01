@@ -13,7 +13,7 @@ from abc import ABC, abstractmethod
 
 import requests
 
-from card_manager.services.fetcher import ProviderResponse
+from card_manager.services.services_types import ProviderResponse
 
 
 class Provider(ABC):

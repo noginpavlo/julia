@@ -5,8 +5,10 @@ import pinject  # this library might be unneccessery
 from pinject import BindingSpec
 from requests import Response
 
+from card_manager.services.services_types import ParsedWordData
+
 from .fetcher import DICTIONARYAPI_URL, DictApiFetcher, Fetcher
-from .parser import DictApiParser, ParsedWordData, Parser
+from .parser import DictApiParser, Parser
 from .validator import DictApiValidator, Validator
 
 

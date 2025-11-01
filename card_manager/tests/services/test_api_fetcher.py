@@ -1,144 +1,152 @@
+from unittest.mock import Mock
+
 import pytest
-from requests.exceptions import ConnectionError, RequestException, Timeout
-from requests.models import Response
+import requests
 
 from card_manager.services.fetcher import (
-    DICTIONARYAPI_URL,
     BadRequestError,
     DictApiErrorMapper,
     DictApiFetcher,
     ExternalAPIError,
+    ProviderResponse,
     ServiceUnavailableError,
-    StatusErrorFactory,
     WordNotFoundError,
     WordService,
 )
 
-
-@pytest.fixture
-def fetcher():
-    return DictApiFetcher()
-
-
-@pytest.fixture
-def error_mapper():
-    return DictApiErrorMapper()
+# ---------------------------
+# Fixtures
+# ---------------------------
 
 
 @pytest.fixture
-def service(fetcher, error_mapper):
-    return WordService(fetcher, error_mapper)
+def word():
+    return "example"
 
 
-def test_fetch_word_success(monkeypatch, fetcher):
-    """Test fetching a word returns a Response."""
-
-    class MockResponse:
-        status_code = 200
-
-        def json(self):
-            return {"word": "example"}
-
-    monkeypatch.setattr("requests.get", lambda *args, **kwargs: MockResponse())
-
-    response = fetcher.fetch_word("example")
-    assert response.status_code == 200
-    assert response.json()["word"] == "example"
+@pytest.fixture
+def provider_mock():
+    return Mock()
 
 
-# -------------------------
+@pytest.fixture
+def success_response(word):
+    return ProviderResponse(data={"word": word}, status_code=200)
+
+
+@pytest.fixture
+def bad_request_response():
+    return ProviderResponse(data={}, status_code=400)
+
+
+@pytest.fixture
+def not_found_response():
+    return ProviderResponse(data={}, status_code=404)
+
+
+@pytest.fixture
+def service_factory(provider_mock):
+    """Helper to create WordService with given provider."""
+
+    def _create():
+        fetcher = DictApiFetcher(provider=provider_mock)
+        mapper = DictApiErrorMapper()
+        return WordService(fetcher, mapper)
+
+    return _create
+
+
+# ---------------------------
+# DictApiFetcher Tests
+# ---------------------------
+
+
+def test_fetch_word_calls_provider(provider_mock, word, success_response):
+    """DictApiFetcher should call provider and return its response."""
+    provider_mock.get_word_data.return_value = success_response
+    fetcher = DictApiFetcher(provider=provider_mock)
+
+    response = fetcher.fetch_word(word)
+
+    provider_mock.get_word_data.assert_called_once_with(
+        f"https://api.dictionaryapi.dev/api/v2/entries/en/{word}"
+    )
+    assert response == success_response
+
+
+# ---------------------------
 # DictApiErrorMapper Tests
-# -------------------------
+# ---------------------------
+
+
 @pytest.mark.parametrize(
-    "status_code, expected_exception",
+    "status_code,expected_exception",
     [
+        (200, None),
         (400, BadRequestError),
+        (403, BadRequestError),
         (404, WordNotFoundError),
         (429, ServiceUnavailableError),
         (500, ServiceUnavailableError),
-        (204, ExternalAPIError),
     ],
 )
-def test_map_status(status_code, expected_exception, error_mapper):
-    """Test mapping of HTTP status codes to exceptions."""
+def test_map_status_various_codes(word, status_code, expected_exception):
+    mapper = DictApiErrorMapper()
+    response = ProviderResponse(data={}, status_code=status_code)
 
-    class MockResponse:
-        def __init__(self, status_code):
-            self.status_code = status_code
+    result = mapper.map_status(response, word)
 
-    response = MockResponse(status_code)
-    result = error_mapper.map_status(response, "example")
-
-    if isinstance(result, expected_exception):
-        if expected_exception is WordNotFoundError:
-            assert result.word == "example"
+    if expected_exception:
+        assert isinstance(result, expected_exception)
+        assert str(word) in str(result)
     else:
-        assert result == response  # 200 or other non-error
+        assert result == response
 
 
-def test_map_exception_requests(error_mapper):
-    """Test mapping of requests.RequestException."""
-    exc = RequestException("Network error")
-    result = error_mapper.map_exception("example", exc)
+def test_map_exception_requests_error(word):
+    mapper = DictApiErrorMapper()
+    exc = requests.ConnectionError("Network down")
+    result = mapper.map_exception(word, exc)
     assert isinstance(result, ExternalAPIError)
     assert "Network/request error" in str(result)
 
 
-def test_map_exception_unexpected(error_mapper):
-    """Test mapping of unexpected exceptions."""
-    exc = ValueError("Unexpected")
-    result = error_mapper.map_exception("example", exc)
+def test_map_exception_generic_error(word):
+    mapper = DictApiErrorMapper()
+    exc = ValueError("Oops")
+    result = mapper.map_exception(word, exc)
     assert isinstance(result, ExternalAPIError)
     assert "Unexpected error" in str(result)
 
 
-# -------------------------
+# ---------------------------
 # WordService Tests
-# -------------------------
-def test_get_word_success(monkeypatch, service):
-    """Test WordService returns response for successful fetch."""
-
-    class MockResponse:
-        status_code = 200
-
-        def json(self):
-            return {"word": "example"}
-
-    monkeypatch.setattr(
-        "card_manager.services.fetcher.DictApiFetcher.fetch_word",
-        lambda self, word: MockResponse(),
-    )
-
-    result = service.get_word("example")
-    assert isinstance(result, MockResponse)
-    assert result.json()["word"] == "example"
+# ---------------------------
 
 
-def test_get_word_status_error(monkeypatch, service):
-    """Test WordService returns mapped exception for HTTP error."""
+def test_get_word_success(service_factory, provider_mock, success_response, word):
+    provider_mock.get_word_data.return_value = success_response
+    service = service_factory()
 
-    class MockResponse:
-        status_code = 404
-
-    monkeypatch.setattr(
-        "card_manager.services.fetcher.DictApiFetcher.fetch_word",
-        lambda self, word: MockResponse(),
-    )
-
-    result = service.get_word("missing")
-    assert isinstance(result, WordNotFoundError)
-    assert result.word == "missing"
+    result = service.get_word(word)
+    assert result == success_response
 
 
-@pytest.mark.parametrize("exc_class", [ConnectionError, Timeout, RequestException])
-def test_get_word_request_exceptions(monkeypatch, service, exc_class):
-    """Test WordService handles network exceptions."""
+def test_get_word_status_error(service_factory, provider_mock, bad_request_response, word):
+    provider_mock.get_word_data.return_value = bad_request_response
+    service = service_factory()
 
-    def raise_exc(self, word):
-        raise exc_class("Network fail")
+    result = service.get_word(word)
+    assert isinstance(result, BadRequestError)
 
-    monkeypatch.setattr("card_manager.services.fetcher.DictApiFetcher.fetch_word", raise_exc)
 
-    result = service.get_word("example")
+def test_get_word_exception_handling(word):
+    class FailingFetcher:
+        def fetch_word(self, word):
+            raise requests.ConnectionError("Network down")
+
+    service = WordService(FailingFetcher(), DictApiErrorMapper())
+    result = service.get_word(word)
+
     assert isinstance(result, ExternalAPIError)
     assert "Network/request error" in str(result)
