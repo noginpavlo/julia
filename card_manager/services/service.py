@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from typing import Callable
 
 import pinject
@@ -16,6 +17,14 @@ from .fetcher import (
 from .parser import DictApiParser, Parser
 from .providers import RequestsProvider
 from .validator import DictApiValidator, Validator
+
+
+@dataclass
+class DictApiConfig:
+    """Configuration for DictApiWordService that has url and max definition parameters."""
+
+    api_url: str = DICTIONARYAPI_URL
+    max_definition: int = 2
 
 
 class WordDataService(ABC):
@@ -44,16 +53,13 @@ class DictApiWordService(WordDataService):
         fetcher: FetcherService,
         validator_factory: Callable[[Response], Validator],
         parser_factory: Callable[[Response, int], Parser],
-        # you can really use config dataclass for the api_url and max_definitions for pylint
-        # but I would have to think about instantiating the config class
-        api_url: str = DICTIONARYAPI_URL,
-        max_definitions: int = 2,
+        config: DictApiConfig = DictApiConfig(),
     ):
         self._fetcher = fetcher
         self._validator_factory = validator_factory
         self._parser_factory = parser_factory
-        self._api_url = api_url
-        self._max_definitions = max_definitions
+        self._api_url = config.api_url
+        self._max_definitions = config.max_definition
 
     def get_word_data(self, word: str) -> ParsedWordData:
         """
