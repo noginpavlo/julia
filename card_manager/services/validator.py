@@ -121,7 +121,7 @@ class DictApiValidator(Validator):
         if not self._is_not_empty():
             raise ResponseValidationError("Response list is empty.")
 
-        entry = self._response["data"]
+        entry = self._response["data"][0]
 
         if not self._is_dict(entry):
             raise ResponseValidationError(
@@ -166,10 +166,10 @@ class DictApiValidator(Validator):
         return 200 <= self._response["status_code"] < 300
 
     def _is_list(self) -> bool:
-        return isinstance(self._response, list)
+        return isinstance(self._response.get("data"), list)
 
     def _is_not_empty(self) -> bool:
-        return bool(self._response)
+        return bool(self._response.get("data", []))
 
     def _has_required_fields(self, entry: Entry, fields: Tuple[str, ...]) -> bool:
         return all(field in entry for field in fields)
