@@ -56,17 +56,17 @@ class DictApiParser(Parser):
 
         entry = self._response["data"]
         parsed_data: ParsedWordData = {
-            "word": entry.get("word", ""),
-            "phonetic": entry.get("phonetic", ""),
-            "audio": self._parse_audio(entry),
-            "definition_by_part_of_speech": self._group_definitions_by_part_of_speech(entry),
+            "word": entry[0].get("word", ""),
+            "phonetic": entry[0].get("phonetic", ""),
+            "audio": self._parse_audio(entry[0]),
+            "definition_by_part_of_speech": self._group_definitions_by_part_of_speech(entry[0]),
         }
 
         return parsed_data
 
     def _group_definitions_by_part_of_speech(
         self, entry: Entry
-    ) -> dict[str, list[DefinitionExampleEntry]]:
+    ) -> dict[str, list[DefinitionExampleEntry]]:  # there is a structure for it in service_types?
 
         result: dict[str, list[DefinitionExampleEntry]] = {}
         for meaning in self._extract_meanings(entry):
