@@ -61,7 +61,7 @@ class DictApiWordService(WordDataService):
         self._api_url = config.api_url
         self._max_definitions = config.max_definition
 
-    def get_word_data(self, word: str) -> ParsedWordData:
+    def get_clean_word(self, word: str) -> ParsedWordData:
         """
         Fetch, validate, and parse data for a given word.
         Returns clean word data ready for db recording.
